@@ -1,0 +1,33 @@
+{"caseId":"empty","language":"vi","mode":"north-no-english-fallback","options":{},"input":""}
+{"caseId":"whitespace-only","language":"vi","mode":"north-no-english-fallback","options":{},"input":" \t\n　 "}
+{"caseId":"basic-greeting","language":"vi","mode":"north-no-english-fallback","options":{},"input":"Xin chào Việt Nam."}
+{"caseId":"dialect-finals","language":"vi","mode":"north-no-english-fallback","options":{},"input":"anh sách học rộng hương hợp"}
+{"caseId":"six-tones","language":"vi","mode":"north-no-english-fallback","options":{},"input":"ma má mà mả mã mạ"}
+{"caseId":"glides-and-clusters","language":"vi","mode":"north-no-english-fallback","options":{},"input":"quy yêu rượu khuya nghiêng"}
+{"caseId":"substring-names","language":"vi","mode":"north-no-english-fallback","options":{},"input":"Y Blôk Êban"}
+{"caseId":"substring-disabled","language":"vi","mode":"north-no-english-fallback","options":{"substr_tokenize":false},"input":"Y Blôk Êban"}
+{"caseId":"custom-pronunciation","language":"vi","mode":"north-no-english-fallback","options":{},"input":"[XIN](/CUSTOM/) chào"}
+{"caseId":"empty-custom-pronunciation","language":"vi","mode":"north-no-english-fallback","options":{},"input":"[xin]() chào"}
+{"caseId":"abbreviations-on","language":"vi","mode":"north-no-english-fallback","options":{"clean_abbr":true},"input":"ko bit v.v"}
+{"caseId":"abbreviations-off","language":"vi","mode":"north-no-english-fallback","options":{"clean_abbr":false},"input":"ko bit v.v"}
+{"caseId":"acronyms-on","language":"vi","mode":"north-no-english-fallback","options":{"clean_acronym":true},"input":"BHXH TP.HCM AI"}
+{"caseId":"acronyms-off","language":"vi","mode":"north-no-english-fallback","options":{"clean_acronym":false},"input":"BHXH TP.HCM AI"}
+{"caseId":"numbers-and-phone","language":"vi","mode":"north-no-english-fallback","options":{},"input":"0 15 21 105 123456 +84908123456"}
+{"caseId":"currency-and-measurement","language":"vi","mode":"north-no-english-fallback","options":{},"input":"12kg 3,5km $20 50€"}
+{"caseId":"date-and-time","language":"vi","mode":"north-no-english-fallback","options":{},"input":"10/07/2026 08:30:05 tháng 4"}
+{"caseId":"punctuation-quotes","language":"vi","mode":"north-no-english-fallback","options":{},"input":"“Xin,” (chào)! Bạn khỏe?"}
+{"caseId":"period-abbreviations","language":"vi","mode":"north-no-english-fallback","options":{"clean_acronym":false},"input":"F.C., U.S.A."}
+{"caseId":"underscore-hyphen","language":"vi","mode":"north-no-english-fallback","options":{"substr_tokenize":true},"input":"xin_chào Blôk-Êban"}
+{"caseId":"preserve-hyphen","language":"vi","mode":"north-no-english-fallback","options":{"substr_tokenize":false},"input":"xin_chào Blôk-Êban"}
+{"caseId":"cao-tone-type","language":"vi","mode":"north-no-english-fallback","options":{"tone_type":1},"input":"má mạ bát bạc"}
+{"caseId":"pham-forced-with-cao","language":"vi","mode":"north-no-english-fallback","options":{"cao":true,"pham":false,"tone_type":0},"input":"má mạ bát bạc"}
+{"caseId":"cao-forced-with-pham","language":"vi","mode":"north-no-english-fallback","options":{"cao":false,"pham":true,"tone_type":1},"input":"má mạ bát bạc"}
+{"caseId":"glottal","language":"vi","mode":"north-no-english-fallback","options":{"glottal":true},"input":"an ăn yêu"}
+{"caseId":"palatals","language":"vi","mode":"north-no-english-fallback","options":{"palatals":true},"input":"ích nghịch"}
+{"caseId":"all-cleaning-disabled","language":"vi","mode":"north-no-english-fallback","options":{"clean_abbr":false,"clean_acronym":false},"input":"ko BHXH 123"}
+{"caseId":"decomposed-unicode","language":"vi","mode":"north-no-english-fallback","options":{},"input":"Việt Nam café"}
+{"caseId":"unicode15-ccc-deltas","language":"vi","mode":"north-no-english-fallback","options":{},"input":"à𐻽̕ à𐻾̕ à𐻿̕ à𑽁̕ à𑽂̕ a𞂏̀̕ à̕𞓬 à̕𞓭 à𞓮̕ a𞓯̀̕"}
+{"caseId":"full-width-forms","language":"vi","mode":"north-no-english-fallback","options":{},"input":"ＸＩＮ １２３"}
+{"caseId":"emoji","language":"vi","mode":"north-no-english-fallback","options":{},"input":"xin😀chào"}
+{"caseId":"variation-selector","language":"vi","mode":"north-no-english-fallback","options":{},"input":"Việt️ Nam"}
+{"caseId":"foreign-no-fallback","language":"vi","mode":"north-no-english-fallback","options":{},"input":"hello qzxxw"}

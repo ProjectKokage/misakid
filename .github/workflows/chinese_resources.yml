@@ -1,0 +1,114 @@
+name: Chinese pure-Dart resource adapter
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: chinese-resources-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux-pinned-resources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      JIEBA_ROOT: ${{ runner.temp }}/jieba-0.42.1
+      MODEL_WHEEL: ${{ runner.temp }}/en_core_web_sm-3.8.0-py3-none-any.whl
+      MODEL_EXTRACT: ${{ runner.temp }}/en_core_web_sm-3.8.0
+      PYPINYIN_ROOT: ${{ runner.temp }}/pypinyin-0.53.0
+      PYPINYIN_DICT_ROOT: ${{ runner.temp }}/pypinyin-dict-0.9.0
+      MISAKID_CHINESE_JIEBA_DICTIONARY: ${{ runner.temp }}/jieba-0.42.1/jieba/dict.txt
+      MISAKID_CHINESE_JIEBA_PROB_START: ${{ runner.temp }}/jieba-0.42.1/jieba/finalseg/prob_start.p
+      MISAKID_CHINESE_JIEBA_PROB_TRANSITION: ${{ runner.temp }}/jieba-0.42.1/jieba/finalseg/prob_trans.p
+      MISAKID_CHINESE_JIEBA_PROB_EMISSION: ${{ runner.temp }}/jieba-0.42.1/jieba/finalseg/prob_emit.p
+      MISAKID_CHINESE_JIEBA_POS_CHAR_STATE: ${{ runner.temp }}/jieba-0.42.1/jieba/posseg/char_state_tab.p
+      MISAKID_CHINESE_JIEBA_POS_PROB_START: ${{ runner.temp }}/jieba-0.42.1/jieba/posseg/prob_start.p
+      MISAKID_CHINESE_JIEBA_POS_PROB_TRANSITION: ${{ runner.temp }}/jieba-0.42.1/jieba/posseg/prob_trans.p
+      MISAKID_CHINESE_JIEBA_POS_PROB_EMISSION: ${{ runner.temp }}/jieba-0.42.1/jieba/posseg/prob_emit.p
+      MISAKID_CHINESE_PYPINYIN_DICT: ${{ runner.temp }}/pypinyin-0.53.0/pypinyin/pinyin_dict.json
+      MISAKID_CHINESE_PYPINYIN_PHRASES: ${{ runner.temp }}/pypinyin-0.53.0/pypinyin/phrases_dict.json
+      MISAKID_CHINESE_LARGE_PINYIN: ${{ runner.temp }}/pypinyin-dict-0.9.0/tools/phrase-pinyin-data/large_pinyin.txt
+      MISAKID_SPACY_EN_MODEL_DIR: ${{ runner.temp }}/en_core_web_sm-3.8.0/en_core_web_sm/en_core_web_sm-3.8.0
+      MISAKI_ORACLE_ZH_PYTHON: python3
+      PYTHONPATH: ${{ runner.temp }}/jieba-0.42.1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.11.5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.11'
+      - name: Fetch exact resource repositories
+        shell: bash
+        run: |
+          git init "$JIEBA_ROOT"
+          git -C "$JIEBA_ROOT" remote add origin https://github.com/fxsjy/jieba.git
+          git -C "$JIEBA_ROOT" fetch --depth 1 origin 1e20c89b66f56c9301b0feed211733ffaa1bd72a
+          git -C "$JIEBA_ROOT" checkout --detach FETCH_HEAD
+          test "$(git -C "$JIEBA_ROOT" rev-parse HEAD)" = 1e20c89b66f56c9301b0feed211733ffaa1bd72a
+
+          git init "$PYPINYIN_ROOT"
+          git -C "$PYPINYIN_ROOT" remote add origin https://github.com/mozillazg/python-pinyin.git
+          git -C "$PYPINYIN_ROOT" fetch --depth 1 origin e42dede51abbc40e225da9a8ec8e5bd0043eed21
+          git -C "$PYPINYIN_ROOT" checkout --detach FETCH_HEAD
+          test "$(git -C "$PYPINYIN_ROOT" rev-parse HEAD)" = e42dede51abbc40e225da9a8ec8e5bd0043eed21
+
+          git init "$PYPINYIN_DICT_ROOT"
+          git -C "$PYPINYIN_DICT_ROOT" remote add origin https://github.com/mozillazg/pypinyin-dict.git
+          git -C "$PYPINYIN_DICT_ROOT" fetch --depth 1 origin d8a12d70ea14a929f296f21f4c493b3ce5d0b14a
+          git -C "$PYPINYIN_DICT_ROOT" checkout --detach FETCH_HEAD
+          test "$(git -C "$PYPINYIN_DICT_ROOT" rev-parse HEAD)" = d8a12d70ea14a929f296f21f4c493b3ce5d0b14a
+          git -C "$PYPINYIN_DICT_ROOT" submodule update --init --depth 1 tools/phrase-pinyin-data
+          test "$(git -C "$PYPINYIN_DICT_ROOT/tools/phrase-pinyin-data" rev-parse HEAD)" = 3fa3308aeeadec0736d84f31b28ac3da6e98d0d9
+      - name: Fetch the exact official small English model
+        shell: bash
+        run: |
+          curl --fail --location --retry 3 \
+            --output "$MODEL_WHEEL" \
+            https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+          test "$(sha256sum "$MODEL_WHEEL" | cut -d ' ' -f 1)" = 1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85
+          mkdir -p "$MODEL_EXTRACT"
+          python -m zipfile -e "$MODEL_WHEEL" "$MODEL_EXTRACT"
+      - name: Verify exact resource identities
+        shell: bash
+        run: |
+          test "$(wc -c < "$MISAKID_CHINESE_JIEBA_DICTIONARY")" = 5071852
+          test "$(sha256sum "$MISAKID_CHINESE_JIEBA_DICTIONARY" | cut -d ' ' -f 1)" = 7197c3211ddd98962b036cdf40324d1ea2bfaa12bd028e68faa70111a88e12a8
+          test "$(sha256sum "$MISAKID_CHINESE_JIEBA_PROB_START" | cut -d ' ' -f 1)" = dfd45976dd4f8f2bc12535a680a178bf9e75eaa38bdfdcb844469e54468d6245
+          test "$(sha256sum "$MISAKID_CHINESE_JIEBA_PROB_TRANSITION" | cut -d ' ' -f 1)" = ea7f50162ffa01db4973c7a8120b3c0233fbc5819fc0d617513535f1f2c7fedc
+          test "$(sha256sum "$MISAKID_CHINESE_JIEBA_PROB_EMISSION" | cut -d ' ' -f 1)" = 1e1d1d835b0c77d234acaa6afa23a13ffce597a295be0d7a1ece6a0d440dcf08
+          test "$(wc -c < "$MISAKID_CHINESE_JIEBA_POS_CHAR_STATE")" = 2113902
+          test "$(sha256sum "$MISAKID_CHINESE_JIEBA_POS_CHAR_STATE" | cut -d ' ' -f 1)" = c0ef4bb3d698eed188225d430ac291000b30c3d6e253a538d26b7ac9687424b1
+          test "$(sha256sum "$MISAKID_CHINESE_JIEBA_POS_PROB_START" | cut -d ' ' -f 1)" = 0fb0fbc6b1840d35a5a8499cff0ae75e06af788e348f9b4b8b9630804cd6cf09
+          test "$(sha256sum "$MISAKID_CHINESE_JIEBA_POS_PROB_TRANSITION" | cut -d ' ' -f 1)" = 236726f5a4efc2f023652925ca1e94f1fe4bfcb9d60224e9db3de0135b21385b
+          test "$(sha256sum "$MISAKID_CHINESE_JIEBA_POS_PROB_EMISSION" | cut -d ' ' -f 1)" = 449b2304b6c73034187d3c8a6f26a7a20037f4ab45659844acd0ef2114171fa8
+          test "$(wc -c < "$MISAKID_CHINESE_PYPINYIN_DICT")" = 783823
+          test "$(sha256sum "$MISAKID_CHINESE_PYPINYIN_DICT" | cut -d ' ' -f 1)" = 19ac93a11b0cf2d1b42741c2956dcb8632944e87d2ebcd1ba7cc4d3a936b9fb5
+          test "$(wc -c < "$MISAKID_CHINESE_PYPINYIN_PHRASES")" = 2544982
+          test "$(sha256sum "$MISAKID_CHINESE_PYPINYIN_PHRASES" | cut -d ' ' -f 1)" = d71fe97165dfd3eb9d8dff86ce5f62787d530b6b9f38c898779fcaf16d2522d1
+          test "$(wc -c < "$MISAKID_CHINESE_LARGE_PINYIN")" = 9140316
+          test "$(sha256sum "$MISAKID_CHINESE_LARGE_PINYIN" | cut -d ' ' -f 1)" = f1f00a0682120f4052eb9ab03c632b040677dd9675bade5b8cb6a3bb7c0b8fd3
+          test "$(wc -c < "$MISAKID_SPACY_EN_MODEL_DIR/tokenizer")" = 77066
+          test "$(sha256sum "$MISAKID_SPACY_EN_MODEL_DIR/tokenizer" | cut -d ' ' -f 1)" = b014e8bba4958b120af2d0c1c63eabb7c00379f2bacaf10df7c5325efd2ea467
+          test "$(wc -c < "$MISAKID_SPACY_EN_MODEL_DIR/vocab/lookups.bin")" = 70040
+          test "$(sha256sum "$MISAKID_SPACY_EN_MODEL_DIR/vocab/lookups.bin" | cut -d ' ' -f 1)" = fce9c883c56165f29573cc938c2a1c9d417ac61bd8f56b671dd5f7996de70682
+          test "$(wc -c < "$MISAKID_SPACY_EN_MODEL_DIR/tok2vec/model")" = 6269370
+          test "$(sha256sum "$MISAKID_SPACY_EN_MODEL_DIR/tok2vec/model" | cut -d ' ' -f 1)" = e84fc06eb319c94d28e460fc334e292120b01f18baa5dc8b50c977459820a090
+          test "$(wc -c < "$MISAKID_SPACY_EN_MODEL_DIR/tagger/model")" = 19829
+          test "$(sha256sum "$MISAKID_SPACY_EN_MODEL_DIR/tagger/model" | cut -d ' ' -f 1)" = 1ec3d93f38cebe172f2b5c89d84be72856ce42c8f1a64f1699f1d98a771f36b7
+      - run: dart pub get
+      - name: Analyze and document the adapter
+        working-directory: packages/misakid_chinese
+        run: |
+          dart analyze --fatal-infos
+          dart doc --dry-run
+      - name: Run exact provider and end-to-end parity tests
+        working-directory: packages/misakid_chinese
+        run: dart test

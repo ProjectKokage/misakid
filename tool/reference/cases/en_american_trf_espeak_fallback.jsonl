@@ -1,0 +1,20 @@
+{"caseId":"empty","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":""}
+{"caseId":"whitespace-only","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":" \t\n  "}
+{"caseId":"known-only","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"Hello world."}
+{"caseId":"single-oov","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"blorptastic"}
+{"caseId":"multiple-oov","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"blorptastic snorflegloop"}
+{"caseId":"mixed-known-oov","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"Hello blorptastic world."}
+{"caseId":"oov-punctuation","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"Blorptastic, snorflegloop!"}
+{"caseId":"oov-capitalization","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"blorptastic BLORPTASTIC Blorptastic"}
+{"caseId":"oov-hyphenated","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"blorp-snorf"}
+{"caseId":"oov-possessive","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"blorptastic's snorflegloops"}
+{"caseId":"composed-accent-oov","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"zéphyrblorp"}
+{"caseId":"decomposed-accent-oov","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"zéphyrblorp"}
+{"caseId":"full-width-oov","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"ｂｌｏｒｐｔａｓｔｉｃ"}
+{"caseId":"supplementary-and-emoji","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"blorptastic 😀 𐐀"}
+{"caseId":"legacy-flap-glottal-candidate","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"buttonblorp butterblorp"}
+{"caseId":"v2-flap-glottal-candidate","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":"2.0"},"input":"buttonblorp butterblorp"}
+{"caseId":"legacy-diphthong-candidates","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":null},"input":"boinkblorp cowblorp dayblorp"}
+{"caseId":"v2-diphthong-candidates","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"version":"2.0"},"input":"boinkblorp cowblorp dayblorp"}
+{"caseId":"preprocess-disabled","language":"en","mode":"american-espeak-fallback","options":{"preprocess":false,"trf":true,"version":null},"input":"[blorptastic](/custom/)"}
+{"caseId":"custom-unknown-marker","language":"en","mode":"american-espeak-fallback","options":{"trf":true,"unk":"◇","version":null},"input":"𐐀"}

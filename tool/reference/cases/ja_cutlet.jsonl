@@ -1,0 +1,27 @@
+{"caseId":"empty","language":"ja","mode":"cutlet","options":{},"input":""}
+{"caseId":"whitespace-only","language":"ja","mode":"cutlet","options":{},"input":" \t\n　"}
+{"caseId":"basic-hiragana","language":"ja","mode":"cutlet","options":{},"input":"こんにちは"}
+{"caseId":"basic-kanji","language":"ja","mode":"cutlet","options":{},"input":"日本語です"}
+{"caseId":"katakana","language":"ja","mode":"cutlet","options":{},"input":"カタカナとローマ字"}
+{"caseId":"small-kana-digraphs","language":"ja","mode":"cutlet","options":{},"input":"きゃ しゅ ちょ ふゅ"}
+{"caseId":"sokuon","language":"ja","mode":"cutlet","options":{},"input":"切って 買った ずっと"}
+{"caseId":"moraic-nasal-assimilation","language":"ja","mode":"cutlet","options":{},"input":"さんぽ げんき しんにゅう ほんだ ほん"}
+{"caseId":"long-vowels","language":"ja","mode":"cutlet","options":{},"input":"スーパー コーヒー ケーキ"}
+{"caseId":"quotes-and-punctuation","language":"ja","mode":"cutlet","options":{},"input":"「こんにちは！」（日本語ですか？）"}
+{"caseId":"spacing-symbols","language":"ja","mode":"cutlet","options":{},"input":"A・B；C〜D—E"}
+{"caseId":"integer-number","language":"ja","mode":"cutlet","options":{},"input":"今日は123匹です"}
+{"caseId":"wave-dash-range","language":"ja","mode":"cutlet","options":{},"input":"1～3匹"}
+{"caseId":"decimal-number","language":"ja","mode":"cutlet","options":{},"input":"3.14です"}
+{"caseId":"leading-zero-number","language":"ja","mode":"cutlet","options":{},"input":"007"}
+{"caseId":"mixed-ascii","language":"ja","mode":"cutlet","options":{},"input":"MisakiとKokoro G2P"}
+{"caseId":"width-and-phonetic-extension","language":"ja","mode":"cutlet","options":{},"input":"ＡＢＣ１２３ ｶﾀｶﾅ ㇰ"}
+{"caseId":"combining-kana-marks","language":"ja","mode":"cutlet","options":{},"input":"が ぱ ゙ ゚"}
+{"caseId":"iteration-marks","language":"ja","mode":"cutlet","options":{},"input":"くゝ くゞ 時々"}
+{"caseId":"unknown-and-emoji","language":"ja","mode":"cutlet","options":{},"input":"𠮷野家 😀 𐐀"}
+{"caseId":"variation-selector","language":"ja","mode":"cutlet","options":{},"input":"葛󠄀飾"}
+{"caseId":"whitespace-preservation","language":"ja","mode":"cutlet","options":{},"input":"  日本\t語\nです  "}
+{"caseId":"middle-dot","language":"ja","mode":"cutlet","options":{},"input":"東京・大阪・京都"}
+{"caseId":"brackets-and-guillemets","language":"ja","mode":"cutlet","options":{},"input":"【日本】《語》«かな»"}
+{"caseId":"three-node-longest-match","language":"ja","mode":"cutlet","options":{},"input":"あうぎ"}
+{"caseId":"empty-romanization-substring-spacing","language":"ja","mode":"cutlet","options":{},"input":"あ」？い"}
+{"caseId":"long-number-diagnostic","language":"ja","mode":"cutlet","options":{},"input":"1234567890"}

@@ -1,0 +1,11 @@
+.dart_tool/
+build/
+doc/
+dart_test.yaml
+native/build/
+native/staged_source/
+test/
+tool/native_silence_smoke.cpp
+*.dylib
+*.so
+*.dll

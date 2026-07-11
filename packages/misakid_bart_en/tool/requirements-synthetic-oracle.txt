@@ -1,0 +1,4 @@
+# Exact fixture-oracle runtime used by this repository. This is tooling only,
+# never a Dart package runtime dependency. The included file pins the complete
+# Python 3.12 closure used by `/private/tmp/misaki-oracle-en-espeak`.
+-r ../../../tool/reference/requirements-en-espeak-py312.txt

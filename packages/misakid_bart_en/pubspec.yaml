@@ -1,0 +1,21 @@
+name: misakid_bart_en
+description: Experimental pure-Dart one-layer BART fallback adapter for misakid English.
+version: 0.1.0-dev.1
+topics:
+  - bart
+  - english
+  - g2p
+  - phonemes
+
+environment:
+  sdk: ^3.11.5
+
+resolution: workspace
+
+dependencies:
+  crypto: ^3.0.7
+  misakid: ^0.1.0-dev.1
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

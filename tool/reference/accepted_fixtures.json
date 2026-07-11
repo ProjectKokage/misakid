@@ -1,0 +1,125 @@
+{
+  "fixtures": [
+    {
+      "caseCount": 32,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/en_american_no_fallback.jsonl",
+      "input": "tool/reference/cases/en_american_no_fallback.jsonl",
+      "language": "en",
+      "pythonKey": "en"
+    },
+    {
+      "caseCount": 38,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/en_american_trf_no_fallback.jsonl",
+      "input": "tool/reference/cases/en_american_trf_no_fallback.jsonl",
+      "language": "en",
+      "pythonKey": "en-trf"
+    },
+    {
+      "caseCount": 20,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/en_american_espeak_fallback.jsonl",
+      "input": "tool/reference/cases/en_american_espeak_fallback.jsonl",
+      "language": "en",
+      "pythonKey": "en"
+    },
+    {
+      "caseCount": 20,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/en_american_trf_espeak_fallback.jsonl",
+      "input": "tool/reference/cases/en_american_trf_espeak_fallback.jsonl",
+      "language": "en",
+      "pythonKey": "en-trf-espeak"
+    },
+    {
+      "caseCount": 21,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/en_american_no_fallback_adversarial.jsonl",
+      "input": "tool/reference/cases/en_american_no_fallback_adversarial.jsonl",
+      "language": "en",
+      "pythonKey": "en"
+    },
+    {
+      "caseCount": 32,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/en_british_no_fallback.jsonl",
+      "input": "tool/reference/cases/en_british_no_fallback.jsonl",
+      "language": "en",
+      "pythonKey": "en"
+    },
+    {
+      "caseCount": 38,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/en_british_trf_no_fallback.jsonl",
+      "input": "tool/reference/cases/en_british_trf_no_fallback.jsonl",
+      "language": "en",
+      "pythonKey": "en-trf"
+    },
+    {
+      "caseCount": 20,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/en_british_espeak_fallback.jsonl",
+      "input": "tool/reference/cases/en_british_espeak_fallback.jsonl",
+      "language": "en",
+      "pythonKey": "en"
+    },
+    {
+      "caseCount": 20,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/en_british_trf_espeak_fallback.jsonl",
+      "input": "tool/reference/cases/en_british_trf_espeak_fallback.jsonl",
+      "language": "en",
+      "pythonKey": "en-trf-espeak"
+    },
+    {
+      "caseCount": 21,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/en_british_no_fallback_adversarial.jsonl",
+      "input": "tool/reference/cases/en_british_no_fallback_adversarial.jsonl",
+      "language": "en",
+      "pythonKey": "en"
+    },
+    {
+      "caseCount": 27,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/ja_cutlet.jsonl",
+      "input": "tool/reference/cases/ja_cutlet.jsonl",
+      "language": "ja",
+      "pythonKey": "ja-cutlet"
+    },
+    {
+      "caseCount": 20,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/ja_num2kana.jsonl",
+      "input": "tool/reference/cases/ja_num2kana.jsonl",
+      "language": "ja",
+      "pythonKey": "ja"
+    },
+    {
+      "caseCount": 24,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/ja_pyopenjtalk.jsonl",
+      "input": "tool/reference/cases/ja_pyopenjtalk.jsonl",
+      "language": "ja",
+      "pythonKey": "ja"
+    },
+    {
+      "caseCount": 34,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/ko_g2pkc_default.jsonl",
+      "input": "tool/reference/cases/ko_g2pkc_default.jsonl",
+      "language": "ko",
+      "pythonKey": "ko"
+    },
+    {
+      "caseCount": 26,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/zh_frontend_1_1.jsonl",
+      "input": "tool/reference/cases/zh_frontend_1_1.jsonl",
+      "language": "zh",
+      "pythonKey": "zh"
+    },
+    {
+      "caseCount": 14,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/zh_frontend_1_1_en_small_no_fallback.jsonl",
+      "input": "tool/reference/cases/zh_frontend_1_1_en_small_no_fallback.jsonl",
+      "language": "zh",
+      "pythonKey": "zh-en"
+    },
+    {
+      "caseCount": 24,
+      "expected": "test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/zh_legacy.jsonl",
+      "input": "tool/reference/cases/zh_legacy.jsonl",
+      "language": "zh",
+      "pythonKey": "zh"
+    }
+  ],
+  "schemaVersion": 1,
+  "upstreamCommit": "fba1236595f2d2bf21d414ba6e57d25256afada3"
+}

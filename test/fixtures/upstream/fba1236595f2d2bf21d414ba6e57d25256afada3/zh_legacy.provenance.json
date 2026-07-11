@@ -1,0 +1,134 @@
+{
+  "backendInput": {
+    "kind": "misaki.zh.legacy.external-stages",
+    "normalizationCallCount": 22,
+    "pinyinCallCount": 82,
+    "pinyinSyllableCount": 152,
+    "rawSegmentedWordCount": 82,
+    "runCount": 41,
+    "schemaVersion": 1
+  },
+  "backendVersions": {
+    "addict": "2.4.0",
+    "cn2an": "0.5.23",
+    "jieba": "0.42.1",
+    "jieba-default-dict": "sha256:7197c3211ddd98962b036cdf40324d1ea2bfaa12bd028e68faa70111a88e12a8",
+    "ordered-set": "4.1.0",
+    "proces": "0.1.7",
+    "pypinyin": "0.53.0",
+    "python": "3.12.11",
+    "regex": "2024.11.6"
+  },
+  "caseCount": 24,
+  "caseCorpus": "tool/reference/cases/zh_legacy.jsonl",
+  "caseCorpusSha256": "dc2b7c89b4f1fb3744de73f05b4aa4040565dd705cd15f3a9a78666f4ae061a0",
+  "dependencyLock": "tool/reference/requirements-zh-py312.txt",
+  "dependencyLockSha256": "75ba60d6332ea92a78d4665df152a7d1fea8655c6bdfdc55280666b1bebe67ce",
+  "distributions": [
+    {
+      "metadataSha256": "66320967996f85fa211f1216a7bf5f921d13b41b0de5db97f389daddbc54eaf4",
+      "name": "addict",
+      "version": "2.4.0"
+    },
+    {
+      "metadataSha256": "447fd0d487993b553a962704854006615de7fa4c5398573bc9df67ad2fd05c88",
+      "name": "cn2an",
+      "version": "0.5.23"
+    },
+    {
+      "metadataSha256": "5661d2cfc5b23f8c1b5ed4cecfa1ec866ddf563273c61e3911a362a3e6f3eea1",
+      "name": "jieba",
+      "version": "0.42.1"
+    },
+    {
+      "metadataSha256": "16a54dfd551325308343ebed9e65eb6e06a90e3722113fb9e2048d278eecae8f",
+      "name": "ordered-set",
+      "version": "4.1.0"
+    },
+    {
+      "metadataSha256": "25d1dd4fe0d19383fa7ad05b465e621947c30cb177976d043be4043d75747aed",
+      "name": "proces",
+      "version": "0.1.7"
+    },
+    {
+      "metadataSha256": "674bf6633309793139c5b5c504787741ee17c1d75412b4f86466808a55527451",
+      "name": "pypinyin",
+      "version": "0.53.0"
+    },
+    {
+      "metadataSha256": "834d4e6889c9292660684fac77a4b805ac1cfb14b67e0d321d16eb535397ce98",
+      "name": "regex",
+      "version": "2024.11.6"
+    }
+  ],
+  "environment": {
+    "compiler": "Clang 20.1.4",
+    "networkPolicy": "socket and urllib access rejected throughout guarded setup and conversion",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "pythonHashSeed": "0",
+    "pythonImplementation": "CPython",
+    "pythonVersion": "3.12.11"
+  },
+  "expectedFailures": [
+    {
+      "caseId": "cjk-upper-bound",
+      "category": "upstreamFailure",
+      "cause": "Pinned transcription rejects pypinyin fallback syllable `鿿5`: ValueError: Parameter 'normal_pinyin': Final couldn't be detected!"
+    },
+    {
+      "caseId": "custom-unknown",
+      "category": "upstreamFailure",
+      "cause": "Pinned transcription rejects pypinyin fallback syllable `鿿5`: ValueError: Parameter 'normal_pinyin': Final couldn't be detected!"
+    }
+  ],
+  "exporter": "tool/reference/export_fixtures.py",
+  "exporterSha256": "1be16dede8befed73be9dbde3b8f728abffe6bc4765a2ae674ff717bed6fe3c1",
+  "fixture": "zh_legacy.jsonl",
+  "fixtureSha256": "30a1f8988aa19cc68cbba5bd9e256159e23e2c9be87fd19a6a990a1141c49096",
+  "mode": {
+    "englishFallback": null,
+    "name": "legacy",
+    "tokens": null,
+    "versionOption": null
+  },
+  "oracleVerification": {
+    "commandMode": "verify",
+    "mismatchCount": 0,
+    "readOnly": true,
+    "verifiedCaseCount": 24
+  },
+  "resources": [
+    {
+      "distribution": "jieba 0.42.1",
+      "distributionLicense": "MIT",
+      "name": "jieba default dict.txt",
+      "sha256": "7197c3211ddd98962b036cdf40324d1ea2bfaa12bd028e68faa70111a88e12a8",
+      "sizeBytes": 5071852
+    }
+  ],
+  "schemaVersion": 1,
+  "sourceFiles": [
+    {
+      "license": "Apache-2.0 (pinned upstream repository)",
+      "path": "misaki/zh.py",
+      "sha256": "97d16aec581832845d2566cb24da2ba045d4552fb65a5017a6eac8feef654c81",
+      "sizeBytes": 3320
+    },
+    {
+      "license": "MIT adaptation; exact provenance and notice are recorded in THIRD_PARTY_NOTICES.md",
+      "path": "misaki/transcription.py",
+      "sha256": "14f0f1b5eb89c5b684229a30ae8b0c19c8266b537967786a2079ba887f5fbc32",
+      "sizeBytes": 9354
+    },
+    {
+      "license": "dependency resolution record for the pinned upstream repository",
+      "path": "uv.lock",
+      "sha256": "52d912cb52640c6b472c40258ee9c49edb63c1397ac1fb85c0dc17ad06654bd9",
+      "sizeBytes": 520905
+    }
+  ],
+  "successCount": 22,
+  "upstreamCommit": "fba1236595f2d2bf21d414ba6e57d25256afada3",
+  "upstreamRepository": "hexgrad/misaki",
+  "upstreamVersion": "0.9.4"
+}

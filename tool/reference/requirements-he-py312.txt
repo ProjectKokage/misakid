@@ -1,0 +1,12 @@
+# Python 3.12 dependency closure for the pinned Hebrew oracle.
+#
+# Every version comes from hexgrad/misaki uv.lock at commit
+# fba1236595f2d2bf21d414ba6e57d25256afada3. Misaki itself is loaded from the
+# separately validated source checkout. Regeneration uses `uv pip sync` and
+# then runs offline.
+
+colorama==0.4.6 ; sys_platform == "win32"
+colorlog==6.9.0
+docopt==0.6.2
+mishkal-hebrew @ https://files.pythonhosted.org/packages/44/17/9efdef222f2fc8e1ca721d919738d69d8b2358554a99f27b0764905f60fd/mishkal_hebrew-0.3.2-py3-none-any.whl#sha256=1b25dc61c2ac1ca2898c288adbd8d81399260fd4d82124bbce5f0d031c785997
+num2words==0.5.14

@@ -1,0 +1,283 @@
+{
+  "backendInput": {
+    "externalCallCount": 472,
+    "frontendCallCount": 25,
+    "kind": "misaki.zh.frontend-1.1.external-stages",
+    "normalizationCallCount": 24,
+    "pinyinCallCount": 365,
+    "pinyinSyllableCount": 746,
+    "posSegmentCount": 131,
+    "schemaVersion": 1,
+    "searchCallCount": 107,
+    "searchSegmentCount": 164,
+    "stageCounts": {
+      "frontend-render/finals-tone3": 91,
+      "frontend-render/initials": 91,
+      "tone-premerge/finals-tone3": 183,
+      "tone-sandhi/jieba-search": 107
+    }
+  },
+  "backendVersions": {
+    "addict": "2.4.0",
+    "cn2an": "0.5.23",
+    "jieba": "0.42.1",
+    "jieba-default-dict": "sha256:7197c3211ddd98962b036cdf40324d1ea2bfaa12bd028e68faa70111a88e12a8",
+    "ordered-set": "4.1.0",
+    "proces": "0.1.7",
+    "pypinyin": "0.53.0",
+    "pypinyin-dict": "0.9.0",
+    "python": "3.12.11",
+    "regex": "2024.11.6"
+  },
+  "caseCount": 26,
+  "caseCorpus": "tool/reference/cases/zh_frontend_1_1.jsonl",
+  "caseCorpusSha256": "bef79cb256aa30ce97a56c62d20aef7f5f7b8932b24857cbf1e15de91b0502f6",
+  "coverage": [
+    "empty and CPython-whitespace-only fast paths",
+    "traditional, full-width, punctuation, quotes, brackets, and internal whitespace",
+    "bu, yi, third-tone, neutral-tone, reduplication, and erhua rules",
+    "custom polyphones plus pypinyin-dict large phrase overlay",
+    "mixed and all-English text without an English callback, including custom unknown marker",
+    "integers, dates, time, phone-like numbers, decimals, currency, and percentages",
+    "rare Basic Han, supplementary Han, emoji, and variation selectors"
+  ],
+  "dependencyLock": "tool/reference/requirements-zh-py312.txt",
+  "dependencyLockSha256": "75ba60d6332ea92a78d4665df152a7d1fea8655c6bdfdc55280666b1bebe67ce",
+  "distributions": [
+    {
+      "metadataSha256": "66320967996f85fa211f1216a7bf5f921d13b41b0de5db97f389daddbc54eaf4",
+      "name": "addict",
+      "recordSha256": "29165720f5f1aa12539c9b63f7d03e11addf6c65f227d4c8cca80436233dc74a",
+      "version": "2.4.0"
+    },
+    {
+      "metadataSha256": "447fd0d487993b553a962704854006615de7fa4c5398573bc9df67ad2fd05c88",
+      "name": "cn2an",
+      "recordSha256": "3508693d04d48c6aade64a36096269ae413b204cda73d66c77e77bb94f52e9f2",
+      "version": "0.5.23"
+    },
+    {
+      "metadataSha256": "5661d2cfc5b23f8c1b5ed4cecfa1ec866ddf563273c61e3911a362a3e6f3eea1",
+      "name": "jieba",
+      "recordSha256": "5d41bff3e59f851cebc3e22114b028ff46722055277ca01dce1012e2d48fb3ff",
+      "version": "0.42.1"
+    },
+    {
+      "metadataSha256": "16a54dfd551325308343ebed9e65eb6e06a90e3722113fb9e2048d278eecae8f",
+      "name": "ordered-set",
+      "recordSha256": "5785be93f3ba152021e3c24a8d6ee098c749489a37ee32d6cd08d3eb677ed3a3",
+      "version": "4.1.0"
+    },
+    {
+      "metadataSha256": "25d1dd4fe0d19383fa7ad05b465e621947c30cb177976d043be4043d75747aed",
+      "name": "proces",
+      "recordSha256": "5bbd62c533cfcd05052f3b26eb223715f6b99fa90919382192a7a27986ee155e",
+      "version": "0.1.7"
+    },
+    {
+      "metadataSha256": "674bf6633309793139c5b5c504787741ee17c1d75412b4f86466808a55527451",
+      "name": "pypinyin",
+      "recordSha256": "cb58c010b0c0aa0bed30462fd02a27f40750c47eadece8e5dce3b0df518134c7",
+      "version": "0.53.0"
+    },
+    {
+      "metadataSha256": "99c5cf4760fd3bacc23908533a4fc85a2cf83c865e8b3f96e57596e70a0ae3c7",
+      "name": "pypinyin-dict",
+      "recordSha256": "23c6dc6b330181b92a9d111edbafbc12729783f9bb50eeaa6672a5fab8559bc0",
+      "version": "0.9.0"
+    },
+    {
+      "metadataSha256": "834d4e6889c9292660684fac77a4b805ac1cfb14b67e0d321d16eb535397ce98",
+      "name": "regex",
+      "recordSha256": "34dbd620fcfb03188e16d207ce8c0a7840c6ee885bb0cdd7c2c765e9d767d7a2",
+      "version": "2024.11.6"
+    }
+  ],
+  "environment": {
+    "compiler": "Clang 20.1.4",
+    "networkPolicy": "socket and urllib access rejected throughout guarded setup and conversion",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "pythonHashSeed": "0",
+    "pythonImplementation": "CPython",
+    "pythonVersion": "3.12.11"
+  },
+  "expectedFailures": [],
+  "exporter": "tool/reference/export_fixtures.py",
+  "exporterSha256": "1be16dede8befed73be9dbde3b8f728abffe6bc4765a2ae674ff717bed6fe3c1",
+  "fixture": "zh_frontend_1_1.jsonl",
+  "fixtureSha256": "57478d39cde81f4676347cd01c9600d834f2da0f2834e4e448e7f1b4728cad5e",
+  "licenses": [
+    {
+      "license": "Apache-2.0",
+      "name": "PaddleSpeech Mandarin frontend source",
+      "sourceCommit": "d7bf91561d5a8a025f3cfc4bd7b28368fd98d102",
+      "textSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "license": "MIT",
+      "name": "pypinyin-dict",
+      "sourceCommit": "d8a12d70ea14a929f296f21f4c493b3ce5d0b14a",
+      "textSha256": "239199faa0e3098c6b7fc7c5d4c50d623c44b7c4c0d8990c1a030266aa558f2c"
+    },
+    {
+      "license": "MIT",
+      "name": "phrase-pinyin-data large_pinyin source",
+      "sourceCommit": "3fa3308aeeadec0736d84f31b28ac3da6e98d0d9",
+      "textSha256": "89ac55df747e4776088c3e77531ef61b973a1a59dd8e6a4548a58996da9a4f70"
+    },
+    {
+      "license": "MIT",
+      "name": "addict 2.4.0",
+      "textSha256": "ca488d33c512d0b226142090af90e89ae266a901a293f89fd642dfec931e22c1"
+    },
+    {
+      "license": "MIT",
+      "name": "cn2an 0.5.23",
+      "textSha256": "b18d8d4ad8bc57e00ae80d08d9da80a32176f031062f87c739ea7557c1b5d759"
+    },
+    {
+      "license": "MIT",
+      "name": "Jieba 0.42.1",
+      "textSha256": "18ba0984839f85853b29fadaf992f7dba8fd0ca0fbeae34de2b8735222dc7a37"
+    },
+    {
+      "evidence": "ordered-set 4.1.0 METADATA OSI classifier",
+      "license": "MIT",
+      "name": "ordered-set 4.1.0"
+    },
+    {
+      "license": "MIT",
+      "name": "proces 0.1.7",
+      "textSha256": "5d91f10d65a205287675a1308b35989979e0a0b15007119b2b539a67643223f0"
+    },
+    {
+      "license": "MIT",
+      "name": "pypinyin 0.53.0",
+      "textSha256": "1e6c90014b4912815c296ee64bb6f6280af47e6d4c5d80e86232dfc5defe764c"
+    },
+    {
+      "license": "Apache-2.0",
+      "name": "regex 2024.11.6",
+      "textSha256": "bff55ef4cdcc8c14ce259f8e8ab60e264418440d6335f4dc138273fbd506144d"
+    }
+  ],
+  "mode": {
+    "englishFallback": null,
+    "name": "frontend-1.1",
+    "tokens": null,
+    "versionOption": "1.1"
+  },
+  "oracleVerification": {
+    "commandMode": "verify",
+    "freshJiebaCache": true,
+    "mismatchCount": 0,
+    "readOnly": true,
+    "verifiedCaseCount": 26
+  },
+  "resources": [
+    {
+      "distribution": "jieba 0.42.1",
+      "distributionLicense": "MIT",
+      "name": "jieba default dict.txt",
+      "sha256": "7197c3211ddd98962b036cdf40324d1ea2bfaa12bd028e68faa70111a88e12a8",
+      "sizeBytes": 5071852
+    },
+    {
+      "distribution": "jieba 0.42.1",
+      "distributionLicense": "MIT",
+      "fileCount": 3,
+      "manifestFormat": "sorted relative-path<TAB>size<TAB>file-sha256<LF>",
+      "manifestSha256": "4f4363107bf5784f09eb32be70ca3ae68d13a948dcc38fc75e829d8051d13a6c",
+      "name": "jieba finalseg protocol-0 probability tables",
+      "sizeBytes": 1275810
+    },
+    {
+      "distribution": "jieba 0.42.1",
+      "distributionLicense": "MIT",
+      "fileCount": 4,
+      "manifestFormat": "sorted relative-path<TAB>size<TAB>file-sha256<LF>",
+      "manifestSha256": "0b852fa29f62d92930c49376025ae1c2c68a70a298eafcb9f0f7b28b85f99054",
+      "name": "jieba POS HMM protocol-0 tables",
+      "sizeBytes": 5494999
+    },
+    {
+      "distribution": "pypinyin 0.53.0",
+      "distributionLicense": "MIT",
+      "name": "pypinyin pinyin_dict.json",
+      "sha256": "19ac93a11b0cf2d1b42741c2956dcb8632944e87d2ebcd1ba7cc4d3a936b9fb5",
+      "sizeBytes": 783823,
+      "sourceCommit": "27dc54a206326e0d8d91428010325f50f614508d"
+    },
+    {
+      "distribution": "pypinyin 0.53.0",
+      "distributionLicense": "MIT",
+      "name": "pypinyin phrases_dict.json",
+      "sha256": "d71fe97165dfd3eb9d8dff86ce5f62787d530b6b9f38c898779fcaf16d2522d1",
+      "sizeBytes": 2544982,
+      "sourceCommit": "1114cb9372804062e79d8b78affd333df41bf599"
+    },
+    {
+      "distribution": "pypinyin-dict 0.9.0",
+      "distributionLicense": "MIT",
+      "entryCount": 411957,
+      "name": "phrase-pinyin-data large_pinyin.txt",
+      "sha256": "f1f00a0682120f4052eb9ab03c632b040677dd9675bade5b8cb6a3bb7c0b8fd3",
+      "sizeBytes": 9140316,
+      "sourceCommit": "3fa3308aeeadec0736d84f31b28ac3da6e98d0d9"
+    },
+    {
+      "distribution": "pypinyin-dict 0.9.0",
+      "distributionLicense": "MIT",
+      "entryCount": 411957,
+      "fileCount": 12,
+      "manifestFormat": "sorted relative-path<TAB>size<TAB>file-sha256<LF>",
+      "manifestSha256": "9bd8c0dd9e525c2b536f7ad529c9c57127e9afcda9bc4c889557ea6e33c9ab7d",
+      "name": "generated pypinyin-dict large_pinyin Python tables",
+      "sizeBytes": 17589503,
+      "sourceCommit": "d8a12d70ea14a929f296f21f4c493b3ce5d0b14a"
+    }
+  ],
+  "schemaVersion": 1,
+  "sourceFiles": [
+    {
+      "license": "Apache-2.0 (pinned upstream repository)",
+      "path": "misaki/zh.py",
+      "sha256": "97d16aec581832845d2566cb24da2ba045d4552fb65a5017a6eac8feef654c81",
+      "sizeBytes": 3320
+    },
+    {
+      "license": "Apache-2.0 adaptation of PaddleSpeech d7bf91561d5a8a025f3cfc4bd7b28368fd98d102",
+      "path": "misaki/zh_frontend.py",
+      "sha256": "002023955e31c692cea2dcd0dea1836df84a9ff8dab966f5ae43ce276bdd1c0c",
+      "sizeBytes": 9448
+    },
+    {
+      "license": "Apache-2.0 adaptation of PaddleSpeech d7bf91561d5a8a025f3cfc4bd7b28368fd98d102",
+      "path": "misaki/tone_sandhi.py",
+      "sha256": "2a0adc3854c137759f304417d844582d7fd902c57d84733d94137a4bc756c301",
+      "sizeBytes": 20100
+    },
+    {
+      "license": "Apache-2.0 (pinned upstream repository)",
+      "path": "misaki/token.py",
+      "sha256": "5ff6ce45da6766cdc1e3d5c91b0b2b093d912b8df6f2da327af56f88ad43f073",
+      "sizeBytes": 433
+    },
+    {
+      "license": "MIT adaptation; imported by zh.py but not invoked by frontend-1.1",
+      "path": "misaki/transcription.py",
+      "sha256": "14f0f1b5eb89c5b684229a30ae8b0c19c8266b537967786a2079ba887f5fbc32",
+      "sizeBytes": 9354
+    },
+    {
+      "license": "dependency resolution record for the pinned upstream repository",
+      "path": "uv.lock",
+      "sha256": "52d912cb52640c6b472c40258ee9c49edb63c1397ac1fb85c0dc17ad06654bd9",
+      "sizeBytes": 520905
+    }
+  ],
+  "successCount": 26,
+  "upstreamCommit": "fba1236595f2d2bf21d414ba6e57d25256afada3",
+  "upstreamRepository": "hexgrad/misaki",
+  "upstreamVersion": "0.9.4"
+}

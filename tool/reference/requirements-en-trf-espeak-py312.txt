@@ -1,0 +1,29 @@
+# Python 3.12 closure for the pinned English transformer plus eSpeak oracle.
+#
+# The exact transformer closure and model wheel are included first. Every
+# eSpeak-specific distribution below is pinned from hexgrad/misaki uv.lock at
+# commit fba1236595f2d2bf21d414ba6e57d25256afada3.
+
+-r requirements-en-trf-py312.txt
+
+attrs==25.3.0
+babel==2.17.0
+colorama==0.4.6
+csvw==3.5.1
+dlinfo==2.0.0
+espeakng-loader==0.2.4
+isodate==0.7.2
+joblib==1.4.2
+jsonschema==4.23.0
+jsonschema-specifications==2024.10.1
+language-tags==1.2.0
+phonemizer-fork==3.3.2
+pyparsing==3.2.1
+python-dateutil==2.9.0.post0
+rdflib==7.1.3
+referencing==0.36.2
+rfc3986==1.5.0
+rpds-py==0.23.1
+segments==2.3.0
+six==1.17.0
+uritemplate==4.1.1

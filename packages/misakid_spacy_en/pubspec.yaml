@@ -1,0 +1,21 @@
+name: misakid_spacy_en
+description: Pure-Dart explicit-resource spaCy English tokenizer and tagger adapter for misakid.
+version: 0.1.0-dev.1
+topics:
+  - g2p
+  - english
+  - nlp
+  - text-to-speech
+
+environment:
+  sdk: ^3.11.5
+
+resolution: workspace
+
+dependencies:
+  crypto: ^3.0.7
+  misakid: ^0.1.0-dev.1
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

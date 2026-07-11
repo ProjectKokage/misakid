@@ -1,0 +1,225 @@
+{
+  "backendInput": {
+    "callbackCallCount": 14,
+    "finalEnglishTokenCount": 33,
+    "kind": "misaki.zh.frontend-1.1-en-small-no-fallback.external-stages",
+    "rawEnglishTokenCount": 40,
+    "schemaVersion": 2
+  },
+  "backendVersions": {
+    "addict": "2.4.0",
+    "cn2an": "0.5.23",
+    "en-core-web-sm": "3.8.0",
+    "jieba": "0.42.1",
+    "jieba-default-dict": "sha256:7197c3211ddd98962b036cdf40324d1ea2bfaa12bd028e68faa70111a88e12a8",
+    "num2words": "0.5.14",
+    "ordered-set": "4.1.0",
+    "proces": "0.1.7",
+    "pypinyin": "0.53.0",
+    "pypinyin-dict": "0.9.0",
+    "python": "3.12.11",
+    "regex": "2024.11.6",
+    "spacy": "3.8.4"
+  },
+  "caseCount": 14,
+  "caseCorpus": "tool/reference/cases/zh_frontend_1_1_en_small_no_fallback.jsonl",
+  "caseCorpusSha256": "e2d91145b5c2411e375af6c66755c98e16beebd74dfd9f381e78ec22bb4ee3f3",
+  "coverage": [
+    "American and British English with legacy and 2.0 rendering",
+    "English-only and multiple mixed Chinese/English segments",
+    "punctuation and C++ splitting plus apostrophe and hyphen retention",
+    "English context-sensitive pronunciations",
+    "no-fallback OOV rendering with default and custom unknown markers",
+    "full-width/ASCII and cn2an number boundaries",
+    "empty and CPython-whitespace-only fast paths",
+    "null outer token lists"
+  ],
+  "dependencyLocks": [
+    {
+      "path": "tool/reference/requirements-en-no-fallback-py312.txt",
+      "sha256": "dd5c6ab110e810ebc8a5932bbb3df1ba5ac752e1ad9850192eecdcfad9314d41"
+    },
+    {
+      "path": "tool/reference/requirements-zh-py312.txt",
+      "sha256": "75ba60d6332ea92a78d4665df152a7d1fea8655c6bdfdc55280666b1bebe67ce"
+    },
+    {
+      "path": "tool/reference/requirements-zh-en-callback-py312.txt",
+      "sha256": "c857f49ac57ebab9cd51de2eeadcb20ccfb55341aac61f0eeaf29d8633d47031"
+    }
+  ],
+  "environment": {
+    "compiler": "Clang 20.1.4",
+    "networkPolicy": "offline uv sync plus exporter socket and urllib rejection",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "pythonHashSeed": "0",
+    "pythonImplementation": "CPython",
+    "pythonVersion": "3.12.11",
+    "unicodeDataVersion": "15.0.0"
+  },
+  "expectedFailures": [],
+  "exporter": {
+    "path": "tool/reference/export_fixtures.py",
+    "sha256": "f0c17f3b954d72496f30b10d9cdcc5566f73ad31c4aec3d6c941c9268a99714b"
+  },
+  "fixture": "zh_frontend_1_1_en_small_no_fallback.jsonl",
+  "fixtureSha256": "b5f6b39b489dc023a39ccb42f35cd5030acecb3426d474f9556ff876cceb7599",
+  "mode": {
+    "englishDialectOptions": [
+      "american",
+      "british"
+    ],
+    "englishFallback": null,
+    "englishModel": "en_core_web_sm 3.8.0",
+    "englishPreprocess": true,
+    "englishVersionOptions": [
+      null,
+      "2.0"
+    ],
+    "name": "frontend-1.1-en-small-no-fallback",
+    "tokens": null,
+    "versionOption": "1.1"
+  },
+  "modelWheel": {
+    "license": "MIT",
+    "name": "en_core_web_sm-3.8.0-py3-none-any.whl",
+    "sha256": "1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85",
+    "url": "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl"
+  },
+  "oracleProvisioning": {
+    "combinedEnvironment": "/private/tmp/misaki-oracle-zh-en",
+    "distributableArtifact": false,
+    "englishClosure": "uv pip sync --offline from the canonical English lock and cache",
+    "pipCheck": "63 installed packages compatible",
+    "recordCopy": {
+      "destination": "/private/tmp/misaki-oracle-zh-en",
+      "distributions": [
+        "cn2an 0.5.23",
+        "jieba 0.42.1",
+        "ordered-set 4.1.0",
+        "proces 0.1.7",
+        "pypinyin 0.53.0",
+        "pypinyin-dict 0.9.0"
+      ],
+      "policy": "every source and destination RECORD hash and size verified; native/shared files, symlinks, special files, missing files, and unexpected versions rejected",
+      "source": "/private/tmp/misaki-oracle-zh",
+      "tool": "tool/reference/prepare_zh_en_callback_oracle.py",
+      "toolSha256": "ccce260fdbab60f0cfb33aa31b675f41ea0fcfad26f851981f3feb2a35d09484"
+    }
+  },
+  "oracleVerification": {
+    "acceptedCandidateSeparately": true,
+    "commandMode": "verify",
+    "mismatchCount": 0,
+    "readOnly": true,
+    "verifiedCaseCount": 14
+  },
+  "resources": [
+    {
+      "name": "jieba/dict.txt",
+      "sha256": "7197c3211ddd98962b036cdf40324d1ea2bfaa12bd028e68faa70111a88e12a8",
+      "sizeBytes": 5071852
+    },
+    {
+      "name": "jieba/finalseg/prob_start.p",
+      "sha256": "dfd45976dd4f8f2bc12535a680a178bf9e75eaa38bdfdcb844469e54468d6245",
+      "sizeBytes": 109
+    },
+    {
+      "name": "jieba/finalseg/prob_trans.p",
+      "sha256": "ea7f50162ffa01db4973c7a8120b3c0233fbc5819fc0d617513535f1f2c7fedc",
+      "sizeBytes": 260
+    },
+    {
+      "name": "jieba/finalseg/prob_emit.p",
+      "sha256": "1e1d1d835b0c77d234acaa6afa23a13ffce597a295be0d7a1ece6a0d440dcf08",
+      "sizeBytes": 1275441
+    },
+    {
+      "name": "jieba/posseg/char_state_tab.p",
+      "sha256": "c0ef4bb3d698eed188225d430ac291000b30c3d6e253a538d26b7ac9687424b1",
+      "sizeBytes": 2113902
+    },
+    {
+      "name": "jieba/posseg/prob_start.p",
+      "sha256": "0fb0fbc6b1840d35a5a8499cff0ae75e06af788e348f9b4b8b9630804cd6cf09",
+      "sizeBytes": 8312
+    },
+    {
+      "name": "jieba/posseg/prob_trans.p",
+      "sha256": "236726f5a4efc2f023652925ca1e94f1fe4bfcb9d60224e9db3de0135b21385b",
+      "sizeBytes": 141551
+    },
+    {
+      "name": "jieba/posseg/prob_emit.p",
+      "sha256": "449b2304b6c73034187d3c8a6f26a7a20037f4ab45659844acd0ef2114171fa8",
+      "sizeBytes": 3231234
+    },
+    {
+      "name": "pypinyin/pinyin_dict.json",
+      "sha256": "19ac93a11b0cf2d1b42741c2956dcb8632944e87d2ebcd1ba7cc4d3a936b9fb5",
+      "sizeBytes": 783823
+    },
+    {
+      "name": "pypinyin/phrases_dict.json",
+      "sha256": "d71fe97165dfd3eb9d8dff86ce5f62787d530b6b9f38c898779fcaf16d2522d1",
+      "sizeBytes": 2544982
+    },
+    {
+      "name": "phrase-pinyin-data/large_pinyin.txt",
+      "sha256": "f1f00a0682120f4052eb9ab03c632b040677dd9675bade5b8cb6a3bb7c0b8fd3",
+      "sizeBytes": 9140316
+    },
+    {
+      "name": "en_core_web_sm/tokenizer",
+      "sha256": "b014e8bba4958b120af2d0c1c63eabb7c00379f2bacaf10df7c5325efd2ea467",
+      "sizeBytes": 77066
+    },
+    {
+      "name": "en_core_web_sm/vocab/lookups.bin",
+      "sha256": "fce9c883c56165f29573cc938c2a1c9d417ac61bd8f56b671dd5f7996de70682",
+      "sizeBytes": 70040
+    },
+    {
+      "name": "en_core_web_sm/tok2vec/model",
+      "sha256": "e84fc06eb319c94d28e460fc334e292120b01f18baa5dc8b50c977459820a090",
+      "sizeBytes": 6269370
+    },
+    {
+      "name": "en_core_web_sm/tagger/model",
+      "sha256": "1ec3d93f38cebe172f2b5c89d84be72856ce42c8f1a64f1699f1d98a771f36b7",
+      "sizeBytes": 19829
+    }
+  ],
+  "schemaVersion": 1,
+  "sourceFiles": [
+    {
+      "path": "misaki/zh.py",
+      "sha256": "97d16aec581832845d2566cb24da2ba045d4552fb65a5017a6eac8feef654c81"
+    },
+    {
+      "path": "misaki/zh_frontend.py",
+      "sha256": "002023955e31c692cea2dcd0dea1836df84a9ff8dab966f5ae43ce276bdd1c0c"
+    },
+    {
+      "path": "misaki/tone_sandhi.py",
+      "sha256": "2a0adc3854c137759f304417d844582d7fd902c57d84733d94137a4bc756c301"
+    },
+    {
+      "path": "misaki/en.py",
+      "sha256": "a9c36c90a3fa6c6084e9042fd8e19f6049add4f1435d8fe5ca1b77f3529a98f4"
+    },
+    {
+      "path": "misaki/token.py",
+      "sha256": "5ff6ce45da6766cdc1e3d5c91b0b2b093d912b8df6f2da327af56f88ad43f073"
+    },
+    {
+      "path": "uv.lock",
+      "sha256": "52d912cb52640c6b472c40258ee9c49edb63c1397ac1fb85c0dc17ad06654bd9"
+    }
+  ],
+  "successCount": 14,
+  "upstreamCommit": "fba1236595f2d2bf21d414ba6e57d25256afada3",
+  "upstreamRepository": "hexgrad/misaki",
+  "upstreamVersion": "0.9.4"
+}

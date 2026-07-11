@@ -1,0 +1,90 @@
+name: Flutter mobile integration
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/mobile_integration.yml'
+      - 'lib/**'
+      - 'packages/misakid_mecab_ja/**'
+      - 'pubspec.yaml'
+      - 'tool/mobile_integration/**'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/mobile_integration.yml'
+      - 'lib/**'
+      - 'packages/misakid_mecab_ja/**'
+      - 'pubspec.yaml'
+      - 'tool/mobile_integration/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-integration-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.target }} release bundle
+    runs-on: macos-14
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - android
+          - ios
+    defaults:
+      run:
+        working-directory: tool/mobile_integration
+    env:
+      FLUTTER_VERSION: 3.41.7
+      ANDROID_NDK_VERSION: 28.2.13676358
+      COCOAPODS_DISABLE_STATS: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Report toolchain
+        run: flutter --version
+      - name: Verify source resource policy
+        run: python3 tool/verify_mobile_artifacts.py source .
+      - name: Resolve harness dependencies
+        run: flutter pub get
+      - name: Check Dart formatting
+        run: >-
+          dart format --output=none --set-exit-if-changed
+          lib test integration_test
+      - name: Analyze harness
+        run: flutter analyze --fatal-infos
+      - name: Run harness tests
+        run: flutter test
+      - name: Install pinned Android NDK
+        if: matrix.target == 'android'
+        run: >-
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          "ndk;${ANDROID_NDK_VERSION}"
+      - name: Build release APK
+        if: matrix.target == 'android'
+        run: >-
+          flutter build apk --release
+          --target-platform android-arm,android-arm64,android-x64
+      - name: Verify Android native assets
+        if: matrix.target == 'android'
+        run: >-
+          python3 tool/verify_mobile_artifacts.py android
+          build/app/outputs/flutter-apk/app-release.apk
+      - name: Build unsigned iOS application
+        if: matrix.target == 'ios'
+        run: flutter build ios --release --no-codesign
+      - name: Verify iOS native assets
+        if: matrix.target == 'ios'
+        run: >-
+          python3 tool/verify_mobile_artifacts.py ios
+          build/ios/iphoneos/Runner.app

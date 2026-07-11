@@ -1,0 +1,24 @@
+name: misakid_mecab_ko
+description: Explicit macOS arm64 MeCab-ko and CMUdict adapters for misakid.
+version: 0.1.0-dev.1
+topics:
+  - g2p
+  - korean
+  - mecab
+  - text-to-speech
+
+executables:
+  build_misakid_mecab_ko: build_misakid_mecab_ko
+
+environment:
+  sdk: ^3.11.5
+
+resolution: workspace
+
+dependencies:
+  crypto: ^3.0.7
+  misakid: ^0.1.0-dev.1
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

@@ -1,0 +1,26 @@
+name: misakid
+description: Pure-Dart Misaki G2P engines with explicit resource and native adapter boundaries.
+version: 0.1.0-dev.1
+topics:
+  - g2p
+  - phonemes
+  - text-to-speech
+  - kokoro
+
+environment:
+  sdk: ^3.11.5
+
+workspace:
+  - packages/misakid_bart_en
+  - packages/misakid_chinese
+  - packages/misakid_espeak_en
+  - packages/misakid_mecab_ja
+  - packages/misakid_mecab_ko
+  - packages/misakid_openjtalk
+  - packages/misakid_spacy_en
+  - packages/misakid_spacy_trf_en
+
+dev_dependencies:
+  crypto: ^3.0.7
+  lints: ^6.0.0
+  test: ^1.25.6

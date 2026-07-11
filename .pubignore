@@ -1,0 +1,13 @@
+/.dart_tool/
+/build/
+/coverage/
+/doc/
+/bin/
+/AGENTS.md
+/pubspec.lock
+/test/
+/tool/
+__pycache__/
+*.pyc
+*.tmp
+.DS_Store

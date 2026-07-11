@@ -1,0 +1,10 @@
+# Python 3.12 dependency closure for the pinned Japanese pyopenjtalk oracle.
+# Registry versions come from hexgrad/misaki uv.lock at commit
+# fba1236595f2d2bf21d414ba6e57d25256afada3. Misaki itself is loaded from the
+# explicitly validated source checkout.
+
+addict==2.4.0
+numpy==2.2.4
+pyopenjtalk==0.4.1
+regex==2024.11.6
+tqdm==4.67.1

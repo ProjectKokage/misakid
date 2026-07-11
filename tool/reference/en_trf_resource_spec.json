@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "upstream": {
+    "repository": "https://github.com/hexgrad/misaki",
+    "commit": "fba1236595f2d2bf21d414ba6e57d25256afada3",
+    "version": "0.9.4",
+    "enPySha256": "a9c36c90a3fa6c6084e9042fd8e19f6049add4f1435d8fe5ca1b77f3529a98f4",
+    "uvLockSha256": "52d912cb52640c6b472c40258ee9c49edb63c1397ac1fb85c0dc17ad06654bd9"
+  },
+  "modelWheel": {
+    "distribution": "en-core-web-trf",
+    "version": "3.8.0",
+    "url": "https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl",
+    "sizeBytes": 457421864,
+    "sha256": "272a31e9d8530d1e075351d30a462d7e80e31da23574f1b274e200f3fff35bf5",
+    "releaseRepositoryCommit": "374ece89b2099818244f5a65ef466b89c0c392ae",
+    "declaredLicense": "MIT"
+  },
+  "python312RuntimeDelta": [
+    {
+      "distribution": "curated-tokenizers",
+      "version": "0.0.9",
+      "sdistSizeBytes": 2237055,
+      "sdistSha256": "c93d47e54ab3528a6db2796eeb4bdce5d44e8226c671e42c2f23522ab1d0ce25",
+      "macosArm64WheelSizeBytes": 703466,
+      "macosArm64WheelSha256": "2abbb571666a9c9b3a15f9df022e25ed1137e9fa8346788aaa747c00f940a3c6"
+    },
+    {
+      "distribution": "curated-transformers",
+      "version": "0.1.1",
+      "sdistSizeBytes": 16313,
+      "sdistSha256": "4671f03314df30efda2ec2b59bc7692ea34fcea44cb65382342c16684e8a2119",
+      "wheelSizeBytes": 25972,
+      "wheelSha256": "d716063d73d803c6925d2dab56fde9b9ab8e89e663c2c0587804944ba488ff01"
+    },
+    {
+      "distribution": "spacy-curated-transformers",
+      "version": "0.3.0",
+      "sdistSizeBytes": 218192,
+      "sdistSha256": "989a6bf2aa7becd1ac8c3be5f245cd489223d4e16e7218f6b69479c7e2689937",
+      "wheelSizeBytes": 236322,
+      "wheelSha256": "ddfd33e81b53ad798dac841ab022189f9543718ff874eda1081fce6ff93de377"
+    },
+    {
+      "distribution": "torch",
+      "version": "2.6.0",
+      "macosArm64Python312WheelSizeBytes": 66532538,
+      "macosArm64Python312WheelSha256": "9a610afe216a85a8b9bc9f8365ed561535c93e804c2a317ef7fabcc5deda0989"
+    }
+  ],
+  "requirements": {
+    "path": "tool/reference/requirements-en-trf-py312.txt",
+    "sha256": "ba6ff423296bb16365a4c5093234648ba7d683826b4c81b478d5d0036f60d7ba"
+  },
+  "preparedCorpora": [
+    {
+      "path": "tool/reference/cases/en_american_trf_no_fallback.jsonl",
+      "caseCount": 38,
+      "sha256": "10e7dd90c1c9a27e2f9eae2c16f10037636361c76b030c87027a65bb2bf0c04d"
+    },
+    {
+      "path": "tool/reference/cases/en_british_trf_no_fallback.jsonl",
+      "caseCount": 38,
+      "sha256": "3fc2929e1ebafe0d77ba124e7ecfd61e454230997228dd807118c85726ee66da"
+    }
+  ],
+  "requiredModelMemberSuffixes": [
+    "/config.cfg",
+    "/meta.json",
+    "/tokenizer",
+    "/vocab/lookups.bin",
+    "/transformer/model",
+    "/tagger/model"
+  ],
+  "acceptanceState": {
+    "wholeWheelIdentityReviewed": true,
+    "memberInventoryAccepted": true,
+    "memberInventorySha256": "4e3cae8256e9e701739cdbd720ffe5f3047202e4a0ebace4bc469a33b1ae7eba",
+    "transformerFixturesAccepted": true
+  }
+}

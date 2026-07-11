@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dart:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.11.5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.11'
+      - run: dart pub get
+      - run: dart format --output=none --set-exit-if-changed .
+      - run: dart analyze --fatal-infos
+      - run: dart doc --dry-run
+      - run: dart test
+      - run: dart analyze --fatal-infos
+        working-directory: packages/misakid_openjtalk
+      - run: dart doc --dry-run
+        working-directory: packages/misakid_openjtalk
+      - run: dart test
+        working-directory: packages/misakid_openjtalk
+      - run: dart analyze --fatal-infos
+        working-directory: packages/misakid_mecab_ja
+      - run: dart doc --dry-run
+        working-directory: packages/misakid_mecab_ja
+      - run: dart test
+        working-directory: packages/misakid_mecab_ja
+      - run: dart analyze --fatal-infos
+        working-directory: packages/misakid_mecab_ko
+      - run: dart doc --dry-run
+        working-directory: packages/misakid_mecab_ko
+      - run: dart test
+        working-directory: packages/misakid_mecab_ko
+      - run: dart analyze --fatal-infos
+        working-directory: packages/misakid_chinese
+      - run: dart doc --dry-run
+        working-directory: packages/misakid_chinese
+      - run: dart test
+        working-directory: packages/misakid_chinese
+      - run: dart analyze --fatal-infos
+        working-directory: packages/misakid_espeak_en
+      - run: dart doc --dry-run
+        working-directory: packages/misakid_espeak_en
+      - run: dart test
+        working-directory: packages/misakid_espeak_en
+      - run: dart analyze --fatal-infos
+        working-directory: packages/misakid_spacy_en
+      - run: dart doc --dry-run
+        working-directory: packages/misakid_spacy_en
+      - run: dart test
+        working-directory: packages/misakid_spacy_en
+      - run: dart analyze --fatal-infos
+        working-directory: packages/misakid_spacy_trf_en
+      - run: dart doc --dry-run
+        working-directory: packages/misakid_spacy_trf_en
+      - run: dart test
+        working-directory: packages/misakid_spacy_trf_en
+      - run: dart analyze --fatal-infos
+        working-directory: packages/misakid_bart_en
+      - run: dart doc --dry-run
+        working-directory: packages/misakid_bart_en
+      - run: dart test
+        working-directory: packages/misakid_bart_en
+      - if: runner.os == 'Linux'
+        run: dart pub publish --dry-run --ignore-warnings
+      - if: runner.os == 'Linux'
+        run: dart pub publish --dry-run --ignore-warnings
+        working-directory: packages/misakid_openjtalk
+      - if: runner.os == 'Linux'
+        run: dart pub publish --dry-run --ignore-warnings
+        working-directory: packages/misakid_mecab_ja
+      - if: runner.os == 'Linux'
+        run: dart pub publish --dry-run --ignore-warnings
+        working-directory: packages/misakid_mecab_ko
+      - if: runner.os == 'Linux'
+        run: dart pub publish --dry-run --ignore-warnings
+        working-directory: packages/misakid_chinese
+      - if: runner.os == 'Linux'
+        run: dart pub publish --dry-run --ignore-warnings
+        working-directory: packages/misakid_espeak_en
+      - if: runner.os == 'Linux'
+        run: dart pub publish --dry-run --ignore-warnings
+        working-directory: packages/misakid_spacy_en
+      - if: runner.os == 'Linux'
+        run: dart pub publish --dry-run --ignore-warnings
+        working-directory: packages/misakid_spacy_trf_en
+      - if: runner.os == 'Linux'
+        run: dart pub publish --dry-run --ignore-warnings
+        working-directory: packages/misakid_bart_en
+
+  reference-tooling:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.11'
+      - run: python -m unittest discover -s tool/reference/tests -v

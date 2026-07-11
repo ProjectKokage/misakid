@@ -1,0 +1,143 @@
+name: Japanese native adapter
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: japanese-native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos-arm64-openjtalk:
+    # This label intentionally selects an owner-provisioned machine. The job
+    # never downloads source or dictionary resources.
+    runs-on: [self-hosted, macOS, ARM64, misakid-openjtalk]
+    timeout-minutes: 30
+    env:
+      PYOPENJTALK_SOURCE: ${{ vars.MISAKID_PYOPENJTALK_SOURCE }}
+      MISAKID_OPENJTALK_DICTIONARY: ${{ vars.MISAKID_OPENJTALK_DICTIONARY }}
+      NATIVE_BUILD: ${{ runner.temp }}/misakid-openjtalk
+      NATIVE_BUILD_2: ${{ runner.temp }}/misakid-openjtalk-reproducible
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.11.5
+      - name: Validate provisioned resource paths
+        run: |
+          test -n "$PYOPENJTALK_SOURCE"
+          test -d "$PYOPENJTALK_SOURCE"
+          test -n "$MISAKID_OPENJTALK_DICTIONARY"
+          test -d "$MISAKID_OPENJTALK_DICTIONARY"
+      - run: dart pub get
+      - name: Build the verified frontend-only dylib
+        working-directory: packages/misakid_openjtalk
+        run: >-
+          dart run tool/build_native.dart
+          --source "$PYOPENJTALK_SOURCE"
+          --build-dir "$NATIVE_BUILD"
+      - name: Rebuild independently for reproducibility
+        working-directory: packages/misakid_openjtalk
+        run: >-
+          dart run tool/build_native.dart
+          --source "$PYOPENJTALK_SOURCE"
+          --build-dir "$NATIVE_BUILD_2"
+      - name: Verify the installed native artifact
+        working-directory: packages/misakid_openjtalk
+        run: |
+          LIB="$NATIVE_BUILD/install/lib/libmisakid_openjtalk.dylib"
+          LIB2="$NATIVE_BUILD_2/install/lib/libmisakid_openjtalk.dylib"
+          cmp "$LIB" "$LIB2"
+          nm -gjU "$LIB" | LC_ALL=C sort > "$RUNNER_TEMP/misakid-exports.txt"
+          diff -u native/expected_exports_macos.txt "$RUNNER_TEMP/misakid-exports.txt"
+          test "$(otool -D "$LIB" | tail -n 1)" = '@rpath/libmisakid_openjtalk.dylib'
+          test "$(otool -L "$LIB" | tail -n +2 | wc -l | tr -d ' ')" = 3
+          otool -L "$LIB" | grep -F '/usr/lib/libSystem.B.dylib'
+          otool -L "$LIB" | grep -F '/usr/lib/libc++.1.dylib'
+          otool -l "$LIB" | grep -F 'minos 11.0'
+          ! nm -u "$LIB" | grep -E '(_exit|_abort)$'
+          ! strings "$LIB" | grep -F "$NATIVE_BUILD"
+          ! strings "$LIB" | grep -F "$NATIVE_BUILD_2"
+          ! strings "$LIB" | grep -F "$PYOPENJTALK_SOURCE"
+          test -f "$NATIVE_BUILD/install/share/misakid_openjtalk/LICENSE"
+          test -f "$NATIVE_BUILD/install/share/misakid_openjtalk/THIRD_PARTY_NOTICES.md"
+          test -f "$NATIVE_BUILD/install/share/misakid_openjtalk/SOURCE_MANIFEST.md"
+      - name: Run exact native Japanese parity and safety tests
+        working-directory: packages/misakid_openjtalk
+        env:
+          MISAKID_OPENJTALK_LIBRARY: ${{ runner.temp }}/misakid-openjtalk/install/lib/libmisakid_openjtalk.dylib
+        run: dart test test/native_parity_test.dart
+
+  macos-arm64-cutlet:
+    # This label intentionally selects an owner-provisioned machine. The job
+    # never downloads the source, UniDic tree, or grouping-list resources.
+    runs-on: [self-hosted, macOS, ARM64, misakid-mecab-ja]
+    timeout-minutes: 45
+    env:
+      PYOPENJTALK_SOURCE: ${{ vars.MISAKID_PYOPENJTALK_SOURCE }}
+      MISAKID_MECAB_JA_DICTIONARY: ${{ vars.MISAKID_MECAB_JA_DICTIONARY }}
+      MISAKID_MECAB_JA_WORD_LIST: ${{ vars.MISAKID_MECAB_JA_WORD_LIST }}
+      MISAKID_MECAB_JA_FIXTURE: ${{ github.workspace }}/test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/ja_cutlet.jsonl
+      NATIVE_BUILD: ${{ runner.temp }}/misakid-mecab-ja
+      NATIVE_BUILD_2: ${{ runner.temp }}/misakid-mecab-ja-reproducible
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.11.5
+      - name: Validate provisioned resource paths
+        run: |
+          test -n "$PYOPENJTALK_SOURCE"
+          test -d "$PYOPENJTALK_SOURCE"
+          test -n "$MISAKID_MECAB_JA_DICTIONARY"
+          test -d "$MISAKID_MECAB_JA_DICTIONARY"
+          test -n "$MISAKID_MECAB_JA_WORD_LIST"
+          test -f "$MISAKID_MECAB_JA_WORD_LIST"
+          test -f "$MISAKID_MECAB_JA_FIXTURE"
+      - run: dart pub get
+      - name: Build the verified MeCab dylib
+        working-directory: packages/misakid_mecab_ja
+        run: >-
+          dart run tool/build_native.dart
+          --source "$PYOPENJTALK_SOURCE"
+          --build-dir "$NATIVE_BUILD"
+      - name: Rebuild independently for reproducibility
+        working-directory: packages/misakid_mecab_ja
+        run: >-
+          dart run tool/build_native.dart
+          --source "$PYOPENJTALK_SOURCE"
+          --build-dir "$NATIVE_BUILD_2"
+      - name: Verify the installed native artifact
+        working-directory: packages/misakid_mecab_ja
+        run: |
+          LIB="$NATIVE_BUILD/install/lib/libmisakid_mecab_ja.dylib"
+          LIB2="$NATIVE_BUILD_2/install/lib/libmisakid_mecab_ja.dylib"
+          cmp "$LIB" "$LIB2"
+          nm -gjU "$LIB" | LC_ALL=C sort > "$RUNNER_TEMP/misakid-mecab-ja-exports.txt"
+          diff -u native/expected_exports_macos.txt "$RUNNER_TEMP/misakid-mecab-ja-exports.txt"
+          test "$(otool -D "$LIB" | tail -n 1)" = '@rpath/libmisakid_mecab_ja.dylib'
+          test "$(otool -L "$LIB" | tail -n +2 | wc -l | tr -d ' ')" = 3
+          ! otool -L "$LIB" | grep -F 'libiconv'
+          otool -L "$LIB" | grep -F '/usr/lib/libSystem.B.dylib'
+          otool -L "$LIB" | grep -F '/usr/lib/libc++.1.dylib'
+          otool -l "$LIB" | grep -F 'minos 11.0'
+          ! nm -u "$LIB" | grep -E '(_exit|_abort)$'
+          ! strings "$LIB" | grep -F "$NATIVE_BUILD"
+          ! strings "$LIB" | grep -F "$NATIVE_BUILD_2"
+          ! strings "$LIB" | grep -F "$PYOPENJTALK_SOURCE"
+          test -f "$NATIVE_BUILD/install/share/misakid_mecab_ja/LICENSE"
+          test -f "$NATIVE_BUILD/install/share/misakid_mecab_ja/THIRD_PARTY_NOTICES.md"
+          test -f "$NATIVE_BUILD/install/share/misakid_mecab_ja/SOURCE_MANIFEST.md"
+          test -f "$NATIVE_BUILD/install/share/misakid_mecab_ja/licenses/mecab-COPYING"
+          test -f "$NATIVE_BUILD/install/share/misakid_mecab_ja/licenses/unidic-BSD"
+      - name: Run exact native Cutlet parity and safety tests
+        working-directory: packages/misakid_mecab_ja
+        env:
+          MISAKID_MECAB_JA_LIBRARY: ${{ runner.temp }}/misakid-mecab-ja/install/lib/libmisakid_mecab_ja.dylib
+        run: dart test test/native_parity_test.dart

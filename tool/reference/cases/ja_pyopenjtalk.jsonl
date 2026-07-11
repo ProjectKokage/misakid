@@ -1,0 +1,24 @@
+{"caseId":"empty","language":"ja","mode":"pyopenjtalk","options":{},"input":""}
+{"caseId":"whitespace-only","language":"ja","mode":"pyopenjtalk","options":{},"input":" \t\n　"}
+{"caseId":"hiragana","language":"ja","mode":"pyopenjtalk","options":{},"input":"こんにちは。"}
+{"caseId":"katakana","language":"ja","mode":"pyopenjtalk","options":{},"input":"カタカナです。"}
+{"caseId":"kanji","language":"ja","mode":"pyopenjtalk","options":{},"input":"東京へ行く。"}
+{"caseId":"small-kana","language":"ja","mode":"pyopenjtalk","options":{},"input":"きゃきゅきょ、ティファニー、ヴァイオリン。"}
+{"caseId":"standalone-small-kana","language":"ja","mode":"pyopenjtalk","options":{},"input":"ぁぃぅぇぉゃゅょゎ。"}
+{"caseId":"sokuon","language":"ja","mode":"pyopenjtalk","options":{},"input":"切手を買った。ちょっと待って。"}
+{"caseId":"moraic-nasal","language":"ja","mode":"pyopenjtalk","options":{},"input":"日本の新聞を案内します。"}
+{"caseId":"long-vowels","language":"ja","mode":"pyopenjtalk","options":{},"input":"大きいコーヒーを東京で飲む。"}
+{"caseId":"leading-long-mark","language":"ja","mode":"pyopenjtalk","options":{},"input":"ーラーメン"}
+{"caseId":"accent-homographs","language":"ja","mode":"pyopenjtalk","options":{},"input":"雨が降る。飴を食べる。橋と箸。"}
+{"caseId":"accent-chain","language":"ja","mode":"pyopenjtalk","options":{},"input":"東京都に住んでいます。"}
+{"caseId":"numbers","language":"ja","mode":"pyopenjtalk","options":{},"input":"0、7、10、21、300、1000、12345。"}
+{"caseId":"full-width-punctuation-quotes","language":"ja","mode":"pyopenjtalk","options":{},"input":"「こんにちは！」（東京）【日本】。"}
+{"caseId":"middle-dot-and-ideographic-space","language":"ja","mode":"pyopenjtalk","options":{},"input":"東京・大阪　京都"}
+{"caseId":"ascii-spacing","language":"ja","mode":"pyopenjtalk","options":{},"input":"東京 大阪\t京都\n奈良"}
+{"caseId":"mixed-latin","language":"ja","mode":"pyopenjtalk","options":{},"input":"MisakiとKokoroはG2Pです。"}
+{"caseId":"emoji-unknown","language":"ja","mode":"pyopenjtalk","options":{},"input":"猫😀犬。"}
+{"caseId":"supplementary-cjk","language":"ja","mode":"pyopenjtalk","options":{},"input":"𠮷野家へ行く。"}
+{"caseId":"variation-selector","language":"ja","mode":"pyopenjtalk","options":{},"input":"飛行機✈️です。"}
+{"caseId":"half-and-full-width-forms","language":"ja","mode":"pyopenjtalk","options":{},"input":"ｺﾝﾆﾁﾊ ＡＢＣ １２３。"}
+{"caseId":"decomposed-dakuten","language":"ja","mode":"pyopenjtalk","options":{},"input":"がくせいとがくせい。"}
+{"caseId":"punctuation-only","language":"ja","mode":"pyopenjtalk","options":{},"input":"！？。、・「」（）"}

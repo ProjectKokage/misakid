@@ -1,0 +1,24 @@
+{"caseId":"empty","language":"zh","mode":"legacy","options":{},"input":""}
+{"caseId":"whitespace-only","language":"zh","mode":"legacy","options":{},"input":" \t\n　"}
+{"caseId":"simple-punctuation","language":"zh","mode":"legacy","options":{},"input":"你好，世界！"}
+{"caseId":"traditional","language":"zh","mode":"legacy","options":{},"input":"繁體中文與臺灣"}
+{"caseId":"fullwidth","language":"zh","mode":"legacy","options":{},"input":"１２３．４５，ＡＢＣ"}
+{"caseId":"quotes-brackets","language":"zh","mode":"legacy","options":{},"input":"《你好》：「世界」？（测试）"}
+{"caseId":"lexical-tones","language":"zh","mode":"legacy","options":{},"input":"妈妈骂马吗"}
+{"caseId":"polyphones","language":"zh","mode":"legacy","options":{},"input":"银行行长重庆音乐快乐"}
+{"caseId":"mixed-english","language":"zh","mode":"legacy","options":{},"input":"Misaki G2P 你好 world"}
+{"caseId":"english-apostrophe-hyphen","language":"zh","mode":"legacy","options":{},"input":"Alice's G2P-test 你好"}
+{"caseId":"integer-date","language":"zh","mode":"legacy","options":{},"input":"今天是2026年7月10日"}
+{"caseId":"decimal-currency-percent","language":"zh","mode":"legacy","options":{},"input":"价格是123.45元，增长12.5%"}
+{"caseId":"iso-date-time","language":"zh","mode":"legacy","options":{},"input":"2024-02-29 08:30:05"}
+{"caseId":"phone-number","language":"zh","mode":"legacy","options":{},"input":"电话13800138000"}
+{"caseId":"fraction-ratio","language":"zh","mode":"legacy","options":{},"input":"比例是3/4和1:2"}
+{"caseId":"internal-whitespace","language":"zh","mode":"legacy","options":{},"input":"你  好\n世界"}
+{"caseId":"emoji-extension-b","language":"zh","mode":"legacy","options":{},"input":"你好😀世界𠀀"}
+{"caseId":"decomposed-latin","language":"zh","mode":"legacy","options":{},"input":"café你好"}
+{"caseId":"rare-han","language":"zh","mode":"legacy","options":{},"input":"龘靐齉"}
+{"caseId":"ideographic-zero","language":"zh","mode":"legacy","options":{},"input":"二〇二六年"}
+{"caseId":"punctuation-map","language":"zh","mode":"legacy","options":{},"input":"你好、世界；再见：朋友。"}
+{"caseId":"cjk-upper-bound","language":"zh","mode":"legacy","options":{},"input":"一鿿"}
+{"caseId":"variation-selector","language":"zh","mode":"legacy","options":{},"input":"禰󠄀好"}
+{"caseId":"custom-unknown","language":"zh","mode":"legacy","options":{"unk":"<?>"},"input":"龘与鿿"}

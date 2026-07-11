@@ -1,0 +1,13 @@
+.dart_tool/
+build/
+dart_test.yaml
+doc/
+test/
+*.dll
+*.dylib
+*.onnx
+*.pt
+*.pth
+*.so
+*.whl
+en_core_web_trf*/

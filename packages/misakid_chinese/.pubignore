@@ -1,0 +1,5 @@
+.dart_tool/
+build/
+dart_test.yaml
+doc/
+test/

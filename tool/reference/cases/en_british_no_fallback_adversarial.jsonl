@@ -1,0 +1,21 @@
+{"caseId":"adv-number-flags","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"[105](#a#) [105](#&#) [105](#n#) [1905](#o#) [42](#an#)"}
+{"caseId":"adv-year-like-numbers","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"1066 1900 1905 1999 2000 2001 2010 2024"}
+{"caseId":"adv-zero-padded-and-signed","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"0007 -3 +4 0.000 001.50"}
+{"caseId":"adv-currency-minor-units","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"$0.01 $1.01 $2.00 £0.50 £1.00 €2.05"}
+{"caseId":"adv-contractions","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"I'm you're he'd she'll we'll they've can't won't shouldn't."}
+{"caseId":"adv-possessives","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"the cat's bowl, James' book, and the children's room"}
+{"caseId":"adv-hyphenated","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"mother-in-law state-of-the-art twenty-one re-enter"}
+{"caseId":"adv-smart-apostrophes","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"don’t rock’n’roll ‘quoted’ ’tis"}
+{"caseId":"adv-suffix-branches","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"heroes churches boxes buzzes fixed laughed loved needed studies studied dying lying"}
+{"caseId":"adv-pos-homographs","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"I record a record and present the present object."}
+{"caseId":"adv-context-function-words","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"I can can fish, as good as it is, for a while."}
+{"caseId":"adv-capitalization-stress","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"us US Who WHO nasa NASA iPhone McDonald"}
+{"caseId":"adv-multiword-pronunciation","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"[New York](/nˈu jˈɔɹk///) is here."}
+{"caseId":"adv-adjacent-controls","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"[a](//)[bee](/bˈi/) [silent](//)[word](/wˈɜɹd/)"}
+{"caseId":"adv-compatibility-normalization","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"① ½ ㎏ ℉ ﬁ ﬂ"}
+{"caseId":"adv-unicode-whitespace","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"hello\u001cworld again once more"}
+{"caseId":"adv-mixed-scripts","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"English中文日本語한글العربيةEnglish"}
+{"caseId":"adv-non-bmp-combining","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"𐐀́ Á̧ 😀⃝"}
+{"caseId":"adv-symbol-clusters","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"C++ C# AT&T 100% @home #topic email@example.com"}
+{"caseId":"adv-large-number","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"999999999999999 1000000000000000"}
+{"caseId":"adv-cherokee-tag-weight","language":"en","mode":"british-no-fallback","options":{"version":null},"input":"[a Ꭰ](/p/)"}

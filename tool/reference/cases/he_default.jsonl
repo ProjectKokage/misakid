@@ -1,0 +1,28 @@
+{"caseId":"empty","language":"he","mode":"default","options":{},"input":""}
+{"caseId":"whitespace-only","language":"he","mode":"default","options":{},"input":" \t\n　"}
+{"caseId":"shalom-niqqud","language":"he","mode":"default","options":{},"input":"שָׁלוֹם"}
+{"caseId":"documented-hello-world","language":"he","mode":"default","options":{},"input":"שָׁלוֹם עוֹלָם"}
+{"caseId":"shalom-unpointed","language":"he","mode":"default","options":{},"input":"שלום"}
+{"caseId":"greeting-sentence","language":"he","mode":"default","options":{},"input":"שָׁלוֹם, מַה שְּׁלוֹמְךָ?"}
+{"caseId":"all-basic-vowels","language":"he","mode":"default","options":{},"input":"בְּ בֱּ בֲּ בֳּ בִּ בֵּ בֶּ בַּ בָּ בֹּ בֻּ"}
+{"caseId":"shin-and-sin","language":"he","mode":"default","options":{},"input":"שָׁ שַׂ"}
+{"caseId":"dagesh-rafe","language":"he","mode":"default","options":{},"input":"בּ בֿ כּ כֿ פּ פֿ"}
+{"caseId":"final-forms","language":"he","mode":"default","options":{},"input":"ךְ ם ן ףְ ץ"}
+{"caseId":"maqaf","language":"he","mode":"default","options":{},"input":"בֵּית־סֵפֶר"}
+{"caseId":"quotes-geresh-gershayim","language":"he","mode":"default","options":{},"input":"ג׳ צה״ל \"שלום\" ‘עולם’"}
+{"caseId":"punctuation","language":"he","mode":"default","options":{},"input":"שָׁלוֹם! (כֵּן); לֹא…"}
+{"caseId":"cantillation","language":"he","mode":"default","options":{},"input":"בְּרֵאשִׁ֖ית בָּרָ֣א אֱלֹהִ֑ים"}
+{"caseId":"explicit-hatama","language":"he","mode":"default","options":{},"input":"טַחִ֫ינָה טְחִינָ֫ה"}
+{"caseId":"explicit-vocal-shva","language":"he","mode":"default","options":{},"input":"תְֽפרְסם"}
+{"caseId":"numbers","language":"he","mode":"default","options":{},"input":"בשנת 2026 יש 12 חודשים."}
+{"caseId":"date","language":"he","mode":"default","options":{},"input":"10/07/2026"}
+{"caseId":"mixed-latin","language":"he","mode":"default","options":{},"input":"שלום OpenAI test"}
+{"caseId":"emoji","language":"he","mode":"default","options":{},"input":"שָׁלוֹם😀עוֹלָם"}
+{"caseId":"variation-selector","language":"he","mode":"default","options":{},"input":"שָׁלוֹם✈️"}
+{"caseId":"punctuation-disabled","language":"he","mode":"default","options":{"preserve_punctuation":false},"input":"שָׁלוֹם, עוֹלָם!"}
+{"caseId":"stress-disabled","language":"he","mode":"default","options":{"preserve_stress":false},"input":"טַחִ֫ינָה טְחִינָ֫ה"}
+{"caseId":"both-disabled","language":"he","mode":"default","options":{"preserve_punctuation":false,"preserve_stress":false},"input":"שָׁלוֹם, עוֹלָם!"}
+{"caseId":"punctuation-explicit-default","language":"he","mode":"default","options":{"preserve_punctuation":true},"input":"מַה? כֵּן."}
+{"caseId":"stress-explicit-default","language":"he","mode":"default","options":{"preserve_stress":true},"input":"מַה שְּׁלוֹמְךָ"}
+{"caseId":"combining-order","language":"he","mode":"default","options":{},"input":"שָׁלוֹם"}
+{"caseId":"unknown-symbols","language":"he","mode":"default","options":{},"input":"שלום @ # % / —"}

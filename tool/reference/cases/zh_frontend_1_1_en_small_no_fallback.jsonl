@@ -1,0 +1,14 @@
+{"caseId":"english-only-american-legacy","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"american","englishVersion":null},"input":"water bottle tomato route"}
+{"caseId":"english-only-american-v2","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"american","englishVersion":"2.0"},"input":"water bottle tomato route"}
+{"caseId":"english-only-british-legacy","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"british","englishVersion":null},"input":"water bottle tomato route"}
+{"caseId":"english-only-british-v2","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"british","englishVersion":"2.0"},"input":"water bottle tomato route"}
+{"caseId":"multiple-mixed-segments","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"american","englishVersion":null},"input":"中文ABC中文DEF"}
+{"caseId":"punctuation-and-symbol-splitting","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"british","englishVersion":null},"input":"C++很好，AI-ready！"}
+{"caseId":"apostrophe-and-hyphen","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"american","englishVersion":"2.0"},"input":"你好 We're text-to-speech 世界"}
+{"caseId":"english-context","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"british","englishVersion":"2.0"},"input":"the apple to orange used to swim"}
+{"caseId":"oov-default-unknown","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"american","englishVersion":null},"input":"你好 blorptastic 世界"}
+{"caseId":"oov-custom-unknown","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"british","englishVersion":null,"unk":"¿"},"input":"你好 blorptastic 世界"}
+{"caseId":"fullwidth-ascii-boundary","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"american","englishVersion":"2.0"},"input":"Ｈｅｌｌｏ中文ABC"}
+{"caseId":"cn2an-number-boundary","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"british","englishVersion":"2.0"},"input":"123 Hello 456"}
+{"caseId":"whitespace-only","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"american","englishVersion":null},"input":" \t\n　"}
+{"caseId":"empty","language":"zh","mode":"frontend-1.1-en-small-no-fallback","options":{"englishDialect":"british","englishVersion":"2.0"},"input":""}

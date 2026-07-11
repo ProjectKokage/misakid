@@ -1,0 +1,153 @@
+name: English spaCy transformer native adapter
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: english-spacy-transformer-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos-arm64-pinned-model:
+    # The owner-provisioned runner supplies the GPL eSpeak runtime and data.
+    # The transformer wheel is still acquired and verified explicitly below.
+    runs-on: [self-hosted, macOS, ARM64, misakid-espeak-en]
+    timeout-minutes: 45
+    env:
+      MODEL_WHEEL: ${{ runner.temp }}/en_core_web_trf-3.8.0-py3-none-any.whl
+      MODEL_EXTRACT: ${{ runner.temp }}/en_core_web_trf-3.8.0
+      MISAKID_SPACY_TRF_EN_MODEL_DIR: ${{ runner.temp }}/en_core_web_trf-3.8.0/en_core_web_trf/en_core_web_trf-3.8.0
+      NATIVE_BUILD: ${{ runner.temp }}/misakid-spacy-trf-en
+      NATIVE_BUILD_2: ${{ runner.temp }}/misakid-spacy-trf-en-reproducible
+      MISAKID_SPACY_TRF_EN_LIBRARY: ${{ runner.temp }}/misakid-spacy-trf-en/install/lib/libmisakid_spacy_trf_en.dylib
+      MISAKID_ESPEAK_EN_LIBRARY: ${{ vars.MISAKID_ESPEAK_EN_LIBRARY }}
+      MISAKID_ESPEAK_EN_DATA: ${{ vars.MISAKID_ESPEAK_EN_DATA }}
+      ESPEAK_NATIVE_BUILD: ${{ runner.temp }}/misakid-espeak-en-for-transformer
+      ESPEAK_NATIVE_BUILD_2: ${{ runner.temp }}/misakid-espeak-en-for-transformer-reproducible
+      MISAKID_ESPEAK_EN_ADAPTER_LIBRARY: ${{ runner.temp }}/misakid-espeak-en-for-transformer/install/lib/libmisakid_espeak_en.dylib
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.11.5
+      - name: Validate the provisioned runner and build tools
+        shell: bash
+        run: |
+          test "$(uname -s)" = Darwin
+          test "$(uname -m)" = arm64
+          command -v cmake
+          command -v ditto
+          command -v shasum
+          test -n "$MISAKID_ESPEAK_EN_LIBRARY"
+          test -f "$MISAKID_ESPEAK_EN_LIBRARY"
+          test -n "$MISAKID_ESPEAK_EN_DATA"
+          test -d "$MISAKID_ESPEAK_EN_DATA"
+      - name: Fetch and extract the exact official transformer model
+        shell: bash
+        run: |
+          test ! -e "$MODEL_WHEEL"
+          test ! -e "$MODEL_EXTRACT"
+          curl --proto '=https' --tlsv1.2 --fail --location --retry 3 \
+            --output "$MODEL_WHEEL" \
+            https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl
+          test "$(stat -f%z "$MODEL_WHEEL")" = 457421864
+          test "$(shasum -a 256 "$MODEL_WHEEL" | awk '{print $1}')" = 272a31e9d8530d1e075351d30a462d7e80e31da23574f1b274e200f3fff35bf5
+          mkdir -p "$MODEL_EXTRACT"
+          ditto -x -k "$MODEL_WHEEL" "$MODEL_EXTRACT"
+      - name: Verify every consumed model resource
+        shell: bash
+        run: |
+          test -d "$MISAKID_SPACY_TRF_EN_MODEL_DIR"
+          test ! -L "$MISAKID_SPACY_TRF_EN_MODEL_DIR"
+          test "$(stat -f%z "$MISAKID_SPACY_TRF_EN_MODEL_DIR/tokenizer")" = 77066
+          test "$(shasum -a 256 "$MISAKID_SPACY_TRF_EN_MODEL_DIR/tokenizer" | awk '{print $1}')" = b014e8bba4958b120af2d0c1c63eabb7c00379f2bacaf10df7c5325efd2ea467
+          test "$(stat -f%z "$MISAKID_SPACY_TRF_EN_MODEL_DIR/vocab/lookups.bin")" = 70040
+          test "$(shasum -a 256 "$MISAKID_SPACY_TRF_EN_MODEL_DIR/vocab/lookups.bin" | awk '{print $1}')" = fce9c883c56165f29573cc938c2a1c9d417ac61bd8f56b671dd5f7996de70682
+          test "$(stat -f%z "$MISAKID_SPACY_TRF_EN_MODEL_DIR/tagger/model")" = 151450
+          test "$(shasum -a 256 "$MISAKID_SPACY_TRF_EN_MODEL_DIR/tagger/model" | awk '{print $1}')" = a489a41d998a6c042eaa279b6b823cd24b40854faf602e696d280788ed62f84c
+          test "$(stat -f%z "$MISAKID_SPACY_TRF_EN_MODEL_DIR/transformer/model")" = 497343046
+          test "$(shasum -a 256 "$MISAKID_SPACY_TRF_EN_MODEL_DIR/transformer/model" | awk '{print $1}')" = 2b7061c623f424486e5dddcff79276927127cee339cc6a9d26d87837c3e6074a
+      - run: dart pub get
+      - name: Build the package-owned eSpeak adapter dylib
+        working-directory: packages/misakid_espeak_en
+        run: >-
+          dart run tool/build_native.dart
+          --build-dir "$ESPEAK_NATIVE_BUILD"
+      - name: Rebuild the eSpeak adapter independently
+        working-directory: packages/misakid_espeak_en
+        run: >-
+          dart run tool/build_native.dart
+          --build-dir "$ESPEAK_NATIVE_BUILD_2"
+      - name: Verify the installed eSpeak adapter artifact
+        working-directory: packages/misakid_espeak_en
+        shell: bash
+        run: |
+          LIB="$ESPEAK_NATIVE_BUILD/install/lib/libmisakid_espeak_en.dylib"
+          LIB2="$ESPEAK_NATIVE_BUILD_2/install/lib/libmisakid_espeak_en.dylib"
+          cmp "$LIB" "$LIB2"
+          nm -gjU "$LIB" | LC_ALL=C sort > "$RUNNER_TEMP/misakid-espeak-en-transformer-exports.txt"
+          diff -u native/expected_exports_macos.txt "$RUNNER_TEMP/misakid-espeak-en-transformer-exports.txt"
+          test "$(otool -D "$LIB" | tail -n 1)" = '@rpath/libmisakid_espeak_en.dylib'
+          test "$(otool -L "$LIB" | tail -n +2 | wc -l | tr -d ' ')" = 3
+          otool -L "$LIB" | grep -F '/usr/lib/libSystem.B.dylib'
+          otool -L "$LIB" | grep -F '/usr/lib/libc++.1.dylib'
+          ! otool -L "$LIB" | grep -F 'libespeak-ng'
+          otool -l "$LIB" | grep -F 'minos 11.0'
+          ! nm -u "$LIB" | grep -E '(_exit|_abort)$'
+          ! strings "$LIB" | grep -F "$ESPEAK_NATIVE_BUILD"
+          ! strings "$LIB" | grep -F "$ESPEAK_NATIVE_BUILD_2"
+          ! strings "$LIB" | grep -F "$GITHUB_WORKSPACE"
+          ! strings "$LIB" | grep -F "$MISAKID_ESPEAK_EN_LIBRARY"
+          ! strings "$LIB" | grep -F "$MISAKID_ESPEAK_EN_DATA"
+          test -f "$ESPEAK_NATIVE_BUILD/install/share/misakid_espeak_en/LICENSE"
+          test -f "$ESPEAK_NATIVE_BUILD/install/share/misakid_espeak_en/THIRD_PARTY_NOTICES.md"
+          test -f "$ESPEAK_NATIVE_BUILD/install/share/misakid_espeak_en/SOURCE_MANIFEST.md"
+      - name: Build the package-owned Accelerate dylib
+        working-directory: packages/misakid_spacy_trf_en
+        run: >-
+          dart run tool/build_native.dart
+          --build-dir "$NATIVE_BUILD"
+      - name: Rebuild independently for reproducibility
+        working-directory: packages/misakid_spacy_trf_en
+        run: >-
+          dart run tool/build_native.dart
+          --build-dir "$NATIVE_BUILD_2"
+      - name: Verify the installed native artifact
+        working-directory: packages/misakid_spacy_trf_en
+        shell: bash
+        run: |
+          LIB="$NATIVE_BUILD/install/lib/libmisakid_spacy_trf_en.dylib"
+          LIB2="$NATIVE_BUILD_2/install/lib/libmisakid_spacy_trf_en.dylib"
+          test -f "$LIB"
+          test -f "$LIB2"
+          cmp "$LIB" "$LIB2"
+          test "$(lipo -archs "$LIB")" = arm64
+          nm -gjU "$LIB" | LC_ALL=C sort > "$RUNNER_TEMP/misakid-spacy-trf-en-exports.txt"
+          diff -u native/expected_exports_macos.txt "$RUNNER_TEMP/misakid-spacy-trf-en-exports.txt"
+          test "$(otool -D "$LIB" | tail -n 1)" = '@rpath/libmisakid_spacy_trf_en.dylib'
+          test "$(otool -L "$LIB" | tail -n +2 | wc -l | tr -d ' ')" = 4
+          otool -L "$LIB" | grep -F '/System/Library/Frameworks/Accelerate.framework/'
+          otool -L "$LIB" | grep -F '/usr/lib/libSystem.B.dylib'
+          otool -L "$LIB" | grep -F '/usr/lib/libc++.1.dylib'
+          otool -l "$LIB" | grep -F 'minos 11.0'
+          ! nm -u "$LIB" | grep -E '(_exit|_abort)$'
+          ! otool -L "$LIB" | grep -Ei 'python|torch'
+          ! strings "$LIB" | grep -F "$NATIVE_BUILD"
+          ! strings "$LIB" | grep -F "$NATIVE_BUILD_2"
+          ! strings "$LIB" | grep -F "$GITHUB_WORKSPACE"
+          ! strings "$LIB" | grep -F "$MISAKID_SPACY_TRF_EN_MODEL_DIR"
+          test -f "$NATIVE_BUILD/install/share/misakid_spacy_trf_en/LICENSE"
+          test -f "$NATIVE_BUILD/install/share/misakid_spacy_trf_en/THIRD_PARTY_NOTICES.md"
+          test -f "$NATIVE_BUILD/install/share/misakid_spacy_trf_en/SOURCE_MANIFEST.md"
+      - name: Run exact model, native safety, and end-to-end parity tests
+        working-directory: packages/misakid_spacy_trf_en
+        run: dart test --concurrency=1 --tags provisioned
+      - name: Run real transformer and eSpeak composition parity
+        working-directory: packages/misakid_espeak_en
+        run: dart test test/transformer_combined_parity_test.dart

@@ -1,0 +1,34 @@
+# Python 3.11 dependency closure for the pinned Vietnamese no-English oracle.
+#
+# Underthesea and all transitive versions come from hexgrad/misaki uv.lock at
+# commit fba1236595f2d2bf21d414ba6e57d25256afada3. Python 3.11 is required
+# because underthesea-core 1.0.4 publishes no CPython 3.12 wheel. Pinned
+# Misaki imports vietnam-number but omits it from pyproject.toml and uv.lock;
+# 1.0.3 is the latest release that existed at the pinned commit date, and its
+# exact PyPI wheel is selected below. Misaki itself is loaded from the
+# separately validated source checkout. Regeneration runs offline.
+#
+# The exporter selects enable_en_g2p=False and isolates vi.py from en.py's
+# undeclared transformers import, supplying only en.py's exact LINK_REGEX and
+# a rejecting G2P sentinel. No English dependency or behavior is exercised.
+
+addict==2.4.0
+certifi==2025.1.31
+charset-normalizer==3.4.1
+click==8.1.8
+idna==3.10
+joblib==1.4.2
+nltk==3.9.1
+numpy==2.2.4
+python-crfsuite==0.9.11
+pyyaml==6.0.2
+regex==2024.11.6
+requests==2.32.3
+scikit-learn==1.6.1
+scipy==1.15.2
+threadpoolctl==3.6.0
+tqdm==4.67.1
+underthesea @ https://files.pythonhosted.org/packages/23/17/8c9b8faa546fc0b1d2c2d95bc3539422946c3614f14db91272b219307c9f/underthesea-6.8.4-py3-none-any.whl#sha256=ddc1387f99320e4a2bbee2bfd34d7cd39fad54802b6752941cbc47d8e79ee9c7
+underthesea-core==1.0.4
+urllib3==2.3.0
+vietnam-number @ https://files.pythonhosted.org/packages/b8/3f/ae3b914ca89e8086467bfaa43b700139010904b8b7eaeea9e4fc453fe563/vietnam_number-1.0.3-py3-none-any.whl#sha256=549d8db75a1fca94786b5534e5aa129dc08d8104e848d9d0662baae925eb31b1

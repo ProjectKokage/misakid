@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "purpose": "CPython 3.11.15 Unicode 14 text-behavior candidate for exact 3.11.13 verification",
+  "source": {
+    "implementation": "CPython",
+    "exportRuntimeVersion": "3.11.15",
+    "targetRuntimeVersion": "3.11.13",
+    "targetVerificationStatus": "pending exact-runtime comparison",
+    "pythonExecutableSha256": "7e470bc0e4889177f9acb5f62208fae2825aba9ccd6a67b7c3378f522aa8f148",
+    "unicodeVersion": "14.0.0",
+    "unicodeDataSource": "https://www.unicode.org/Public/14.0.0/ucd/",
+    "unicodeDataLicense": "Unicode-3.0",
+    "pythonLicense": "PSF-2.0"
+  },
+  "extractor": {
+    "path": "tool/reference/export_python311_case.py",
+    "sha256": "5083315b37031c66770cfcc6e098cbba008f5e7e0e4ad2b84c0e4219fef2813f"
+  },
+  "targetComparator": {
+    "path": "tool/reference/compare_python31113_case.py",
+    "sha256": "4b1e047ed868e99c7b7334fb125c962c3e170f335ccafa5651e6b7561cffab11"
+  },
+  "canonicalData": {
+    "path": "case_maps.json",
+    "sha256": "f6ab81284aad17b08281af1e2619efca74aec171dfb1701796ea327b3810d9b1",
+    "bytes": 50779,
+    "scalarRecords": 1112064,
+    "lowercaseMappingCount": 1433,
+    "uppercaseMappingCount": 1525,
+    "casedRangeCount": 149,
+    "caseIgnorableRangeCount": 427,
+    "whitespaceRangeCount": 10,
+    "lowercaseSha256": "12d850423c3890cfd592776a5973994a1bfd5133cf1fea3699102e373a676279",
+    "uppercaseSha256": "da697e9c3f3a24d8d549aa9203bae2eef9db60ae8a658637736c902954a49e04",
+    "propertiesSha256": "b00b84a6e79acbbde7691a85bbbed4bb5e4b14dea17f440bbb933fd09d080771"
+  },
+  "runtimeGenerator": {
+    "path": "tool/generators/generate_python311_case.dart",
+    "sha256": "ea2eb5e8a9bcc282fa8446f60daf3dbddcf343349b3ab34c8e899e5e7ffed8f6"
+  },
+  "generatedRuntime": {
+    "path": "lib/src/generated/python311_case_data.dart",
+    "sha256": "1a73213057532f443a1e4777b282380a51dbcf8a9003deec97bf508732f55cc0",
+    "bytes": 74278
+  }
+}

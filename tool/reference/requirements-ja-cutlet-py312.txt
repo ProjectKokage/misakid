@@ -1,0 +1,23 @@
+# Python 3.12 dependency closure for the pinned Japanese Cutlet oracle.
+#
+# Every version comes from hexgrad/misaki uv.lock at commit
+# fba1236595f2d2bf21d414ba6e57d25256afada3. Misaki itself is loaded from the
+# separately validated source checkout. The full UniDic resource is pinned and
+# provisioned separately; regeneration runs offline and never downloads it.
+
+addict==2.4.0
+certifi==2025.1.31
+charset-normalizer==3.4.1
+fugashi==1.4.0
+idna==3.10
+jaconv==0.4.0
+mojimoji==0.0.13
+numpy==2.2.4
+plac==1.4.5
+pyopenjtalk==0.4.1
+regex==2024.11.6
+requests==2.32.3
+tqdm==4.67.1
+unidic==1.1.0
+urllib3==2.3.0
+wasabi==0.10.1

@@ -1,0 +1,69 @@
+{
+  "backendVersions": {
+    "en-core-web-sm": "3.8.0",
+    "num2words": "0.5.14",
+    "spacy": "3.8.4"
+  },
+  "backendInput": {
+    "capture": "single wrapped G2P.tokenize invocation per case",
+    "kind": "misaki.en.G2P.preprocess-tokenize",
+    "preprocessApplied": true,
+    "rawTokenCount": 175,
+    "schemaVersion": 1
+  },
+  "caseCount": 21,
+  "caseCorpus": "tool/reference/cases/en_american_no_fallback_adversarial.jsonl",
+  "caseCorpusReview": {
+    "coverage": [
+      "number flags, signed and large values, year forms, and currency edge cases",
+      "contractions, possessives, suffix branches, homographs, and capitalization",
+      "multiword and adjacent controls",
+      "compatibility forms, Python whitespace, mixed scripts, combining marks, and symbols"
+    ],
+    "reviewedRecordCount": 21
+  },
+  "caseCorpusSha256": "bf648e6936491b32a4021ed95b086413e961c8357e7a9524aeae834702d9e006",
+  "dependencyLock": "tool/reference/requirements-en-no-fallback-py312.txt",
+  "dependencyLockSha256": "dd5c6ab110e810ebc8a5932bbb3df1ba5ac752e1ad9850192eecdcfad9314d41",
+  "fallbackPolicy": {
+    "constructorArgument": "truthy _DisabledFallback callable",
+    "effectiveFallback": null,
+    "mode": "american-no-fallback"
+  },
+  "fixture": "en_american_no_fallback_adversarial.jsonl",
+  "fixtureSha256": "69a973bcdbc79a31800fb94e8ea8e5a2963b3cb58470b07de719e77f87a744eb",
+  "generatedBy": "tool/reference/export_fixtures.py",
+  "model": {
+    "distribution": "en-core-web-sm",
+    "sha256": "1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85",
+    "url": "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl",
+    "version": "3.8.0"
+  },
+  "pythonVersion": "3.12.11",
+  "schemaVersion": 1,
+  "sourceFiles": [
+    {
+      "license": "Apache-2.0 (pinned upstream repository)",
+      "path": "misaki/en.py",
+      "sha256": "a9c36c90a3fa6c6084e9042fd8e19f6049add4f1435d8fe5ca1b77f3529a98f4"
+    },
+    {
+      "license": "Apache-2.0 (pinned upstream repository)",
+      "path": "misaki/token.py",
+      "sha256": "5ff6ce45da6766cdc1e3d5c91b0b2b093d912b8df6f2da327af56f88ad43f073"
+    },
+    {
+      "license": "Apache-2.0 (author-published hexgrad/misaki dataset revision b65a6b4398e053983b9c360f0682b720e362859d)",
+      "path": "misaki/data/us_gold.json",
+      "sha256": "dc414872a49a28ae6c141463d502fd945f3b2fde040484fdc47d00cc4612686f"
+    },
+    {
+      "license": "Apache-2.0 (author-published hexgrad/misaki dataset revision b65a6b4398e053983b9c360f0682b720e362859d)",
+      "path": "misaki/data/us_silver.json",
+      "sha256": "de8f67be911bb6c659187b4a65fd966b6a30e56350e0f790d763210b053ac475"
+    }
+  ],
+  "upstreamCommit": "fba1236595f2d2bf21d414ba6e57d25256afada3",
+  "upstreamRepository": "hexgrad/misaki",
+  "upstreamVersion": "0.9.4"
+}

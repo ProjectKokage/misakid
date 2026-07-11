@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug tests accept HTTP only because the Dart provisioner restricts the
+     origin to localhost, 127.0.0.1, or Android's 10.0.2.2 host alias. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true"/>
+</network-security-config>

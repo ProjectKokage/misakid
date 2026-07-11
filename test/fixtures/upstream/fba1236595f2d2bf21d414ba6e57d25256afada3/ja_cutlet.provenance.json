@@ -1,0 +1,124 @@
+{
+  "backendInput": {
+    "capture": "one wrapped fugashi Tagger invocation per non-empty case, followed by pinned Cutlet longest-match grouping",
+    "hiraganaCount": 126,
+    "joinWithNextCount": 12,
+    "kanaNullCount": 26,
+    "kanaValueCount": 100,
+    "kind": "misaki.cutlet.normalized-morphology",
+    "pronunciationNullCount": 26,
+    "pronunciationValueCount": 100,
+    "rawWordCount": 126,
+    "schemaVersion": 1,
+    "unknownWordCount": 26
+  },
+  "backendVersions": {
+    "fugashi": "1.4.0",
+    "fugashi-system-dictionary": "charset:utf8+entries:878989+binary-version:102",
+    "jaconv": "0.4.0",
+    "misaki-ja-words": "sha256:a93a8e8aee24db307a32becb8bf01c4c2908ecf37e6c91f7a705fafdfeba67ff+bytes:1921140+records:147571",
+    "mojimoji": "0.0.13",
+    "python": "3.12.11",
+    "unicode-data": "15.0.0",
+    "unidic": "1.1.0",
+    "unidic-dictionary-tree": "sha256:95bd65fa96955b644c15510932ca8439f463ac8b66f57bac6dfee5e29fa03115+files:20+bytes:811662881",
+    "unidic-dictionary-version": "unidic-3.1.0+2021-08-31"
+  },
+  "caseCount": 27,
+  "caseCorpus": "tool/reference/cases/ja_cutlet.jsonl",
+  "caseCorpusSha256": "7eb170aec3e004a3457a74e245dcf8851e13cb2d2e206c844e282acda26fac10",
+  "dependencyLock": "tool/reference/requirements-ja-cutlet-py312.txt",
+  "dependencyLockSha256": "e3b2766a1221e9253a5c190f4125ada6dd46771855574815907b6b0b0bf4caf4",
+  "dictionary": {
+    "archiveSha256": "39ea0eae3b1f10ba8986483592cbc83bcc92f1898bb43ecbc607010f2e98cd22",
+    "archiveSizeBytes": 524664138,
+    "archiveUrl": "https://huggingface.co/drewThomasson/unidic_3.1.0_backup/resolve/9fcae6f3676c255dac3b81d8fbc83b16cc192d20/unidic-3.1.0.zip",
+    "entryCount": 878989,
+    "installedTreeHashAlgorithm": "SHA-256 over sorted records containing an 8-byte big-endian UTF-8 relative-path length, path bytes, 8-byte big-endian file size, and file bytes",
+    "installedTreeSha256": "95bd65fa96955b644c15510932ca8439f463ac8b66f57bac6dfee5e29fa03115",
+    "installedTreeSizeBytes": 811662881,
+    "installedVersionMarker": "unidic-3.1.0+2021-08-31",
+    "license": "UniDic Consortium BSD option; data is supplied externally and is not redistributed by Misakid",
+    "name": "unidic-cwj-3.1.0",
+    "systemDictionaryBinaryVersion": 102,
+    "systemDictionaryCharset": "utf8",
+    "treeFileCount": 20
+  },
+  "environment": {
+    "compiler": "Clang 20.1.4",
+    "networkPolicy": "socket and urllib access rejected throughout guarded setup and conversion",
+    "platform": "macOS-26.5.1-arm64-arm-64bit",
+    "pythonHashSeed": "0",
+    "pythonImplementation": "CPython",
+    "pythonVersion": "3.12.11"
+  },
+  "expectedFailures": [
+    {
+      "caseId": "long-number-diagnostic",
+      "category": "upstreamFailure",
+      "cause": "Pinned number normalization emits its diagnostic sentence, whose remaining `10` morphology surface triggers Cutlet's AssertionError"
+    }
+  ],
+  "exporter": "tool/reference/export_fixtures.py",
+  "exporterSha256": "3cefd07402b6eaa5ce1da9f4182d58c81b645cf00dab704dd40bfcb9a51a3e66",
+  "fixture": "ja_cutlet.jsonl",
+  "fixtureSha256": "c599ac58455263a9c9e100f175e9eaa07d1b9e77194a075dea6d02d3a1627a48",
+  "groupingResource": {
+    "gitBlob": "fb3b5b1f87e8dcf113857f96ffe845869a616908",
+    "path": "misaki/data/ja_words.txt",
+    "provenance": "Authoritative pinned Misaki artifact; differential evidence strongly suggests an older Kaikki/Wiktextract snapshot, but the exact historical input and generator were not recovered",
+    "recordCount": 147571,
+    "redistribution": "Not copied into the Dart package or fixture; only case-local join decisions are recorded",
+    "sha256": "a93a8e8aee24db307a32becb8bf01c4c2908ecf37e6c91f7a705fafdfeba67ff",
+    "sizeBytes": 1921140,
+    "terminalLf": false
+  },
+  "mode": {
+    "name": "cutlet",
+    "tokens": null,
+    "unknownMarker": "❓"
+  },
+  "oracleVerification": {
+    "directRawPronunciationKanaMatchCount": 126,
+    "mismatchCount": 0,
+    "readOnly": true,
+    "verifiedCaseCount": 27
+  },
+  "schemaVersion": 1,
+  "sourceFiles": [
+    {
+      "license": "Apache-2.0 (pinned Misaki repository) and adapted Cutlet MIT notice recorded in THIRD_PARTY_NOTICES.md",
+      "path": "misaki/cutlet.py",
+      "sha256": "7695fc7d853ae4e99679dff4ca0c8404d4804a6fb1059a9d6ad02baeabc4d4de",
+      "sizeBytes": 13809
+    },
+    {
+      "license": "Apache-2.0 (pinned upstream repository)",
+      "path": "misaki/ja.py",
+      "sha256": "5870e02433629475e95eaa0b023ac4948a9335e3dafbda0b6641156516c03c22",
+      "sizeBytes": 12573
+    },
+    {
+      "license": "MIT adaptation; exact Greatdane and Misaki provenance recorded in THIRD_PARTY_NOTICES.md",
+      "path": "misaki/num2kana.py",
+      "sha256": "26ca4b39ac7165104e53971bd2459df6466ff8140e1dac836a3bf1f9e811e2d2",
+      "sizeBytes": 12956
+    },
+    {
+      "license": "External compatibility artifact; undocumented upstream prehistory and inferred Wiktionary/Kaikki lineage recorded in THIRD_PARTY_NOTICES.md",
+      "path": "misaki/data/ja_words.txt",
+      "sha256": "a93a8e8aee24db307a32becb8bf01c4c2908ecf37e6c91f7a705fafdfeba67ff",
+      "sizeBytes": 1921140
+    },
+    {
+      "license": "dependency resolution record for the pinned upstream repository",
+      "path": "uv.lock",
+      "sha256": "52d912cb52640c6b472c40258ee9c49edb63c1397ac1fb85c0dc17ad06654bd9",
+      "sizeBytes": 520905
+    }
+  ],
+  "successCount": 26,
+  "upstreamCommit": "fba1236595f2d2bf21d414ba6e57d25256afada3",
+  "upstreamRepository": "hexgrad/misaki",
+  "upstreamVersion": "0.9.4"
+}

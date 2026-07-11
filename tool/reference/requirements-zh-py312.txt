@@ -1,0 +1,15 @@
+# Python 3.12 dependency closure for the pinned Chinese oracle.
+#
+# Every version comes from hexgrad/misaki uv.lock at commit
+# fba1236595f2d2bf21d414ba6e57d25256afada3. Misaki itself is loaded from the
+# separately validated source checkout. Regeneration uses `uv pip sync` and
+# then runs offline; no dependency or dictionary download is permitted.
+
+addict==2.4.0
+cn2an==0.5.23
+jieba==0.42.1
+ordered-set==4.1.0
+proces==0.1.7
+pypinyin==0.53.0
+pypinyin-dict==0.9.0
+regex==2024.11.6

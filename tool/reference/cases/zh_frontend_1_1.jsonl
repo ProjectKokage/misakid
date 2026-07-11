@@ -1,0 +1,26 @@
+{"caseId":"empty","language":"zh","mode":"frontend-1.1","options":{},"input":""}
+{"caseId":"whitespace-only","language":"zh","mode":"frontend-1.1","options":{},"input":" \t\n　"}
+{"caseId":"simple-punctuation","language":"zh","mode":"frontend-1.1","options":{},"input":"你好，世界！"}
+{"caseId":"traditional","language":"zh","mode":"frontend-1.1","options":{},"input":"繁體中文與臺灣"}
+{"caseId":"fullwidth","language":"zh","mode":"frontend-1.1","options":{},"input":"１２３．４５，ＡＢＣ"}
+{"caseId":"bu-sandhi","language":"zh","mode":"frontend-1.1","options":{},"input":"不怕不对看不懂"}
+{"caseId":"yi-sandhi","language":"zh","mode":"frontend-1.1","options":{},"input":"一天一段第一名看一看"}
+{"caseId":"third-tone-sandhi","language":"zh","mode":"frontend-1.1","options":{},"input":"你好很好蒙古包纸老虎"}
+{"caseId":"neutral-tone","language":"zh","mode":"frontend-1.1","options":{},"input":"妈妈看看桌子衣服什么"}
+{"caseId":"reduplication","language":"zh","mode":"frontend-1.1","options":{},"input":"奶奶试试听一听"}
+{"caseId":"must-erhua","language":"zh","mode":"frontend-1.1","options":{},"input":"小院儿胡同儿范儿"}
+{"caseId":"not-erhua","language":"zh","mode":"frontend-1.1","options":{},"input":"女儿少儿花儿"}
+{"caseId":"polyphones-custom-dict","language":"zh","mode":"frontend-1.1","options":{},"input":"开户行发卡行行号重庆音乐"}
+{"caseId":"mixed-english-no-engine","language":"zh","mode":"frontend-1.1","options":{},"input":"你好 Misaki world"}
+{"caseId":"all-english-no-engine","language":"zh","mode":"frontend-1.1","options":{},"input":"Hello world"}
+{"caseId":"custom-unknown-mixed","language":"zh","mode":"frontend-1.1","options":{"unk":"<?>"},"input":"Hello 你好 X"}
+{"caseId":"integer-date","language":"zh","mode":"frontend-1.1","options":{},"input":"今天是2026年7月10日"}
+{"caseId":"iso-date-time-phone","language":"zh","mode":"frontend-1.1","options":{},"input":"2024-02-29 08:30 电话13800138000"}
+{"caseId":"decimal-currency-percent","language":"zh","mode":"frontend-1.1","options":{},"input":"价格是123.45元，增长12.5%"}
+{"caseId":"internal-whitespace","language":"zh","mode":"frontend-1.1","options":{},"input":"你  好\n世界"}
+{"caseId":"emoji-extension-b","language":"zh","mode":"frontend-1.1","options":{},"input":"你好😀世界𠀀"}
+{"caseId":"rare-han","language":"zh","mode":"frontend-1.1","options":{},"input":"龘靐齉鿿"}
+{"caseId":"quotes-brackets","language":"zh","mode":"frontend-1.1","options":{},"input":"《你好》：「世界」？（测试）"}
+{"caseId":"interjections-neutral","language":"zh","mode":"frontend-1.1","options":{},"input":"嗯呗嗲掺和"}
+{"caseId":"multiple-mixed-segments","language":"zh","mode":"frontend-1.1","options":{},"input":"中文 one 汉字 two 再见"}
+{"caseId":"variation-selector","language":"zh","mode":"frontend-1.1","options":{},"input":"禰󠄀好"}

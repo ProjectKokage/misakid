@@ -1,0 +1,34 @@
+{"caseId":"empty","language":"ko","mode":"g2pkc-default","options":{},"input":""}
+{"caseId":"whitespace-only","language":"ko","mode":"g2pkc-default","options":{},"input":" \t\n　 "}
+{"caseId":"basic-greeting","language":"ko","mode":"g2pkc-default","options":{},"input":"안녕하세요."}
+{"caseId":"basic-sentence","language":"ko","mode":"g2pkc-default","options":{},"input":"한국어를 읽는다."}
+{"caseId":"rule-boundaries","language":"ko","mode":"g2pkc-default","options":{},"input":"국밥을 먹고 같이 걷는다."}
+{"caseId":"spacing-and-newline","language":"ko","mode":"g2pkc-default","options":{},"input":"첫째 줄\n둘째 줄\t끝"}
+{"caseId":"idioms-compounds","language":"ko","mode":"g2pkc-default","options":{},"input":"문고리와 아침밥, 꽃잎과 서울역."}
+{"caseId":"idioms-exceptions","language":"ko","mode":"g2pkc-default","options":{},"input":"갇혀서 의견란을 본다."}
+{"caseId":"idioms-numeric","language":"ko","mode":"g2pkc-default","options":{},"input":"3연대와 6·25, 10월과 119"}
+{"caseId":"arabic-integers","language":"ko","mode":"g2pkc-default","options":{},"input":"0 7 10 16 106 123,456"}
+{"caseId":"native-counters","language":"ko","mode":"g2pkc-default","options":{},"input":"1개 2명 3마리 20살 21시 10분"}
+{"caseId":"spaced-counters","language":"ko","mode":"g2pkc-default","options":{},"input":"3 개와 21 명"}
+{"caseId":"english-cmudict","language":"ko","mode":"g2pkc-default","options":{},"input":"game file old school"}
+{"caseId":"mixed-english","language":"ko","mode":"g2pkc-default","options":{},"input":"오늘 game을 하고 file을 받는다."}
+{"caseId":"english-acronyms","language":"ko","mode":"g2pkc-default","options":{},"input":"NASA AI MP3 file"}
+{"caseId":"english-unknown","language":"ko","mode":"g2pkc-default","options":{},"input":"qzxxw XYZ"}
+{"caseId":"punctuation","language":"ko","mode":"g2pkc-default","options":{},"input":"안녕! 정말? (네), 아니요…"}
+{"caseId":"punctuation-only","language":"ko","mode":"g2pkc-default","options":{},"input":"… — () / %"}
+{"caseId":"compatibility-jamo","language":"ko","mode":"g2pkc-default","options":{},"input":"ㄱ ㄴ ㅏ ㅓ ㅎㅏㄴ"}
+{"caseId":"conjoining-jamo","language":"ko","mode":"g2pkc-default","options":{},"input":"한글 말"}
+{"caseId":"emoji","language":"ko","mode":"g2pkc-default","options":{},"input":"안녕😀세계"}
+{"caseId":"variation-selector","language":"ko","mode":"g2pkc-default","options":{},"input":"한글✈️테스트"}
+{"caseId":"full-width-forms","language":"ko","mode":"g2pkc-default","options":{},"input":"Ｈｅｌｌｏ １２３ ＡＩ"}
+{"caseId":"rule-blocking-caret","language":"ko","mode":"g2pkc-default","options":{},"input":"국^밥과 옷^입다"}
+{"caseId":"idiom-order-units","language":"ko","mode":"g2pkc-default","options":{},"input":"결단력 단력 1번째 3·1절 6월 5kg 30cm jpeg mp4 mp3 일일구 깻잎"}
+{"caseId":"pos-sensitive-batchim","language":"ko","mode":"g2pkc-default","options":{},"input":"맑게 밟고 넓게 핥다. 읽는 값이 닭을 먹는다."}
+{"caseId":"palatalization-ui","language":"ko","mode":"g2pkc-default","options":{},"input":"굳히고 닫히며 밭이랑 같이, 무늬와 나의 의의."}
+{"caseId":"numeral-place-limit","language":"ko","mode":"g2pkc-default","options":{},"input":"1,000,000,000,000,000 10,000,000,000,000,000"}
+{"caseId":"unicode-decimal-digits","language":"ko","mode":"g2pkc-default","options":{},"input":"١٢٣ 𝟙𝟚𝟛 ０"}
+{"caseId":"counter-boundaries","language":"ko","mode":"g2pkc-default","options":{},"input":"20개 99명 100개 3군데 12권 2시간"}
+{"caseId":"english-arpabet-branches","language":"ko","mode":"g2pkc-default","options":{},"input":"bags power church nothing judgment visionary underworld yellowstone"}
+{"caseId":"english-overlap-case","language":"ko","mode":"g2pkc-default","options":{},"input":"cat scatter Game GAME game friendship"}
+{"caseId":"numeral-set-order","language":"ko","mode":"g2pkc-default","options":{},"input":"1개 1 3개 30개 3 30 3 개 10 100 106 1006"}
+{"caseId":"english-adjacent-vowels","language":"ko","mode":"g2pkc-default","options":{},"input":"abbreviate abiola"}

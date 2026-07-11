@@ -1,0 +1,22 @@
+name: misakid_chinese
+description: Pure-Dart explicit-resource Chinese backend adapters for misakid.
+version: 0.1.0-dev.1
+topics:
+  - g2p
+  - chinese
+  - pinyin
+  - text-to-speech
+
+environment:
+  sdk: ^3.11.5
+
+resolution: workspace
+
+dependencies:
+  crypto: ^3.0.7
+  misakid: ^0.1.0-dev.1
+
+dev_dependencies:
+  lints: ^6.0.0
+  misakid_spacy_en: ^0.1.0-dev.1
+  test: ^1.25.6

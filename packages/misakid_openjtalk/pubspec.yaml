@@ -1,0 +1,24 @@
+name: misakid_openjtalk
+description: Explicit macOS arm64 Open JTalk frontend adapter for misakid.
+version: 0.1.0-dev.1
+topics:
+  - g2p
+  - japanese
+  - open-jtalk
+  - text-to-speech
+
+executables:
+  build_misakid_openjtalk: build_misakid_openjtalk
+
+environment:
+  sdk: ^3.11.5
+
+resolution: workspace
+
+dependencies:
+  crypto: ^3.0.7
+  misakid: ^0.1.0-dev.1
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

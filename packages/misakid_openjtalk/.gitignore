@@ -1,0 +1,9 @@
+.dart_tool/
+build/
+doc/
+pubspec.lock
+native/build/
+native/staged_source/
+*.dylib
+*.so
+*.dll

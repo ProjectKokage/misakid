@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "upstreamCommit": "fba1236595f2d2bf21d414ba6e57d25256afada3",
+  "english": [
+    {"text": "hello", "tag": "UH"},
+    {"text": "world", "tag": "NN"},
+    {"text": "the", "tag": "DT"},
+    {"text": "used", "tag": "VBD"},
+    {"text": "computer", "tag": "NN"},
+    {"text": "language", "tag": "NN"},
+    {"text": "123", "tag": "CD"},
+    {"text": "A.B.C.", "tag": "NNP"}
+  ],
+  "japaneseNumbers": [
+    "0",
+    "7",
+    "10",
+    "300",
+    "12345",
+    "100010001",
+    "20.5",
+    "00042"
+  ]
+}

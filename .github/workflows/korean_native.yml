@@ -1,0 +1,81 @@
+name: Korean native adapter
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: korean-native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos-arm64-mecab-ko:
+    # This label intentionally selects an owner-provisioned machine. The job
+    # never downloads source, dictionary, or CMUdict resources.
+    runs-on: [self-hosted, macOS, ARM64, misakid-mecab-ko]
+    timeout-minutes: 30
+    env:
+      MECAB_KO_SOURCE: ${{ vars.MISAKID_MECAB_KO_SOURCE }}
+      MISAKID_MECAB_KO_DICTIONARY: ${{ vars.MISAKID_MECAB_KO_DICTIONARY }}
+      MISAKID_MECAB_KO_CMUDICT: ${{ vars.MISAKID_MECAB_KO_CMUDICT }}
+      NATIVE_BUILD: ${{ runner.temp }}/misakid-mecab-ko
+      NATIVE_BUILD_2: ${{ runner.temp }}/misakid-mecab-ko-reproducible
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.11.5
+      - name: Validate provisioned resource paths
+        run: |
+          test -n "$MECAB_KO_SOURCE"
+          test -d "$MECAB_KO_SOURCE"
+          test -n "$MISAKID_MECAB_KO_DICTIONARY"
+          test -d "$MISAKID_MECAB_KO_DICTIONARY"
+          test -n "$MISAKID_MECAB_KO_CMUDICT"
+          test -f "$MISAKID_MECAB_KO_CMUDICT"
+      - run: dart pub get
+      - name: Build the verified MeCab-ko dylib
+        working-directory: packages/misakid_mecab_ko
+        run: >-
+          dart run tool/build_native.dart
+          --source "$MECAB_KO_SOURCE"
+          --build-dir "$NATIVE_BUILD"
+      - name: Rebuild independently for reproducibility
+        working-directory: packages/misakid_mecab_ko
+        run: >-
+          dart run tool/build_native.dart
+          --source "$MECAB_KO_SOURCE"
+          --build-dir "$NATIVE_BUILD_2"
+      - name: Verify the installed native artifact
+        working-directory: packages/misakid_mecab_ko
+        run: |
+          LIB="$NATIVE_BUILD/install/lib/libmisakid_mecab_ko.dylib"
+          LIB2="$NATIVE_BUILD_2/install/lib/libmisakid_mecab_ko.dylib"
+          cmp "$LIB" "$LIB2"
+          nm -gjU "$LIB" | LC_ALL=C sort > "$RUNNER_TEMP/misakid-exports.txt"
+          diff -u native/expected_exports_macos.txt "$RUNNER_TEMP/misakid-exports.txt"
+          test "$(otool -D "$LIB" | tail -n 1)" = '@rpath/libmisakid_mecab_ko.dylib'
+          test "$(otool -L "$LIB" | tail -n +2 | wc -l | tr -d ' ')" = 4
+          otool -L "$LIB" | grep -F '/usr/lib/libiconv.2.dylib'
+          otool -L "$LIB" | grep -F '/usr/lib/libc++.1.dylib'
+          otool -L "$LIB" | grep -F '/usr/lib/libSystem.B.dylib'
+          otool -l "$LIB" | grep -F 'minos 11.0'
+          ! nm -u "$LIB" | grep -E '(_exit|_abort)$'
+          ! strings "$LIB" | grep -F "$NATIVE_BUILD"
+          ! strings "$LIB" | grep -F "$NATIVE_BUILD_2"
+          ! strings "$LIB" | grep -F "$MECAB_KO_SOURCE"
+          test -f "$NATIVE_BUILD/install/share/misakid_mecab_ko/LICENSE"
+          test -f "$NATIVE_BUILD/install/share/misakid_mecab_ko/THIRD_PARTY_NOTICES.md"
+          test -f "$NATIVE_BUILD/install/share/misakid_mecab_ko/SOURCE_MANIFEST.md"
+          test -f "$NATIVE_BUILD/install/share/misakid_mecab_ko/licenses/mecab-ko-BSD"
+          test -f "$NATIVE_BUILD/install/share/misakid_mecab_ko/licenses/cmudict-README"
+      - name: Run exact native Korean parity and safety tests
+        working-directory: packages/misakid_mecab_ko
+        env:
+          MISAKID_MECAB_KO_LIBRARY: ${{ runner.temp }}/misakid-mecab-ko/install/lib/libmisakid_mecab_ko.dylib
+        run: dart test test/native_parity_test.dart

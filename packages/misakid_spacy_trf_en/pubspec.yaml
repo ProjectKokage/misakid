@@ -1,0 +1,25 @@
+name: misakid_spacy_trf_en
+description: Explicit macOS arm64 spaCy transformer English adapter for misakid.
+version: 0.1.0-dev.1
+topics:
+  - g2p
+  - english
+  - nlp
+  - text-to-speech
+
+executables:
+  build_misakid_spacy_trf_en: build_misakid_spacy_trf_en
+
+environment:
+  sdk: ^3.11.5
+
+resolution: workspace
+
+dependencies:
+  crypto: ^3.0.7
+  misakid: ^0.1.0-dev.1
+  misakid_spacy_en: ^0.1.0-dev.1
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6
