@@ -1364,6 +1364,16 @@ documented real-backend and provenance gates.
   This makes the no-fallback English and supported Chinese resource modes
   usable with mobile asset/model stores without importing Flutter into core.
 
+## 2026-07-11: Root package 0.1.0
+
+- Promoted the root `misakid` package from `0.1.0-dev.1` to `0.1.0` without
+  changing the independently versioned optional adapter packages.
+- Applied the pinned Dart 3.11.5 formatter to the workspace and removed stale
+  Flutter-template TODO comments from the repository-owned mobile build
+  harness. No G2P behavior, fixture, generated data, or support claim changed.
+- Kept the missing canonical repository URL as an explicit publish warning;
+  no URL was invented because this Git repository has no configured remote.
+
 ## Next parity slices
 
 - Validate the Japanese Cutlet release configuration on physical iOS/Android

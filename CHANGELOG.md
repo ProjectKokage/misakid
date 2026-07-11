@@ -1,4 +1,4 @@
-## 0.1.0-dev.1
+## 0.1.0
 
 - Add immutable Kokoro handoff chunks that reproduce the pinned Kokoro 0.9.4
   English and non-English text-splitting limits, fixed English `unk=''`

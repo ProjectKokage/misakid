@@ -2,6 +2,9 @@
 
 Last reviewed: 2026-07-11
 
+Root Dart package version: 0.1.0. The optional sibling adapter packages remain
+independently versioned prereleases.
+
 Misakid is a behavior-preserving Dart port of Misaki under active pre-1.0
 development. Exact committed fixtures cover both English dialects, Japanese
 number and pyopenjtalk-style rendering, Korean default mode, and both Chinese

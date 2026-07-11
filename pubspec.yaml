@@ -1,6 +1,6 @@
 name: misakid
 description: Pure-Dart Misaki G2P engines with explicit resource and native adapter boundaries.
-version: 0.1.0-dev.1
+version: 0.1.0
 topics:
   - g2p
   - phonemes
