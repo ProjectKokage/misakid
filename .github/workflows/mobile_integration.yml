@@ -6,6 +6,7 @@ on:
       - '.github/workflows/mobile_integration.yml'
       - 'lib/**'
       - 'packages/misakid_mecab_ja/**'
+      - 'packages/misakid_openjtalk/**'
       - 'pubspec.yaml'
       - 'tool/mobile_integration/**'
   push:
@@ -15,6 +16,7 @@ on:
       - '.github/workflows/mobile_integration.yml'
       - 'lib/**'
       - 'packages/misakid_mecab_ja/**'
+      - 'packages/misakid_openjtalk/**'
       - 'pubspec.yaml'
       - 'tool/mobile_integration/**'
   workflow_dispatch:

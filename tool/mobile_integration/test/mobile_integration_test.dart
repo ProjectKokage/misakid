@@ -74,4 +74,64 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('passes the Open JTalk dictionary to its bundled probe', (
+    tester,
+  ) async {
+    String? capturedDictionaryPath;
+    await tester.pumpWidget(
+      MobileIntegrationApp(
+        openJtalkProbe: ({required String dictionaryPath}) async {
+          capturedDictionaryPath = dictionaryPath;
+          return BundledBackendProbeResult(
+            backend: BackendInfo(name: 'pyopenjtalk-test', version: '1'),
+            input: '日本語です',
+            phonemes: 'test-phones',
+          );
+        },
+      ),
+    );
+
+    await tester.enterText(
+      find.byKey(const Key('openJtalkDictionaryPath')),
+      '/data/open_jtalk_dic_utf_8-1.11',
+    );
+    await tester.ensureVisible(find.byKey(const Key('openJtalkProbeButton')));
+    await tester.tap(find.byKey(const Key('openJtalkProbeButton')));
+    await tester.pumpAndSettle();
+
+    expect(capturedDictionaryPath, '/data/open_jtalk_dic_utf_8-1.11');
+    expect(
+      find.text('G2P ready: pyopenjtalk-test 1\n日本語です → test-phones'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('does not probe Open JTalk without its dictionary path', (
+    tester,
+  ) async {
+    var called = false;
+    await tester.pumpWidget(
+      MobileIntegrationApp(
+        openJtalkProbe: ({required String dictionaryPath}) async {
+          called = true;
+          return BundledBackendProbeResult(
+            backend: BackendInfo(name: 'unexpected', version: '1'),
+            input: '日本語です',
+            phonemes: 'unexpected',
+          );
+        },
+      ),
+    );
+
+    await tester.ensureVisible(find.byKey(const Key('openJtalkProbeButton')));
+    await tester.tap(find.byKey(const Key('openJtalkProbeButton')));
+    await tester.pump();
+
+    expect(called, isFalse);
+    expect(
+      find.text('The Open JTalk dictionary path is required.'),
+      findsOneWidget,
+    );
+  });
 }

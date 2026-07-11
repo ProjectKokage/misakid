@@ -2,11 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:misakid_mecab_ja/misakid_mecab_ja.dart';
+import 'package:misakid_openjtalk/misakid_openjtalk.dart';
 
 typedef BundledBackendProbe =
     Future<BundledBackendProbeResult> Function({
       required String dictionaryPath,
       required String wordListPath,
+    });
+
+typedef BundledOpenJtalkProbe =
+    Future<BundledBackendProbeResult> Function({
+      required String dictionaryPath,
     });
 
 final class BundledBackendProbeResult {
@@ -46,14 +52,41 @@ Future<BundledBackendProbeResult> probeBundledBackend({
   }
 }
 
+Future<BundledBackendProbeResult> probeBundledOpenJtalk({
+  required String dictionaryPath,
+}) async {
+  final backend = await OpenJtalkFrontendBackend.openBundled(
+    dictionaryPath: dictionaryPath,
+  );
+  try {
+    const input = '日本語です';
+    final result = JapanesePyopenjtalkEngine(backend: backend).convert(input);
+    if (result.tokens == null) {
+      throw StateError('Open JTalk mode unexpectedly returned no tokens.');
+    }
+    return BundledBackendProbeResult(
+      backend: backend.info,
+      input: input,
+      phonemes: result.phonemes,
+    );
+  } finally {
+    backend.close();
+  }
+}
+
 void main() {
   runApp(const MobileIntegrationApp());
 }
 
 class MobileIntegrationApp extends StatelessWidget {
-  const MobileIntegrationApp({super.key, this.probe = probeBundledBackend});
+  const MobileIntegrationApp({
+    super.key,
+    this.probe = probeBundledBackend,
+    this.openJtalkProbe = probeBundledOpenJtalk,
+  });
 
   final BundledBackendProbe probe;
+  final BundledOpenJtalkProbe openJtalkProbe;
 
   @override
   Widget build(BuildContext context) {
@@ -62,15 +95,20 @@ class MobileIntegrationApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: MobileIntegrationHome(probe: probe),
+      home: MobileIntegrationHome(probe: probe, openJtalkProbe: openJtalkProbe),
     );
   }
 }
 
 class MobileIntegrationHome extends StatefulWidget {
-  const MobileIntegrationHome({required this.probe, super.key});
+  const MobileIntegrationHome({
+    required this.probe,
+    required this.openJtalkProbe,
+    super.key,
+  });
 
   final BundledBackendProbe probe;
+  final BundledOpenJtalkProbe openJtalkProbe;
 
   @override
   State<MobileIntegrationHome> createState() => _MobileIntegrationHomeState();
@@ -79,6 +117,7 @@ class MobileIntegrationHome extends StatefulWidget {
 class _MobileIntegrationHomeState extends State<MobileIntegrationHome> {
   final _dictionaryController = TextEditingController();
   final _wordListController = TextEditingController();
+  final _openJtalkDictionaryController = TextEditingController();
   var _status = 'Provide external resource paths to probe the bundled asset.';
   var _busy = false;
 
@@ -86,7 +125,45 @@ class _MobileIntegrationHomeState extends State<MobileIntegrationHome> {
   void dispose() {
     _dictionaryController.dispose();
     _wordListController.dispose();
+    _openJtalkDictionaryController.dispose();
     super.dispose();
+  }
+
+  Future<void> _probeOpenJtalk() async {
+    final dictionaryPath = _openJtalkDictionaryController.text.trim();
+    if (dictionaryPath.isEmpty) {
+      setState(() {
+        _status = 'The Open JTalk dictionary path is required.';
+      });
+      return;
+    }
+
+    setState(() {
+      _busy = true;
+      _status = 'Opening bundled Open JTalk asset…';
+    });
+    try {
+      final result = await widget.openJtalkProbe(
+        dictionaryPath: dictionaryPath,
+      );
+      if (!mounted) return;
+      setState(() {
+        _status =
+            'G2P ready: ${result.backend.name} ${result.backend.version}\n'
+            '${result.input} → ${result.phonemes}';
+      });
+    } on Exception catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _status = 'Probe failed: $error';
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _busy = false;
+        });
+      }
+    }
   }
 
   Future<void> _probe() async {
@@ -162,6 +239,21 @@ class _MobileIntegrationHomeState extends State<MobileIntegrationHome> {
             key: const Key('probeButton'),
             onPressed: _busy ? null : _probe,
             child: Text(_busy ? 'Opening…' : 'Probe bundled backend'),
+          ),
+          const SizedBox(height: 28),
+          TextField(
+            key: const Key('openJtalkDictionaryPath'),
+            controller: _openJtalkDictionaryController,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Open JTalk dictionary path',
+            ),
+          ),
+          const SizedBox(height: 16),
+          FilledButton(
+            key: const Key('openJtalkProbeButton'),
+            onPressed: _busy ? null : _probeOpenJtalk,
+            child: Text(_busy ? 'Opening…' : 'Probe Open JTalk backend'),
           ),
           const SizedBox(height: 16),
           SelectableText(_status, key: const Key('status')),
