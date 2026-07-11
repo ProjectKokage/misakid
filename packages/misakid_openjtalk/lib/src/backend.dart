@@ -12,6 +12,16 @@ import 'native_bindings.dart';
 /// Exact platform supported by the first Open JTalk adapter release.
 const String openJtalkSupportedPlatform = 'macos-arm64';
 
+/// Platforms targeted by the package's reproducible native-assets build hook.
+///
+/// This describes build availability, not the narrower set of runtime tuples
+/// that have completed provisioned parity testing.
+const Set<String> openJtalkBundledBuildPlatforms = <String>{
+  'android',
+  'ios',
+  'macos',
+};
+
 /// Default maximum UTF-8 input size accepted by one frontend call.
 const int defaultOpenJtalkMaxInputBytes = 1024 * 1024;
 
@@ -20,9 +30,10 @@ const int _maximumPathUtf8Bytes = 32768;
 
 /// Explicit native Open JTalk frontend for [JapanesePyopenjtalkEngine].
 ///
-/// Open the backend once with [open], reuse it for synchronous conversions,
-/// and call [close] when finished. The caller supplies both resources; this
-/// package never searches for or downloads a library or dictionary.
+/// Open the backend once with [open] or [openBundled], reuse it for synchronous
+/// conversions, and call [close] when finished. The caller supplies the
+/// dictionary; this package never searches for or downloads native code or
+/// resources.
 final class OpenJtalkFrontendBackend implements JapaneseFrontendBackend {
   OpenJtalkFrontendBackend._({
     required OpenJtalkNativeFrontend frontend,
@@ -40,11 +51,7 @@ final class OpenJtalkFrontendBackend implements JapaneseFrontendBackend {
       dictionaryPath: dictionaryPath,
       maxInputBytes: maxInputBytes,
     );
-    if (!Platform.isMacOS || Abi.current() != Abi.macosArm64) {
-      throw const BackendUnavailableException(
-        'misakid_openjtalk 0.1.0-dev.1 supports only macOS arm64.',
-      );
-    }
+    _validateSupportedPlatform();
     final FileSystemEntityType libraryType;
     try {
       libraryType = await FileSystemEntity.type(
@@ -87,6 +94,49 @@ final class OpenJtalkFrontendBackend implements JapaneseFrontendBackend {
       );
     }
 
+    return _initialize(
+      library: library,
+      dictionaryPath: dictionaryPath,
+      maxInputBytes: maxInputBytes,
+      platform: openJtalkSupportedPlatform,
+    );
+  }
+
+  /// Opens the package-built native asset with an explicit dictionary path.
+  ///
+  /// [dictionaryPath] must point to an already materialized, validated Open
+  /// JTalk 1.11 dictionary directory. Mobile applications commonly copy that
+  /// resource from their app bundle into application support storage.
+  static Future<OpenJtalkFrontendBackend> openBundled({
+    required String dictionaryPath,
+    int maxInputBytes = defaultOpenJtalkMaxInputBytes,
+  }) async {
+    _validateBundledConfiguration(
+      dictionaryPath: dictionaryPath,
+      maxInputBytes: maxInputBytes,
+    );
+    _validateBundledSupportedPlatform();
+
+    final OpenJtalkNativeLibrary library;
+    try {
+      library = OpenJtalkNativeLibrary.loadBundled();
+    } on OpenJtalkNativeLibraryException catch (error) {
+      throw BackendUnavailableException(error.message, cause: error);
+    }
+    return _initialize(
+      library: library,
+      dictionaryPath: dictionaryPath,
+      maxInputBytes: maxInputBytes,
+      platform: _bundledPlatformLabel(),
+    );
+  }
+
+  static Future<OpenJtalkFrontendBackend> _initialize({
+    required OpenJtalkNativeLibrary library,
+    required String dictionaryPath,
+    required int maxInputBytes,
+    required String platform,
+  }) async {
     final dictionary = await OpenJtalkDictionarySnapshot.validate(
       dictionaryPath,
     );
@@ -107,7 +157,7 @@ final class OpenJtalkFrontendBackend implements JapaneseFrontendBackend {
           details: <String, String>{
             'adapterVersion': identities[0]!,
             'abiVersion': openJtalkNativeAbiVersion.toString(),
-            'platform': openJtalkSupportedPlatform,
+            'platform': platform,
             'openJtalkVersion': identities[2]!,
             'nativeSourceTreeSha256': identities[3]!,
             'nativeSourceSdistSha256': identities[4]!,
@@ -198,10 +248,58 @@ void _validateConfiguration({
       'Open JTalk paths must be valid Unicode without NUL and no longer than 32768 UTF-8 bytes.',
     );
   }
+  _validateInputLimit(maxInputBytes);
+}
+
+void _validateBundledConfiguration({
+  required String dictionaryPath,
+  required int maxInputBytes,
+}) {
+  if (!_isAbsolutePath(dictionaryPath)) {
+    throw const InvalidConfigurationException(
+      'The Open JTalk dictionary path must be a non-empty absolute path.',
+    );
+  }
+  if (!_isValidPathText(dictionaryPath)) {
+    throw const InvalidConfigurationException(
+      'The Open JTalk dictionary path must be valid Unicode without NUL and '
+      'no longer than 32768 UTF-8 bytes.',
+    );
+  }
+  _validateInputLimit(maxInputBytes);
+}
+
+void _validateInputLimit(int maxInputBytes) {
   if (maxInputBytes <= 0 || maxInputBytes > _maximumConfigurableInputBytes) {
     throw InvalidConfigurationException(
       'maxInputBytes must be between 1 and '
       '$_maximumConfigurableInputBytes.',
+    );
+  }
+}
+
+void _validateBundledSupportedPlatform() {
+  final abi = Abi.current();
+  final supported =
+      (Platform.isAndroid &&
+          (abi == Abi.androidArm ||
+              abi == Abi.androidArm64 ||
+              abi == Abi.androidX64)) ||
+      (Platform.isIOS && (abi == Abi.iosArm64 || abi == Abi.iosX64)) ||
+      (Platform.isMacOS && (abi == Abi.macosArm64 || abi == Abi.macosX64));
+  if (!supported) {
+    throw BackendUnavailableException(
+      'The bundled Open JTalk native asset does not support ${abi.toString()}.',
+    );
+  }
+}
+
+String _bundledPlatformLabel() => 'native-assets-${Abi.current()}';
+
+void _validateSupportedPlatform() {
+  if (!Platform.isMacOS || Abi.current() != Abi.macosArm64) {
+    throw const BackendUnavailableException(
+      'misakid_openjtalk 0.1.0-dev.1 supports only macOS arm64.',
     );
   }
 }

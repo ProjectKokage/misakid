@@ -1,10 +1,11 @@
-/// Explicit macOS arm64 Open JTalk adapter for misakid Japanese G2P.
+/// Explicit native Open JTalk adapter for misakid Japanese G2P.
 library;
 
 export 'src/backend.dart'
     show
         OpenJtalkFrontendBackend,
         defaultOpenJtalkMaxInputBytes,
+        openJtalkBundledBuildPlatforms,
         openJtalkSupportedPlatform;
 export 'src/dictionary_identity.dart'
     show

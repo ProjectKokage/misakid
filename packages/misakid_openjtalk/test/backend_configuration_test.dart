@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:misakid/misaki.dart';
@@ -10,6 +11,12 @@ void main() {
     await expectLater(
       OpenJtalkFrontendBackend.open(
         libraryPath: 'relative.dylib',
+        dictionaryPath: 'relative-dictionary',
+      ),
+      throwsA(isA<InvalidConfigurationException>()),
+    );
+    await expectLater(
+      OpenJtalkFrontendBackend.openBundled(
         dictionaryPath: 'relative-dictionary',
       ),
       throwsA(isA<InvalidConfigurationException>()),
@@ -28,29 +35,59 @@ void main() {
         ),
         throwsA(isA<InvalidConfigurationException>()),
       );
+      await expectLater(
+        OpenJtalkFrontendBackend.openBundled(
+          dictionaryPath: _absoluteMissingPath(suffix),
+        ),
+        throwsA(isA<InvalidConfigurationException>()),
+      );
     }
   });
 
   test(
     'validates the configured input limit before touching resources',
     () async {
+      for (final limit in <int>[0, 64 * 1024 * 1024 + 1]) {
+        await expectLater(
+          OpenJtalkFrontendBackend.open(
+            libraryPath: _absoluteMissingPath('library.dylib'),
+            dictionaryPath: _absoluteMissingPath('dictionary'),
+            maxInputBytes: limit,
+          ),
+          throwsA(isA<InvalidConfigurationException>()),
+        );
+        await expectLater(
+          OpenJtalkFrontendBackend.openBundled(
+            dictionaryPath: _absoluteMissingPath('dictionary'),
+            maxInputBytes: limit,
+          ),
+          throwsA(isA<InvalidConfigurationException>()),
+        );
+      }
+    },
+  );
+
+  test('publishes the exact bundled target operating systems', () {
+    expect(openJtalkBundledBuildPlatforms, <String>{'android', 'ios', 'macos'});
+    expect(
+      () => openJtalkBundledBuildPlatforms.add('linux'),
+      throwsUnsupportedError,
+    );
+  });
+
+  test(
+    'unsupported bundled ABI fails before reading the dictionary',
+    () async {
       await expectLater(
-        OpenJtalkFrontendBackend.open(
-          libraryPath: _absoluteMissingPath('library.dylib'),
-          dictionaryPath: _absoluteMissingPath('dictionary'),
-          maxInputBytes: 0,
+        OpenJtalkFrontendBackend.openBundled(
+          dictionaryPath: _absoluteMissingPath('open_jtalk_dictionary'),
         ),
-        throwsA(isA<InvalidConfigurationException>()),
-      );
-      await expectLater(
-        OpenJtalkFrontendBackend.open(
-          libraryPath: _absoluteMissingPath('library.dylib'),
-          dictionaryPath: _absoluteMissingPath('dictionary'),
-          maxInputBytes: 64 * 1024 * 1024 + 1,
-        ),
-        throwsA(isA<InvalidConfigurationException>()),
+        throwsA(isA<BackendUnavailableException>()),
       );
     },
+    skip: _isBundledSupportedHost
+        ? 'This host is a supported bundled native-assets tuple.'
+        : false,
   );
 
   test('reports a missing explicit library as unavailable', () async {
@@ -88,3 +125,13 @@ void main() {
 String _absoluteMissingPath(String name) => Platform.isWindows
     ? 'C:\\definitely-missing\\$name'
     : '/definitely-missing/$name';
+
+bool get _isBundledSupportedHost {
+  final abi = Abi.current();
+  return (Platform.isAndroid &&
+          (abi == Abi.androidArm ||
+              abi == Abi.androidArm64 ||
+              abi == Abi.androidX64)) ||
+      (Platform.isIOS && (abi == Abi.iosArm64 || abi == Abi.iosX64)) ||
+      (Platform.isMacOS && (abi == Abi.macosArm64 || abi == Abi.macosX64));
+}

@@ -1,6 +1,9 @@
 // Copyright 2026 the misakid contributors.
 // SPDX-License-Identifier: Apache-2.0
 
+@DefaultAsset('package:misakid_openjtalk/misakid_openjtalk')
+library;
+
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:typed_data';
@@ -152,6 +155,119 @@ typedef _WordIntegerDart = int Function(Pointer<_NativeResult>, int, int);
 typedef _ResultDestroyNative = Void Function(Pointer<_NativeResult>);
 typedef _ResultDestroyDart = void Function(Pointer<_NativeResult>);
 
+@Native<_AbiNative>(symbol: 'misakid_openjtalk_abi_version')
+external int _bundledAbiVersion();
+
+@Native<_IdentityDataNative>(symbol: 'misakid_openjtalk_identity_data')
+external Pointer<Uint8> _bundledIdentityData(int field);
+
+@Native<_IdentitySizeNative>(symbol: 'misakid_openjtalk_identity_size')
+external int _bundledIdentitySize(int field);
+
+@Native<_BufferAllocNative>(symbol: 'misakid_openjtalk_buffer_alloc')
+external Pointer<Uint8> _bundledBufferAlloc(int size);
+
+@Native<_BufferFreeNative>(symbol: 'misakid_openjtalk_buffer_free')
+external void _bundledBufferFree(Pointer<Void> buffer);
+
+@Native<_ContextCreateNative>(symbol: 'misakid_openjtalk_context_create')
+external Pointer<_NativeContext> _bundledContextCreate(
+  Pointer<Uint8> dictionaryPath,
+  int dictionaryPathSize,
+  int maxInputBytes,
+);
+
+@Native<_ContextStatusNative>(symbol: 'misakid_openjtalk_context_status')
+external int _bundledContextStatus(Pointer<_NativeContext> context);
+
+@Native<_ContextDataNative>(
+  symbol: 'misakid_openjtalk_context_error_stage_data',
+)
+external Pointer<Uint8> _bundledContextErrorStageData(
+  Pointer<_NativeContext> context,
+);
+
+@Native<_ContextSizeNative>(
+  symbol: 'misakid_openjtalk_context_error_stage_size',
+)
+external int _bundledContextErrorStageSize(Pointer<_NativeContext> context);
+
+@Native<_ContextDataNative>(
+  symbol: 'misakid_openjtalk_context_error_message_data',
+)
+external Pointer<Uint8> _bundledContextErrorMessageData(
+  Pointer<_NativeContext> context,
+);
+
+@Native<_ContextSizeNative>(
+  symbol: 'misakid_openjtalk_context_error_message_size',
+)
+external int _bundledContextErrorMessageSize(Pointer<_NativeContext> context);
+
+@Native<_ContextDestroyNative>(symbol: 'misakid_openjtalk_context_destroy')
+external void _bundledContextDestroy(Pointer<_NativeContext> context);
+
+@Native<_AnalyzeNative>(symbol: 'misakid_openjtalk_analyze')
+external Pointer<_NativeResult> _bundledAnalyze(
+  Pointer<_NativeContext> context,
+  Pointer<Uint8> utf8,
+  int utf8Size,
+);
+
+@Native<_ResultStatusNative>(symbol: 'misakid_openjtalk_result_status')
+external int _bundledResultStatus(Pointer<_NativeResult> result);
+
+@Native<_ResultDataNative>(symbol: 'misakid_openjtalk_result_error_stage_data')
+external Pointer<Uint8> _bundledResultErrorStageData(
+  Pointer<_NativeResult> result,
+);
+
+@Native<_ResultSizeNative>(symbol: 'misakid_openjtalk_result_error_stage_size')
+external int _bundledResultErrorStageSize(Pointer<_NativeResult> result);
+
+@Native<_ResultDataNative>(
+  symbol: 'misakid_openjtalk_result_error_message_data',
+)
+external Pointer<Uint8> _bundledResultErrorMessageData(
+  Pointer<_NativeResult> result,
+);
+
+@Native<_ResultSizeNative>(
+  symbol: 'misakid_openjtalk_result_error_message_size',
+)
+external int _bundledResultErrorMessageSize(Pointer<_NativeResult> result);
+
+@Native<_WordCountNative>(symbol: 'misakid_openjtalk_result_word_count')
+external int _bundledResultWordCount(Pointer<_NativeResult> result);
+
+@Native<_WordStringDataNative>(
+  symbol: 'misakid_openjtalk_result_word_string_data',
+)
+external Pointer<Uint8> _bundledResultWordStringData(
+  Pointer<_NativeResult> result,
+  int wordIndex,
+  int field,
+);
+
+@Native<_WordStringSizeNative>(
+  symbol: 'misakid_openjtalk_result_word_string_size',
+)
+external int _bundledResultWordStringSize(
+  Pointer<_NativeResult> result,
+  int wordIndex,
+  int field,
+);
+
+@Native<_WordIntegerNative>(symbol: 'misakid_openjtalk_result_word_integer')
+external int _bundledResultWordInteger(
+  Pointer<_NativeResult> result,
+  int wordIndex,
+  int field,
+);
+
+@Native<_ResultDestroyNative>(symbol: 'misakid_openjtalk_result_destroy')
+external void _bundledResultDestroy(Pointer<_NativeResult> result);
+
 /// Loaded and identity-checked native ABI bindings.
 final class OpenJtalkNativeLibrary {
   OpenJtalkNativeLibrary._(DynamicLibrary library)
@@ -250,6 +366,35 @@ final class OpenJtalkNativeLibrary {
             'misakid_openjtalk_result_destroy',
           );
 
+  OpenJtalkNativeLibrary._bundled()
+    : _abiVersion = _bundledAbiVersion,
+      _identityData = _bundledIdentityData,
+      _identitySize = _bundledIdentitySize,
+      _bufferAlloc = _bundledBufferAlloc,
+      _bufferFree = _bundledBufferFree,
+      _contextCreate = _bundledContextCreate,
+      _contextStatus = _bundledContextStatus,
+      _contextErrorStageData = _bundledContextErrorStageData,
+      _contextErrorStageSize = _bundledContextErrorStageSize,
+      _contextErrorMessageData = _bundledContextErrorMessageData,
+      _contextErrorMessageSize = _bundledContextErrorMessageSize,
+      _contextDestroy = _bundledContextDestroy,
+      _contextDestroyPointer =
+          Native.addressOf<NativeFunction<_ContextDestroyNative>>(
+            _bundledContextDestroy,
+          ).cast<NativeFunction<Void Function(Pointer<Void>)>>(),
+      _analyze = _bundledAnalyze,
+      _resultStatus = _bundledResultStatus,
+      _resultErrorStageData = _bundledResultErrorStageData,
+      _resultErrorStageSize = _bundledResultErrorStageSize,
+      _resultErrorMessageData = _bundledResultErrorMessageData,
+      _resultErrorMessageSize = _bundledResultErrorMessageSize,
+      _resultWordCount = _bundledResultWordCount,
+      _resultWordStringData = _bundledResultWordStringData,
+      _resultWordStringSize = _bundledResultWordStringSize,
+      _resultWordInteger = _bundledResultWordInteger,
+      _resultDestroy = _bundledResultDestroy;
+
   /// Loads all required symbols and verifies immutable ABI/source identities.
   static OpenJtalkNativeLibrary load(String path) {
     try {
@@ -261,6 +406,23 @@ final class OpenJtalkNativeLibrary {
     } on Object catch (error) {
       throw OpenJtalkNativeLibraryException(
         'The configured library could not be loaded as a compatible '
+        'misakid Open JTalk adapter.',
+        cause: error,
+      );
+    }
+  }
+
+  /// Loads the package's build-hook native asset and verifies its identities.
+  static OpenJtalkNativeLibrary loadBundled() {
+    try {
+      final bindings = OpenJtalkNativeLibrary._bundled();
+      bindings._validateIdentity();
+      return bindings;
+    } on OpenJtalkNativeLibraryException {
+      rethrow;
+    } on Object catch (error) {
+      throw OpenJtalkNativeLibraryException(
+        'The bundled native asset could not be loaded as a compatible '
         'misakid Open JTalk adapter.',
         cause: error,
       );

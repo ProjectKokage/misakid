@@ -206,24 +206,166 @@ void main() {
       test(
         'native success and failure paths do not write process stdio',
         () async {
-          final result = await Process.run(
-            Platform.resolvedExecutable,
-            <String>[
-              'run',
-              'tool/native_silence_smoke.dart',
+          final temporary = await Directory.systemTemp.createTemp(
+            'misakid-openjtalk-silence-',
+          );
+          try {
+            final executable = '${temporary.path}/native_silence_smoke';
+            final compile = await Process.run('xcrun', <String>[
+              'clang++',
+              '-std=c++17',
+              '-Wall',
+              '-Wextra',
+              '-Werror',
+              '-I',
+              'native/include',
+              'tool/native_silence_smoke.cpp',
+              '-o',
+              executable,
+            ], workingDirectory: Directory.current.path);
+            expect(
+              compile.exitCode,
+              0,
+              reason: '${compile.stdout}${compile.stderr}',
+            );
+            final result = await Process.run(executable, <String>[
               libraryPath!,
               dictionaryPath!,
-            ],
-            workingDirectory: Directory.current.path,
-          );
-          expect(result.exitCode, 0);
-          expect(result.stdout, '');
-          expect(result.stderr, '');
+            ]);
+            expect(result.exitCode, 0);
+            expect(result.stdout, '');
+            expect(result.stderr, '');
+          } finally {
+            await temporary.delete(recursive: true);
+          }
         },
+        timeout: const Timeout(Duration(seconds: 30)),
       );
     },
     tags: 'native',
     skip: skipReason,
+  );
+
+  group(
+    'provisioned bundled native-asset adapter',
+    () {
+      late List<Map<String, Object?>> fixtures;
+      late OpenJtalkNativeFrontend rawFrontend;
+      late OpenJtalkFrontendBackend backend;
+
+      setUpAll(() async {
+        fixtures = await _readFixtures();
+        rawFrontend = OpenJtalkNativeFrontend.create(
+          library: OpenJtalkNativeLibrary.loadBundled(),
+          dictionaryPath: dictionaryPath!,
+          maxInputBytes: defaultOpenJtalkMaxInputBytes,
+        );
+        backend = await OpenJtalkFrontendBackend.openBundled(
+          dictionaryPath: dictionaryPath,
+        );
+      });
+
+      tearDownAll(() {
+        rawFrontend.close();
+        backend.close();
+      });
+
+      test('reports exact portable resource identities', () {
+        expect(backend.info.name, 'pyopenjtalk');
+        expect(backend.info.version, '0.4.1');
+        expect(
+          backend.info.details['platform'],
+          'native-assets-${Abi.current()}',
+        );
+        expect(
+          backend.info.details['nativePatchSet'],
+          'misakid-openjtalk-safety-v1',
+        );
+        expect(
+          backend.info.details['dictionaryTreeSha256'],
+          openJtalkDictionaryTreeSha256,
+        );
+      });
+
+      test('all 24 cases and 155 words match every raw field', () {
+        var wordCount = 0;
+        for (final fixture in fixtures) {
+          final caseId = _string(fixture, 'caseId');
+          final actual = rawFrontend.analyzeRaw(_string(fixture, 'input'));
+          final backendInput = _map(fixture['backendInput'], '$caseId backend');
+          final expectedWords = _list(backendInput['words'], '$caseId words');
+          expect(actual, hasLength(expectedWords.length), reason: caseId);
+          wordCount += actual.length;
+          for (var index = 0; index < actual.length; index++) {
+            final expected = _map(expectedWords[index], '$caseId word $index');
+            for (var field = 0; field < _stringFields.length; field++) {
+              expect(
+                actual[index].stringFields[field],
+                expected[_stringFields[field]],
+                reason: '$caseId word $index ${_stringFields[field]}',
+              );
+            }
+            for (var field = 0; field < _integerFields.length; field++) {
+              expect(
+                actual[index].integerFields[field],
+                expected[_integerFields[field]],
+                reason: '$caseId word $index ${_integerFields[field]}',
+              );
+            }
+          }
+        }
+        expect(fixtures, hasLength(24));
+        expect(wordCount, 155);
+      });
+
+      test('all final outputs and typed tokens match the pinned oracle', () {
+        final engine = JapanesePyopenjtalkEngine(backend: backend);
+        for (final fixture in fixtures) {
+          final caseId = _string(fixture, 'caseId');
+          if (fixture['error'] != null) {
+            expect(
+              () => engine.convert(_string(fixture, 'input')),
+              throwsA(isA<BackendFailureException>()),
+              reason: caseId,
+            );
+            continue;
+          }
+          final actual = engine.convert(_string(fixture, 'input'));
+          expect(actual.phonemes, fixture['phonemes'], reason: caseId);
+          _expectTokens(actual.tokens, fixture['tokens'], caseId);
+        }
+      });
+
+      test('bundled lifecycle, bounds, and isolates are safe', () async {
+        final frontend = OpenJtalkNativeFrontend.create(
+          library: OpenJtalkNativeLibrary.loadBundled(),
+          dictionaryPath: dictionaryPath!,
+          maxInputBytes: 3,
+        );
+        expect(frontend.analyzeRaw('猫'), isNotEmpty);
+        expect(
+          () => frontend.analyzeRaw('猫a'),
+          throwsA(
+            isA<OpenJtalkNativeException>().having(
+              (error) => error.code,
+              'code',
+              2,
+            ),
+          ),
+        );
+        frontend.close();
+        frontend.close();
+        expect(frontend.isClosed, isTrue);
+
+        final outputs = await Future.wait(<Future<String>>[
+          for (var index = 0; index < 4; index++)
+            _analyzeBundledInIsolate(dictionaryPath, index),
+        ]);
+        expect(outputs, everyElement('東京'));
+      });
+    },
+    tags: 'native',
+    skip: dictionaryPath == null ? 'Set MISAKID_OPENJTALK_DICTIONARY.' : false,
   );
 }
 
@@ -322,12 +464,54 @@ Future<String> _analyzeInIsolate(
   throw StateError('native isolate failed: $message');
 }
 
+Future<String> _analyzeBundledInIsolate(
+  String dictionaryPath,
+  int index,
+) async {
+  final receivePort = ReceivePort();
+  await Isolate.spawn<(SendPort, String, int)>(_bundledIsolateEntry, (
+    receivePort.sendPort,
+    dictionaryPath,
+    index,
+  ));
+  final message = await receivePort.first;
+  receivePort.close();
+  if (message is List<Object?> &&
+      message.length == 2 &&
+      message[0] == 'ok' &&
+      message[1] is String) {
+    return message[1]! as String;
+  }
+  throw StateError('bundled native isolate failed: $message');
+}
+
 void _isolateEntry((SendPort, String, String, int) arguments) {
   final (sendPort, libraryPath, dictionaryPath, index) = arguments;
   try {
     final library = OpenJtalkNativeLibrary.load(libraryPath);
     final frontend = OpenJtalkNativeFrontend.create(
       library: library,
+      dictionaryPath: dictionaryPath,
+      maxInputBytes: 1024,
+    );
+    try {
+      sendPort.send(<Object?>[
+        'ok',
+        frontend.analyzeRaw('東京$index。').first.surface,
+      ]);
+    } finally {
+      frontend.close();
+    }
+  } on Object catch (error) {
+    sendPort.send(<Object?>['error', error.toString()]);
+  }
+}
+
+void _bundledIsolateEntry((SendPort, String, int) arguments) {
+  final (sendPort, dictionaryPath, index) = arguments;
+  try {
+    final frontend = OpenJtalkNativeFrontend.create(
+      library: OpenJtalkNativeLibrary.loadBundled(),
       dictionaryPath: dictionaryPath,
       maxInputBytes: 1024,
     );
