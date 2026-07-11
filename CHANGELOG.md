@@ -15,6 +15,14 @@
   15/API 35 arm64 and iOS 26.4 emulated runtimes. Physical-device and clean
   hosted-matrix validation remain before broad mobile release support is
   claimed.
+- Add Android, iOS, and macOS bundled-native-asset build profiles to the
+  Japanese Open JTalk backend. The package vendors the exact reviewed
+  safety-patched source tree, preserves C11/C++17 language boundaries, and
+  enforces signed-char UTF-8 table semantics on Android. The shared Flutter
+  release APK and unsigned iOS app pass exact dual-library export, linkage,
+  manifest, and alignment checks; the complete 24-case/155-record fixture and
+  23 typed-token outputs pass on Android 15/API 35 arm64 and iOS 26.5 emulated
+  runtimes. Physical-device and clean hosted-matrix validation remain.
 - Add byte-backed English small-model and Chinese legacy/frontend-1.1 resource
   constructors so mobile applications can load packaged assets without
   filesystem-only APIs.

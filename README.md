@@ -207,22 +207,25 @@ respectively). Punctuation, configurable unknown markers, Cutlet pass-through,
 and pitch-only trace markers are documented exclusions.
 
 The pure package still bundles and discovers no native frontend or dictionary.
-The sibling `misakid_openjtalk` package provides an explicit no-Python adapter
-for macOS arm64. Callers supply absolute native
-library and Open JTalk 1.11 dictionary paths; initialization streams and
-validates the exact source/ABI/dictionary identities before opening. The new
-owned-result ABI passed all 24 cases, all 155 raw words and 14 fields, all 23
-successful final results and typed token fields, concurrent-isolate stress,
-and silent success/failure checks. No native binary or 107 MB dictionary is
-committed.
+The sibling `misakid_openjtalk` package provides a no-Python adapter with a
+source-built native asset for Android, iOS, and macOS, while retaining its
+legacy explicit-library macOS-arm64 API. Callers always supply an absolute
+Open JTalk 1.11 dictionary path; initialization streams and validates the exact
+source/ABI/dictionary identities before opening. The owned-result ABI passes
+all 24 cases, all 155 raw words and 14 fields, all 23 successful final results
+and typed token fields, concurrent-isolate stress, and silent success/failure
+checks. The complete fixture also passes through `openBundled` on an Android
+15/API 35 arm64 emulator and iPhone 17 iOS 26.5 Simulator. Mobile physical
+devices and the clean hosted matrix remain experimental release gates. No
+native binary or 107 MB dictionary is committed.
 
 The compiling
 [`example/japanese_pyopenjtalk_injected.dart`](example/japanese_pyopenjtalk_injected.dart)
 uses a fixed frontend record to demonstrate the public contract without
 claiming to be pyopenjtalk. The adapter package includes its own real-backend
 example, offline source build, full resource identities, platform limits, and
-third-party notices. Linux, Windows, and Intel macOS remain unsupported for
-this adapter; Cutlet is provided separately as described below.
+third-party notices. Linux and Windows remain unsupported; Cutlet is provided
+separately as described below.
 
 ## Japanese Cutlet pipeline
 

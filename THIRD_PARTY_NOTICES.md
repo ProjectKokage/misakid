@@ -189,11 +189,16 @@ is retained in `lib/src/core/kokoro_frontend.dart`.
   The extracted 139-file Open JTalk source tree has canonical relative-path
   aggregate SHA-256
   `dea0f240fad8dc8b9ea1984920a4d64a48227a40c2924a3c545eaeca50357857`.
-  The adapter distributes its new Apache-2.0 shim/build tooling and exact
-  copies of the four reviewed license notices, but no upstream source tree,
-  dictionary, compiled binary, HTS engine, or voice. Its offline source
-  verifier, compiled component list, `misakid-openjtalk-safety-v1` patch set,
-  prominent modification record, and complete notices are in
+  The adapter distributes the exact 139-file, 5,382,103-byte post-safety-patch
+  source tree with aggregate SHA-256
+  `8ce47a975dee79c078914df15c40df5906430e4a63be4fc2bc0987e7b5b2fccb`,
+  its new Apache-2.0 shim/build tooling, and exact copies of the four reviewed
+  license notices. It distributes no dictionary, compiled binary, HTS engine,
+  or voice. Android consumer builds statically link the NDK LLVM libc++ under
+  Apache-2.0 with the LLVM exception; that exception is retained under
+  `native/licenses/`. The offline source verifier, compiled component list,
+  `misakid-openjtalk-safety-v1` patch set, prominent modification record, and
+  complete notices are in
   `packages/misakid_openjtalk/native/` and its `THIRD_PARTY_NOTICES.md`.
 - The optional `packages/misakid_mecab_ja` adapter uses the same exact
   `pyopenjtalk==0.4.1` source distribution but compiles only its standard
