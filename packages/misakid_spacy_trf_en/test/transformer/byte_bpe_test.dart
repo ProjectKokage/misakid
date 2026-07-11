@@ -156,20 +156,26 @@ void main() {
       }
     });
 
-    test('does not rescan a long unmergeable tail for every prefix merge', () {
-      final merges = <SpacyTransformerByteBpeMerge>[];
-      var prefix = 'a';
-      for (var index = 0; index < 512; index++) {
-        merges.add(SpacyTransformerByteBpeMerge(prefix, 'b'));
-        prefix = '${prefix}b';
-      }
-      final tail = List<String>.filled(100000, 'c').join();
-      final pieces = _processor(merges: merges).encodeAsPieces('$prefix$tail');
+    test(
+      'does not rescan a long unmergeable tail for every prefix merge',
+      () {
+        final merges = <SpacyTransformerByteBpeMerge>[];
+        var prefix = 'a';
+        for (var index = 0; index < 512; index++) {
+          merges.add(SpacyTransformerByteBpeMerge(prefix, 'b'));
+          prefix = '${prefix}b';
+        }
+        final tail = List<String>.filled(100000, 'c').join();
+        final pieces = _processor(
+          merges: merges,
+        ).encodeAsPieces('$prefix$tail');
 
-      expect(pieces, hasLength(tail.length + 1));
-      expect(pieces.first, prefix);
-      expect(pieces.last, 'c');
-    }, timeout: const Timeout(Duration(seconds: 10)));
+        expect(pieces, hasLength(tail.length + 1));
+        expect(pieces.first, prefix);
+        expect(pieces.last, 'c');
+      },
+      timeout: const Timeout(Duration(seconds: 10)),
+    );
   });
 
   group('regex 2024.11.6 split semantics', () {

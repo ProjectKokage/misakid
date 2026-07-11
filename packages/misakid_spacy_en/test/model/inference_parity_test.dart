@@ -45,29 +45,33 @@ void main() {
     );
   }, skip: provisionedSkip);
 
-  test('matches pinned spaCy tags across context and whitespace tokens', () {
-    expect(model.infer(_pangramFeatures).tags, const <String>[
-      'DT',
-      'JJ',
-      'JJ',
-      'NN',
-      'VBZ',
-      'IN',
-      'CD',
-      'JJ',
-      'NNS',
-      '.',
-    ]);
-    expect(model.infer(_whitespaceFeatures).tags, const <String>[
-      'CD',
-      '_SP',
-      'CD',
-      '_SP',
-      'CD',
-      '_SP',
-      'CD',
-    ]);
-  }, skip: provisionedSkip);
+  test(
+    'matches pinned spaCy tags across context and whitespace tokens',
+    () {
+      expect(model.infer(_pangramFeatures).tags, const <String>[
+        'DT',
+        'JJ',
+        'JJ',
+        'NN',
+        'VBZ',
+        'IN',
+        'CD',
+        'JJ',
+        'NNS',
+        '.',
+      ]);
+      expect(model.infer(_whitespaceFeatures).tags, const <String>[
+        'CD',
+        '_SP',
+        'CD',
+        '_SP',
+        'CD',
+        '_SP',
+        'CD',
+      ]);
+    },
+    skip: provisionedSkip,
+  );
 
   test('returns correctly shaped empty model output', () {
     final result = model.infer(const <SpacyTokenFeatures>[]);

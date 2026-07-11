@@ -206,13 +206,16 @@ void main() {
       test(
         'native success and failure paths do not write process stdio',
         () async {
-          final result =
-              await Process.run(Platform.resolvedExecutable, <String>[
-                'run',
-                'tool/native_silence_smoke.dart',
-                libraryPath!,
-                dictionaryPath!,
-              ], workingDirectory: Directory.current.path);
+          final result = await Process.run(
+            Platform.resolvedExecutable,
+            <String>[
+              'run',
+              'tool/native_silence_smoke.dart',
+              libraryPath!,
+              dictionaryPath!,
+            ],
+            workingDirectory: Directory.current.path,
+          );
           expect(result.exitCode, 0);
           expect(result.stdout, '');
           expect(result.stderr, '');

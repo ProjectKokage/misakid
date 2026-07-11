@@ -39,10 +39,11 @@ void main() {
     () async {
       final header = File('native/src/generated_tensor_manifest.h');
       final before = header.readAsBytesSync();
-      final result = await Process.run(Platform.resolvedExecutable, <String>[
-        'tool/generate_native_tensor_manifest.dart',
-        '--check',
-      ], workingDirectory: Directory.current.absolute.path);
+      final result = await Process.run(
+        Platform.resolvedExecutable,
+        <String>['tool/generate_native_tensor_manifest.dart', '--check'],
+        workingDirectory: Directory.current.absolute.path,
+      );
 
       expect(result.exitCode, 0, reason: '${result.stdout}${result.stderr}');
       expect(
