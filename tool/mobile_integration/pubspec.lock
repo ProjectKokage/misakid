@@ -200,6 +200,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0-dev.1"
+  misakid_openjtalk:
+    dependency: "direct main"
+    description:
+      path: "../../packages/misakid_openjtalk"
+      relative: true
+    source: path
+    version: "0.1.0-dev.1"
   native_toolchain_c:
     dependency: transitive
     description:

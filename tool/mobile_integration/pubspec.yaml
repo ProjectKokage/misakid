@@ -1,5 +1,5 @@
 name: misakid_mobile_integration
-description: Mobile build harness for the bundled Japanese MeCab native asset.
+description: Mobile build harness for the bundled Japanese native-code assets.
 publish_to: 'none'
 version: 0.1.0+1
 
@@ -13,6 +13,8 @@ dependencies:
     path: ../..
   misakid_mecab_ja:
     path: ../../packages/misakid_mecab_ja
+  misakid_openjtalk:
+    path: ../../packages/misakid_openjtalk
 
 dependency_overrides:
   # Keep the adapter's publishable hosted constraint on this repository copy.
