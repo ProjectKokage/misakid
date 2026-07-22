@@ -53,6 +53,9 @@ const _frontendSources = <String>[
 
 Future<void> main(List<String> arguments) async {
   await build(arguments, (input, output) async {
+    if (!input.config.buildCodeAssets) {
+      return;
+    }
     final vendorDependencies = await _verifyVendoredOpenJtalk(
       input.packageRoot,
     );

@@ -1,3 +1,10 @@
+## Unreleased
+
+- Return immediately from non-code-asset hook invocations before verifying
+  native sources or reading `input.config.code`. This restores Flutter web
+  builds and macOS development-run follow-up passes that do not request code
+  assets.
+
 ## 0.1.0-dev.1
 
 - Add the explicit macOS arm64 Open JTalk 1.11 frontend for Misakid Japanese.

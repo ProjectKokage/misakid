@@ -35,6 +35,7 @@ void main() {
     final assertion = await File('native/src/silent_stdio.c').readAsString();
     expect(hook, contains("language: Language.c"));
     expect(hook, contains("'-fsigned-char'"));
+    expect(hook, contains('if (!input.config.buildCodeAssets)'));
     expect(hook, contains('output.dependencies.addAll(vendorDependencies)'));
     expect(hook, contains('followLinks: false'));
     expect(assertion, contains('CHAR_MIN != -128 || CHAR_MAX != 127'));
