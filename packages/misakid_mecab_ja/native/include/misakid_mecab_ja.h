@@ -64,6 +64,8 @@ misakid_mecab_ja_context_create(const uint8_t *dictionary_path,
                                 size_t max_input_bytes);
 MISAKID_MECAB_JA_API uint32_t misakid_mecab_ja_context_status(
     const misakid_mecab_ja_context *context);
+MISAKID_MECAB_JA_API uint32_t misakid_mecab_ja_context_feature_field_count(
+    const misakid_mecab_ja_context *context);
 MISAKID_MECAB_JA_API const uint8_t *
 misakid_mecab_ja_context_error_stage_data(
     const misakid_mecab_ja_context *context);

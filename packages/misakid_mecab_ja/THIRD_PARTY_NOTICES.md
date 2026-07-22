@@ -18,12 +18,38 @@ complete notice byte-for-byte as both `native/vendor/mecab/COPYING` and
 `native/licenses/mecab-COPYING`. Exact archive, tree, and notice identities
 are recorded in `native/SOURCE_MANIFEST.md`.
 
-## UniDic 3.1.0
+## UniDic
 
-The caller supplies the exact UniDic 3.1.0 installed tree. UniDic offers a
-GPL/LGPL/New BSD choice; this adapter uses the New BSD terms. The complete
-notice copied byte-for-byte from the pinned resource is
-`native/licenses/unidic-BSD`. No dictionary bytes are distributed.
+The caller supplies a UniDic installed tree. The default compatible profile is
+not hard-coded to a particular UniDic corpus or release. It validates only a
+runtime and feature-layout contract; CWJ, CSJ, and custom resources can share a
+layout or release number. Callers choosing a dictionary are responsible for
+reviewing that exact artifact's provenance and license.
+
+Compatibility tests additionally use the external official NINJAL lightweight
+`unidic-cwj-202302.zip` and `unidic-csj-202302.zip` archives from
+https://clrd.ninjal.ac.jp/unidic_archive/2302/. Their included READMEs identify
+the distinct contemporary-written and contemporary-spoken corpora and offer a
+GPL v2.0/LGPL v2.1/modified-BSD choice. The identical included modified-BSD
+notice has SHA-256
+`9980b1824f0d1dac41ea93dc96780c222e5cca3c4d1b5677ac8ab923a8533c3f`.
+The archives and their notice are not distributed by this package; their exact
+archive identities and test role are recorded in `native/SOURCE_MANIFEST.md`.
+
+The independent 26-field compatibility test uses the external official
+`unidic-lite==1.0.8` source distribution. Its metadata offers the Python
+wrapper under MIT or WTFPL and identifies the contained UniDic 2.1.2
+dictionary as BSD-licensed. Neither the archive, wrapper, dictionary, nor
+notices are distributed by this package. Its exact source-archive and
+runtime-file identities are recorded in `native/SOURCE_MANIFEST.md`.
+
+The separately selected exact-parity profile uses one modified unidic-py CWJ
+tree whose descriptive release marker is `3.1.0+2021-08-31`. That artifact
+offers a GPL/LGPL/New BSD choice, and the complete New BSD notice copied
+byte-for-byte from it is `native/licenses/unidic-BSD`. Its complete tree hash,
+not the release marker, identifies the tested fixture resource. That identity
+is not a requirement of the generic compatible profile. No dictionary bytes
+are distributed.
 
 ## jaconv 0.4.0
 

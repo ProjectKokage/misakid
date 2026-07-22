@@ -8,3 +8,8 @@ pubspec.lock
 __pycache__/
 *.pyc
 .DS_Store
+
+# Provisioned external test dictionaries; never distribute these archives.
+unidic-csj-202302.zip
+unidic-cwj-202302.zip
+unidic-lite-1.0.8.tar.gz

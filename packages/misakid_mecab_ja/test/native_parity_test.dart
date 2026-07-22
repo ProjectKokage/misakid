@@ -35,6 +35,8 @@ void main() {
           libraryPath: libraryPath,
           dictionaryPath: dictionaryPath!,
           wordListPath: wordListPath!,
+          dictionaryProfile:
+              MecabJapaneseDictionaryProfile.pinnedUnidicPyCwjParity,
         );
       });
 
@@ -50,12 +52,30 @@ void main() {
 
       test('reports every immutable identity', () {
         expect(library.identities, expectedMecabJapaneseNativeIdentities);
+        expect(
+          backend.dictionaryProfile,
+          MecabJapaneseDictionaryProfile.pinnedUnidicPyCwjParity,
+        );
+        expect(
+          backend.dictionaryFeatureLayout,
+          MecabJapaneseUnidicFeatureLayout.fields29,
+        );
         expect(backend.info.name, 'mecab-unidic-cutlet');
-        expect(backend.info.version, '0.996/unidic-3.1.0');
+        expect(backend.info.version, '0.996');
+        expect(
+          backend.info.details['dictionaryProfile'],
+          'pinned-unidic-py-cwj-parity',
+        );
+        expect(backend.info.details['dictionaryCorpus'], 'cwj');
+        expect(backend.info.details['dictionaryDistribution'], 'unidic-py');
+        expect(
+          backend.info.details['dictionaryReleaseMarker'],
+          pinnedUnidicPyCwjReleaseMarker,
+        );
         expect(backend.info.details['platform'], 'macos-arm64');
         expect(
           backend.info.details['dictionaryTreeSha256'],
-          unidic310TreeSha256,
+          pinnedUnidicPyCwjTreeSha256,
         );
         expect(
           backend.info.details['wordMembershipVersion'],
@@ -226,6 +246,7 @@ void main() {
           dictionaryPath: dictionaryPath!,
           maxInputBytes: 3,
         );
+        expect(raw.featureFieldCount, 29);
         expect(raw.analyzeRaw('猫'), isNotEmpty);
         expect(
           () => raw.analyzeRaw('猫a'),
@@ -324,6 +345,8 @@ void main() {
         backend = await MecabJapaneseCutletBackend.openBundled(
           dictionaryPath: dictionaryPath!,
           wordListBytes: wordListBytes,
+          dictionaryProfile:
+              MecabJapaneseDictionaryProfile.pinnedUnidicPyCwjParity,
         );
         wordListBytes.fillRange(0, wordListBytes.length, 0);
       });
@@ -332,22 +355,68 @@ void main() {
 
       test('reports the portable build and exact resource identities', () {
         expect(
+          backend.dictionaryProfile,
+          MecabJapaneseDictionaryProfile.pinnedUnidicPyCwjParity,
+        );
+        expect(
+          backend.dictionaryFeatureLayout,
+          MecabJapaneseUnidicFeatureLayout.fields29,
+        );
+        expect(
           backend.info.details['platform'],
           'native-assets-${Abi.current()}',
         );
         expect(
           backend.info.details['nativeBuildProfile'],
-          'misakid-mecab-ja-build-v2-portable',
+          'misakid-mecab-ja-build-v4-portable',
         );
         expect(
           backend.info.details['dictionaryTreeSha256'],
-          unidic310TreeSha256,
+          pinnedUnidicPyCwjTreeSha256,
         );
         expect(
           backend.info.details['wordMembershipVersion'],
           'fba1236595f2d2bf21d414ba6e57d25256afada3',
         );
       });
+
+      test(
+        'compatible profile does not infer CWJ from its release marker',
+        () async {
+          final wordListBytes = await File(wordListPath!).readAsBytes();
+          final compatible = await MecabJapaneseCutletBackend.openBundled(
+            dictionaryPath: dictionaryPath!,
+            wordListBytes: wordListBytes,
+          );
+          wordListBytes.fillRange(0, wordListBytes.length, 0);
+          try {
+            expect(
+              compatible.dictionaryProfile,
+              MecabJapaneseDictionaryProfile.compatible,
+            );
+            expect(
+              compatible.dictionaryFeatureLayout,
+              MecabJapaneseUnidicFeatureLayout.fields29,
+            );
+            expect(compatible.info.details['dictionaryCorpus'], 'unknown');
+            expect(
+              compatible.info.details['dictionaryDistribution'],
+              'unknown',
+            );
+            expect(compatible.info.details['dictionaryIdentity'], 'unverified');
+            expect(
+              compatible.info.details,
+              isNot(contains('dictionaryReleaseMarker')),
+            );
+            expect(
+              compatible.info.details,
+              isNot(contains('dictionaryTreeSha256')),
+            );
+          } finally {
+            compatible.close();
+          }
+        },
+      );
 
       test('all raw words and Cutlet grouping match the pinned oracle', () {
         var wordCount = 0;
@@ -426,6 +495,7 @@ void main() {
             dictionaryPath: dictionaryPath!,
             maxInputBytes: 3,
           );
+          expect(analyzer.featureFieldCount, 29);
           expect(analyzer.analyzeRaw('猫'), isNotEmpty);
           expect(
             () => analyzer.analyzeRaw('猫a'),

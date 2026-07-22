@@ -8,29 +8,35 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:misakid/misaki.dart';
 
-/// Exact dictionary resource required by the Cutlet parity adapter.
-const String unidic310DictionaryName = 'unidic-cwj';
+/// Exact dictionary distribution required by the Cutlet parity profile.
+const String pinnedUnidicPyCwjDistribution = 'unidic-py';
 
-/// Version marker contained in the pinned dictionary tree.
-const String unidic310DictionaryVersion = '3.1.0+2021-08-31';
+/// Corpus variant of the exact dictionary used by the pinned fixtures.
+const String pinnedUnidicPyCwjCorpus = 'cwj';
+
+/// Release marker contained in the pinned dictionary tree.
+///
+/// This is descriptive metadata, not dictionary identity. The complete tree
+/// hash below is the identity check.
+const String pinnedUnidicPyCwjReleaseMarker = '3.1.0+2021-08-31';
 
 /// SHA-256 of the immutable recovery archive used for the pinned tree.
-const String unidic310ArchiveSha256 =
+const String pinnedUnidicPyCwjArchiveSha256 =
     '39ea0eae3b1f10ba8986483592cbc83bcc92f1898bb43ecbc607010f2e98cd22';
 
 /// Exact immutable archive size.
-const int unidic310ArchiveSizeBytes = 524664138;
+const int pinnedUnidicPyCwjArchiveSizeBytes = 524664138;
 
 /// Canonical SHA-256 identity of the installed 20-file tree.
-const String unidic310TreeSha256 =
+const String pinnedUnidicPyCwjTreeSha256 =
     '95bd65fa96955b644c15510932ca8439f463ac8b66f57bac6dfee5e29fa03115';
 
 /// Exact total size of the installed dictionary tree.
-const int unidic310TreeSizeBytes = 811662881;
+const int pinnedUnidicPyCwjTreeSizeBytes = 811662881;
 
-/// Exact per-file identity of the pinned UniDic 3.1.0 tree.
+/// Exact per-file identity of the pinned modified unidic-py CWJ tree.
 const Map<String, ({int size, String sha256})>
-unidic310FileManifest = <String, ({int size, String sha256})>{
+pinnedUnidicPyCwjFileManifest = <String, ({int size, String sha256})>{
   'README': (
     size: 4490,
     sha256: '8b9c0e67caf2b1e838d63dca5a2b7ff34fa8faafe461e942ca1469f90f126e9a',
@@ -114,33 +120,179 @@ unidic310FileManifest = <String, ({int size, String sha256})>{
 };
 
 const int _maximumPathUtf8Bytes = 32768;
+const List<String> _requiredRuntimeFiles = <String>[
+  'char.bin',
+  'matrix.bin',
+  'sys.dic',
+  'unk.dic',
+];
+const List<String> _optionalRuntimeFiles = <String>['dicrc'];
 
 final _productionManifest = _DictionaryManifest(
-  files: unidic310FileManifest,
-  totalBytes: unidic310TreeSizeBytes,
-  treeSha256: unidic310TreeSha256,
+  files: pinnedUnidicPyCwjFileManifest,
+  totalBytes: pinnedUnidicPyCwjTreeSizeBytes,
+  treeSha256: pinnedUnidicPyCwjTreeSha256,
 );
 
-/// Validated exact dictionary identity retained across native initialization.
-final class Unidic310Snapshot {
-  Unidic310Snapshot._({
+/// Dictionary state retained while a native MeCab context is opened.
+abstract interface class UnidicDictionarySnapshot {
+  /// Canonical absolute directory passed to the native MeCab frontend.
+  String get resolvedPath;
+
+  /// Detects a required-file change after validation.
+  Future<void> ensureUnchanged();
+}
+
+/// Minimal filesystem validation for a caller-selected UniDic dictionary.
+final class CompatibleUnidicSnapshot implements UnidicDictionarySnapshot {
+  CompatibleUnidicSnapshot._({
+    required this.resolvedPath,
+    required Map<String, _FileSnapshot?> files,
+  }) : _files = Map<String, _FileSnapshot?>.unmodifiable(files);
+
+  @override
+  final String resolvedPath;
+
+  final Map<String, _FileSnapshot?> _files;
+
+  /// Validates the real directory and runtime files required by MeCab.
+  static Future<CompatibleUnidicSnapshot> validate(String path) async {
+    _validatePath(path);
+    try {
+      final rootType = await FileSystemEntity.type(path, followLinks: false);
+      if (rootType == FileSystemEntityType.notFound) {
+        throw const BackendUnavailableException(
+          'The configured UniDic directory does not exist.',
+        );
+      }
+      if (rootType != FileSystemEntityType.directory) {
+        throw const MalformedDataException(
+          'The configured UniDic resource must be a real directory, not a link.',
+        );
+      }
+
+      final resolvedPath = await Directory(path).resolveSymbolicLinks();
+      if (await FileSystemEntity.type(path, followLinks: false) !=
+          FileSystemEntityType.directory) {
+        throw const MalformedDataException(
+          'The configured UniDic directory changed while being resolved.',
+        );
+      }
+
+      final files = <String, _FileSnapshot?>{};
+      for (final name in _requiredRuntimeFiles) {
+        final file = File(_joinResourcePath(resolvedPath, name));
+        final type = await FileSystemEntity.type(file.path, followLinks: false);
+        final stat = await file.stat();
+        if (type != FileSystemEntityType.file ||
+            stat.type != FileSystemEntityType.file ||
+            stat.size <= 0) {
+          throw MalformedDataException(
+            'The configured UniDic runtime file `$name` is missing or invalid.',
+          );
+        }
+        files[name] = _FileSnapshot.fromStat(stat);
+      }
+      for (final name in _optionalRuntimeFiles) {
+        final file = File(_joinResourcePath(resolvedPath, name));
+        final type = await FileSystemEntity.type(file.path, followLinks: false);
+        if (type == FileSystemEntityType.notFound) {
+          files[name] = null;
+          continue;
+        }
+        final stat = await file.stat();
+        if (type != FileSystemEntityType.file ||
+            stat.type != FileSystemEntityType.file) {
+          throw MalformedDataException(
+            'The configured UniDic optional file `$name` must be a real file.',
+          );
+        }
+        files[name] = _FileSnapshot.fromStat(stat);
+      }
+
+      return CompatibleUnidicSnapshot._(
+        resolvedPath: resolvedPath,
+        files: files,
+      );
+    } on MisakiException {
+      rethrow;
+    } on FileSystemException catch (error) {
+      throw BackendUnavailableException(
+        'The configured UniDic dictionary could not be read.',
+        cause: error,
+      );
+    } on ArgumentError catch (error) {
+      throw InvalidConfigurationException(
+        'The configured UniDic path is invalid.',
+        cause: error,
+      );
+    }
+  }
+
+  @override
+  Future<void> ensureUnchanged() async {
+    try {
+      if (await FileSystemEntity.type(resolvedPath, followLinks: false) !=
+          FileSystemEntityType.directory) {
+        throw const MalformedDataException(
+          'The validated UniDic directory changed while opening.',
+        );
+      }
+      for (final entry in _files.entries) {
+        final path = _joinResourcePath(resolvedPath, entry.key);
+        final type = await FileSystemEntity.type(path, followLinks: false);
+        final snapshot = entry.value;
+        if (snapshot == null) {
+          if (type != FileSystemEntityType.notFound) {
+            throw const MalformedDataException(
+              'The UniDic runtime files changed while the backend was opening.',
+            );
+          }
+          continue;
+        }
+        final stat = await File(path).stat();
+        if (type != FileSystemEntityType.file || !snapshot.matches(stat)) {
+          throw const MalformedDataException(
+            'The UniDic runtime files changed while the backend was opening.',
+          );
+        }
+      }
+    } on MisakiException {
+      rethrow;
+    } on FileSystemException catch (error) {
+      throw BackendUnavailableException(
+        'The validated UniDic dictionary became unreadable while opening.',
+        cause: error,
+      );
+    } on ArgumentError catch (error) {
+      throw MalformedDataException(
+        'The validated UniDic path became invalid.',
+        cause: error,
+      );
+    }
+  }
+}
+
+/// Exact modified unidic-py CWJ identity retained across initialization.
+final class PinnedUnidicPyCwjSnapshot implements UnidicDictionarySnapshot {
+  PinnedUnidicPyCwjSnapshot._({
     required this.resolvedPath,
     required Map<String, _FileSnapshot> files,
     required _DictionaryManifest manifest,
   }) : _files = Map<String, _FileSnapshot>.unmodifiable(files),
        _manifest = manifest;
 
-  /// Canonical absolute directory passed to the native MeCab frontend.
+  @override
   final String resolvedPath;
 
   final Map<String, _FileSnapshot> _files;
   final _DictionaryManifest _manifest;
 
   /// Streams and validates every file in the pinned dictionary.
-  static Future<Unidic310Snapshot> validate(String path) =>
+  static Future<PinnedUnidicPyCwjSnapshot> validate(String path) =>
       _validate(path, _productionManifest);
 
-  static Future<Unidic310Snapshot> _validate(
+  static Future<PinnedUnidicPyCwjSnapshot> _validate(
     String path,
     _DictionaryManifest manifest,
   ) async {
@@ -151,30 +303,30 @@ final class Unidic310Snapshot {
       rethrow;
     } on FileSystemException catch (error) {
       throw BackendUnavailableException(
-        'The configured UniDic 3.1.0 dictionary could not be read.',
+        'The configured pinned unidic-py CWJ dictionary could not be read.',
         cause: error,
       );
     } on ArgumentError catch (error) {
       throw InvalidConfigurationException(
-        'The configured UniDic 3.1.0 path is invalid.',
+        'The configured pinned unidic-py CWJ path is invalid.',
         cause: error,
       );
     }
   }
 
-  static Future<Unidic310Snapshot> _validateReadable(
+  static Future<PinnedUnidicPyCwjSnapshot> _validateReadable(
     String path,
     _DictionaryManifest manifest,
   ) async {
     final rootType = await FileSystemEntity.type(path, followLinks: false);
     if (rootType == FileSystemEntityType.notFound) {
       throw const BackendUnavailableException(
-        'The configured UniDic 3.1.0 directory does not exist.',
+        'The configured pinned unidic-py CWJ directory does not exist.',
       );
     }
     if (rootType != FileSystemEntityType.directory) {
       throw const MalformedDataException(
-        'The configured UniDic 3.1.0 resource must be a real directory, not a link.',
+        'The configured pinned unidic-py CWJ resource must be a real directory, not a link.',
       );
     }
 
@@ -182,7 +334,7 @@ final class Unidic310Snapshot {
     if (await FileSystemEntity.type(path, followLinks: false) !=
         FileSystemEntityType.directory) {
       throw const MalformedDataException(
-        'The configured UniDic 3.1.0 directory changed while being resolved.',
+        'The configured pinned unidic-py CWJ directory changed while being resolved.',
       );
     }
     await _validateEntrySet(Directory(resolvedPath), manifest.files);
@@ -204,7 +356,7 @@ final class Unidic310Snapshot {
           statBeforeHash.type != FileSystemEntityType.file ||
           statBeforeHash.size != expected.size) {
         throw MalformedDataException(
-          'UniDic 3.1.0 file `$name` has the wrong type or size.',
+          'Pinned unidic-py CWJ file `$name` has the wrong type or size.',
         );
       }
 
@@ -229,14 +381,14 @@ final class Unidic310Snapshot {
       if (typeAfterHash != FileSystemEntityType.file ||
           !snapshot.matches(statAfterHash)) {
         throw MalformedDataException(
-          'UniDic 3.1.0 file `$name` changed while being validated.',
+          'Pinned unidic-py CWJ file `$name` changed while being validated.',
         );
       }
 
       final actualHash = fileDigestSink.value.toString();
       if (actualHash != expected.sha256) {
         throw MalformedDataException(
-          'UniDic 3.1.0 file `$name` failed its SHA-256 check.',
+          'Pinned unidic-py CWJ file `$name` failed its SHA-256 check.',
         );
       }
       totalBytes += statBeforeHash.size;
@@ -247,10 +399,10 @@ final class Unidic310Snapshot {
     final treeHash = treeDigestSink.value.toString();
     if (totalBytes != manifest.totalBytes || treeHash != manifest.treeSha256) {
       throw const MalformedDataException(
-        'The UniDic 3.1.0 tree identity does not match the pinned release.',
+        'The unidic-py CWJ tree identity does not match the pinned fixture resource.',
       );
     }
-    return Unidic310Snapshot._(
+    return PinnedUnidicPyCwjSnapshot._(
       resolvedPath: resolvedPath,
       files: snapshots,
       manifest: manifest,
@@ -258,12 +410,13 @@ final class Unidic310Snapshot {
   }
 
   /// Detects an entry, type, size, or timestamp change after validation.
+  @override
   Future<void> ensureUnchanged() async {
     try {
       if (await FileSystemEntity.type(resolvedPath, followLinks: false) !=
           FileSystemEntityType.directory) {
         throw const MalformedDataException(
-          'The validated UniDic 3.1.0 directory changed while opening.',
+          'The validated pinned unidic-py CWJ directory changed while opening.',
         );
       }
       await _validateEntrySet(Directory(resolvedPath), _manifest.files);
@@ -273,7 +426,7 @@ final class Unidic310Snapshot {
         final stat = await File(path).stat();
         if (type != FileSystemEntityType.file || !entry.value.matches(stat)) {
           throw const MalformedDataException(
-            'The UniDic 3.1.0 dictionary changed while the backend was opening.',
+            'The pinned unidic-py CWJ dictionary changed while the backend was opening.',
           );
         }
       }
@@ -281,12 +434,12 @@ final class Unidic310Snapshot {
       rethrow;
     } on FileSystemException catch (error) {
       throw BackendUnavailableException(
-        'The validated UniDic 3.1.0 dictionary became unreadable while opening.',
+        'The validated pinned unidic-py CWJ dictionary became unreadable while opening.',
         cause: error,
       );
     } on ArgumentError catch (error) {
       throw MalformedDataException(
-        'The validated UniDic 3.1.0 path became invalid.',
+        'The validated pinned unidic-py CWJ path became invalid.',
         cause: error,
       );
     }
@@ -294,12 +447,12 @@ final class Unidic310Snapshot {
 }
 
 /// Validates a small injected tree manifest for offline integrity tests.
-Future<Unidic310Snapshot> validateUnidic310ForTesting(
+Future<PinnedUnidicPyCwjSnapshot> validatePinnedUnidicPyCwjForTesting(
   String path, {
   required Map<String, ({int size, String sha256})> files,
   required int totalBytes,
   required String treeSha256,
-}) => Unidic310Snapshot._validate(
+}) => PinnedUnidicPyCwjSnapshot._validate(
   path,
   _DictionaryManifest(
     files: files,
@@ -326,7 +479,7 @@ Future<void> _validateEntrySet(
   await for (final entity in root.list(recursive: true, followLinks: false)) {
     if (files.length + directories.length >= maximumEntries) {
       throw const MalformedDataException(
-        'The UniDic 3.1.0 tree contains too many entries.',
+        'The pinned unidic-py CWJ tree contains too many entries.',
       );
     }
     final relative = _relativeResourcePath(root.path, entity.path);
@@ -334,19 +487,19 @@ Future<void> _validateEntrySet(
     if (type == FileSystemEntityType.file) {
       if (!expectedFiles.containsKey(relative) || !files.add(relative)) {
         throw const MalformedDataException(
-          'The UniDic 3.1.0 file set does not match the pinned release.',
+          'The unidic-py CWJ file set does not match the pinned fixture resource.',
         );
       }
     } else if (type == FileSystemEntityType.directory) {
       if (!expectedDirectories.contains(relative) ||
           !directories.add(relative)) {
         throw const MalformedDataException(
-          'The UniDic 3.1.0 directory set does not match the pinned release.',
+          'The unidic-py CWJ directory set does not match the pinned fixture resource.',
         );
       }
     } else {
       throw const MalformedDataException(
-        'The UniDic 3.1.0 tree contains a link or special file.',
+        'The pinned unidic-py CWJ tree contains a link or special file.',
       );
     }
   }
@@ -355,7 +508,7 @@ Future<void> _validateEntrySet(
       directories.length != expectedDirectories.length ||
       !directories.containsAll(expectedDirectories)) {
     throw const MalformedDataException(
-      'The UniDic 3.1.0 tree does not match the pinned release.',
+      'The unidic-py CWJ tree does not match the pinned fixture resource.',
     );
   }
 }
@@ -363,12 +516,12 @@ Future<void> _validateEntrySet(
 void _validatePath(String path) {
   if (!_isAbsolutePath(path)) {
     throw const InvalidConfigurationException(
-      'The UniDic 3.1.0 path must be a non-empty absolute path.',
+      'The UniDic path must be a non-empty absolute path.',
     );
   }
   if (!_isValidPathText(path)) {
     throw const InvalidConfigurationException(
-      'The UniDic 3.1.0 path must be valid Unicode without NUL and no longer than 32768 UTF-8 bytes.',
+      'The UniDic path must be valid Unicode without NUL and no longer than 32768 UTF-8 bytes.',
     );
   }
 }
@@ -415,7 +568,7 @@ String _relativeResourcePath(String root, String path) {
   final prefix = '$root${Platform.pathSeparator}';
   if (!path.startsWith(prefix)) {
     throw const MalformedDataException(
-      'The UniDic 3.1.0 traversal escaped its configured directory.',
+      'The pinned unidic-py CWJ traversal escaped its configured directory.',
     );
   }
   return path.substring(prefix.length).replaceAll(Platform.pathSeparator, '/');

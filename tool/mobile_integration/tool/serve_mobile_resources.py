@@ -233,10 +233,12 @@ def _build_resources(
         media_type="application/x-ndjson; charset=utf-8",
     )
     manifest = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "dictionary": {
             "name": "unidic-cwj",
-            "version": "3.1.0+2021-08-31",
+            "distribution": "unidic-py",
+            "corpus": "cwj",
+            "releaseMarker": "3.1.0+2021-08-31",
             "treeSha256": DICTIONARY_TREE_SHA256,
             "bytes": DICTIONARY_TOTAL_BYTES,
             "files": dictionary_manifest,

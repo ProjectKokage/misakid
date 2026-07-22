@@ -63,18 +63,30 @@ void main() {
         backend = await MecabJapaneseCutletBackend.openBundled(
           dictionaryPath: provisioned.dictionary.path,
           wordListBytes: wordListBytes,
+          dictionaryProfile:
+              MecabJapaneseDictionaryProfile.pinnedUnidicPyCwjParity,
         );
         wordListBytes.fillRange(0, wordListBytes.length, 0);
 
+        expect(
+          backend.dictionaryProfile,
+          MecabJapaneseDictionaryProfile.pinnedUnidicPyCwjParity,
+        );
+        expect(
+          backend.dictionaryFeatureLayout,
+          MecabJapaneseUnidicFeatureLayout.fields29,
+        );
         expect(backend.info.name, 'mecab-unidic-cutlet');
-        expect(backend.info.version, '0.996/unidic-3.1.0');
+        expect(backend.info.version, '0.996');
+        expect(backend.info.details['dictionaryCorpus'], 'cwj');
+        expect(backend.info.details['dictionaryDistribution'], 'unidic-py');
         expect(
           backend.info.details['platform'],
           'native-assets-${Abi.current()}',
         );
         expect(
           backend.info.details['nativeBuildProfile'],
-          'misakid-mecab-ja-build-v2-portable',
+          'misakid-mecab-ja-build-v4-portable',
         );
         expect(
           backend.info.details['dictionaryTreeSha256'],
@@ -159,7 +171,7 @@ void main() {
                   (error) => error.message,
                   'message',
                   'Japanese Cutlet morphology mecab-unidic-cutlet '
-                      '0.996/unidic-3.1.0 returned invalid word 8: '
+                      '0.996 returned invalid word 8: '
                       'surface `10` remained numeric after normalization.',
                 ),
               ),
@@ -377,12 +389,14 @@ final class _ProvisioningManifest {
       'wordList',
       'fixture',
     }, 'manifest');
-    _expectValue(root, 'schemaVersion', 1, 'manifest');
+    _expectValue(root, 'schemaVersion', 2, 'manifest');
 
     final dictionary = _map(root['dictionary'], 'manifest.dictionary');
     _expectKeys(dictionary, const <String>{
       'name',
-      'version',
+      'distribution',
+      'corpus',
+      'releaseMarker',
       'treeSha256',
       'bytes',
       'files',
@@ -390,7 +404,14 @@ final class _ProvisioningManifest {
     _expectValue(dictionary, 'name', 'unidic-cwj', 'manifest.dictionary');
     _expectValue(
       dictionary,
-      'version',
+      'distribution',
+      'unidic-py',
+      'manifest.dictionary',
+    );
+    _expectValue(dictionary, 'corpus', 'cwj', 'manifest.dictionary');
+    _expectValue(
+      dictionary,
+      'releaseMarker',
       '3.1.0+2021-08-31',
       'manifest.dictionary',
     );

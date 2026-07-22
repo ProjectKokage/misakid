@@ -67,6 +67,16 @@ void main() {
     );
   });
 
+  test('publishes only provisioned UniDic feature layouts', () {
+    expect(
+      MecabJapaneseUnidicFeatureLayout.values,
+      <MecabJapaneseUnidicFeatureLayout>[
+        MecabJapaneseUnidicFeatureLayout.fields26,
+        MecabJapaneseUnidicFeatureLayout.fields29,
+      ],
+    );
+  });
+
   test(
     'unsupported platform fails before reading any configured resource',
     () async {

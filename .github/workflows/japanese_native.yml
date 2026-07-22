@@ -83,6 +83,9 @@ jobs:
       PYOPENJTALK_SOURCE: ${{ vars.MISAKID_PYOPENJTALK_SOURCE }}
       MISAKID_MECAB_JA_DICTIONARY: ${{ vars.MISAKID_MECAB_JA_DICTIONARY }}
       MISAKID_MECAB_JA_WORD_LIST: ${{ vars.MISAKID_MECAB_JA_WORD_LIST }}
+      MISAKID_MECAB_JA_UNIDIC_LITE_SDIST: ${{ vars.MISAKID_MECAB_JA_UNIDIC_LITE_SDIST }}
+      MISAKID_MECAB_JA_CWJ_202302_ARCHIVE: ${{ vars.MISAKID_MECAB_JA_CWJ_202302_ARCHIVE }}
+      MISAKID_MECAB_JA_CSJ_202302_ARCHIVE: ${{ vars.MISAKID_MECAB_JA_CSJ_202302_ARCHIVE }}
       MISAKID_MECAB_JA_FIXTURE: ${{ github.workspace }}/test/fixtures/upstream/fba1236595f2d2bf21d414ba6e57d25256afada3/ja_cutlet.jsonl
       NATIVE_BUILD: ${{ runner.temp }}/misakid-mecab-ja
       NATIVE_BUILD_2: ${{ runner.temp }}/misakid-mecab-ja-reproducible
@@ -99,8 +102,30 @@ jobs:
           test -d "$MISAKID_MECAB_JA_DICTIONARY"
           test -n "$MISAKID_MECAB_JA_WORD_LIST"
           test -f "$MISAKID_MECAB_JA_WORD_LIST"
+          test -n "$MISAKID_MECAB_JA_UNIDIC_LITE_SDIST"
+          test -f "$MISAKID_MECAB_JA_UNIDIC_LITE_SDIST"
+          test -n "$MISAKID_MECAB_JA_CWJ_202302_ARCHIVE"
+          test -f "$MISAKID_MECAB_JA_CWJ_202302_ARCHIVE"
+          test -n "$MISAKID_MECAB_JA_CSJ_202302_ARCHIVE"
+          test -f "$MISAKID_MECAB_JA_CSJ_202302_ARCHIVE"
           test -f "$MISAKID_MECAB_JA_FIXTURE"
       - run: dart pub get
+      - name: Verify and extract compatible UniDic resources
+        run: |
+          set -euo pipefail
+          test "$(wc -c < "$MISAKID_MECAB_JA_UNIDIC_LITE_SDIST" | tr -d '[:space:]')" = 47356746
+          test "$(wc -c < "$MISAKID_MECAB_JA_CWJ_202302_ARCHIVE" | tr -d '[:space:]')" = 603549853
+          test "$(wc -c < "$MISAKID_MECAB_JA_CSJ_202302_ARCHIVE" | tr -d '[:space:]')" = 638074705
+          printf '%s  %s\n' db9d4572d9fdd4d00a97949d4b0741ec480ee05a7e7e2e32f547500dae27b245 "$MISAKID_MECAB_JA_UNIDIC_LITE_SDIST" | shasum -a 256 --check
+          printf '%s  %s\n' 601bc4b0af794d3c20c2089771b8771209390e1b35b0f20c85cf0a10c9a98c6d "$MISAKID_MECAB_JA_CWJ_202302_ARCHIVE" | shasum -a 256 --check
+          printf '%s  %s\n' 9fee27c64738a440ca7340e4243014d6151bfd00da8f01c4ef35b416e3fac1d9 "$MISAKID_MECAB_JA_CSJ_202302_ARCHIVE" | shasum -a 256 --check
+          mkdir -p "$RUNNER_TEMP/unidic-lite-1.0.8" "$RUNNER_TEMP/unidic-cwj-202302" "$RUNNER_TEMP/unidic-csj-202302"
+          tar -xzf "$MISAKID_MECAB_JA_UNIDIC_LITE_SDIST" -C "$RUNNER_TEMP/unidic-lite-1.0.8" --strip-components=1
+          unzip -q "$MISAKID_MECAB_JA_CWJ_202302_ARCHIVE" -d "$RUNNER_TEMP/unidic-cwj-202302"
+          unzip -q "$MISAKID_MECAB_JA_CSJ_202302_ARCHIVE" -d "$RUNNER_TEMP/unidic-csj-202302"
+          echo "MISAKID_MECAB_JA_COMPATIBLE_DICTIONARY=$RUNNER_TEMP/unidic-lite-1.0.8/unidic_lite/dicdir" >> "$GITHUB_ENV"
+          echo "MISAKID_MECAB_JA_CWJ_202302_DICTIONARY=$RUNNER_TEMP/unidic-cwj-202302" >> "$GITHUB_ENV"
+          echo "MISAKID_MECAB_JA_CSJ_202302_DICTIONARY=$RUNNER_TEMP/unidic-csj-202302" >> "$GITHUB_ENV"
       - name: Build the verified MeCab dylib
         working-directory: packages/misakid_mecab_ja
         run: >-
@@ -141,3 +166,9 @@ jobs:
         env:
           MISAKID_MECAB_JA_LIBRARY: ${{ runner.temp }}/misakid-mecab-ja/install/lib/libmisakid_mecab_ja.dylib
         run: dart test test/native_parity_test.dart
+      - name: Run compatible 26-field UniDic test
+        working-directory: packages/misakid_mecab_ja
+        run: dart test test/native_compatible_dictionary_test.dart
+      - name: Run official CWJ/CSJ 2023.02 compatibility tests
+        working-directory: packages/misakid_mecab_ja
+        run: dart test test/native_official_dictionary_test.dart

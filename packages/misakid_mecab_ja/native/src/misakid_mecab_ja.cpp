@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 // Native compatibility boundary for the MeCab 0.996 runtime embedded in
-// pyopenjtalk 0.4.1 and the exact UniDic 3.1.0 resource. MeCab and UniDic keep
-// their original notices; see the package's THIRD_PARTY_NOTICES.md.
+// pyopenjtalk 0.4.1 and compatible UTF-8 UniDic resources. MeCab and UniDic
+// keep their original notices; see the package's THIRD_PARTY_NOTICES.md.
 
 #include "misakid_mecab_ja.h"
 
@@ -24,7 +24,7 @@
 
 namespace {
 
-constexpr uint32_t kAbiVersion = 1;
+constexpr uint32_t kAbiVersion = 3;
 constexpr size_t kErrorStageCapacity = 48;
 constexpr size_t kErrorMessageCapacity = 1024;
 constexpr size_t kMaximumDictionaryPathBytes = 32768;
@@ -34,16 +34,15 @@ constexpr size_t kMaximumTraversedNodes = kMaximumWords + 16;
 constexpr size_t kMaximumFieldBytes = 1024 * 1024;
 constexpr size_t kMaximumResultBytes = 64 * 1024 * 1024;
 
-constexpr unsigned int kExpectedDictionarySize = 878989;
-constexpr unsigned short kExpectedDictionaryVersion = 102;
+constexpr unsigned short kExpectedMecabDictionaryFormatVersion = 102;
 
 constexpr std::array<const char *, 6> kIdentityValues = {
-    "0.1.0-dev.1",
+    "0.1.0",
     "0.996",
     "dea0f240fad8dc8b9ea1984920a4d64a48227a40c2924a3c545eaeca50357857",
     "d5ada46f7fc2b52c1c79c273eb9668ff6ad7ab276a8db9d8be119ef93440f0dc",
-    "misakid-mecab-ja-build-v2-portable",
-    "95bd65fa96955b644c15510932ca8439f463ac8b66f57bac6dfee5e29fa03115",
+    "misakid-mecab-ja-build-v4-portable",
+    "unidic-features-26-29-v1",
 };
 
 std::mutex g_mecab_mutex;
@@ -170,6 +169,32 @@ bool parse_csv_fields(const char *data, size_t size,
   }
 }
 
+bool ascii_equal_ignore_case(char actual, char expected) {
+  if (actual >= 'A' && actual <= 'Z')
+    actual = static_cast<char>(actual - 'A' + 'a');
+  return actual == expected;
+}
+
+bool is_utf8_charset(const char *charset) {
+  if (charset == nullptr)
+    return false;
+  const size_t size = ::strnlen(charset, 6);
+  if (size != 4 && size != 5)
+    return false;
+  if (!ascii_equal_ignore_case(charset[0], 'u') ||
+      !ascii_equal_ignore_case(charset[1], 't') ||
+      !ascii_equal_ignore_case(charset[2], 'f')) {
+    return false;
+  }
+  if (size == 4)
+    return charset[3] == '8';
+  return (charset[3] == '-' || charset[3] == '_') && charset[4] == '8';
+}
+
+bool is_supported_feature_schema(size_t field_count) {
+  return field_count == 26 || field_count == 29;
+}
+
 struct WordSnapshot {
   std::array<std::string, 3> strings;
   std::array<int32_t, 4> integers = {};
@@ -180,6 +205,7 @@ struct WordSnapshot {
 struct misakid_mecab_ja_context {
   mecab_t *tagger = nullptr;
   size_t max_input_bytes = 0;
+  size_t feature_schema = 0;
   uint32_t status = MISAKID_MECAB_JA_INTERNAL_ERROR;
   char error_stage[kErrorStageCapacity] = {};
   char error_message[kErrorMessageCapacity] = {};
@@ -206,22 +232,17 @@ void set_result_error(misakid_mecab_ja_result *result, uint32_t code,
             stage, message);
 }
 
-bool has_expected_dictionary_identity(const mecab_dictionary_info_t *info) {
+bool has_compatible_dictionary_format(const mecab_dictionary_info_t *info) {
   if (info == nullptr || info->next != nullptr || info->charset == nullptr ||
-      info->type != MECAB_SYS_DIC) {
+      info->type != MECAB_SYS_DIC || info->size == 0) {
     return false;
   }
-  constexpr char kExpectedCharset[] = "utf8";
-  const size_t charset_length =
-      ::strnlen(info->charset, sizeof(kExpectedCharset));
-  return charset_length == sizeof(kExpectedCharset) - 1 &&
-         std::memcmp(info->charset, kExpectedCharset,
-                     sizeof(kExpectedCharset) - 1) == 0 &&
-         info->version == kExpectedDictionaryVersion &&
-         info->size == kExpectedDictionarySize;
+  return is_utf8_charset(info->charset) &&
+         info->version == kExpectedMecabDictionaryFormatVersion;
 }
 
-bool copy_words(const mecab_node_t *first, misakid_mecab_ja_result *result) {
+bool copy_words(const mecab_node_t *first, size_t feature_schema,
+                misakid_mecab_ja_result *result) {
   size_t traversed_nodes = 0;
   size_t total_bytes = 0;
   std::vector<std::string> features;
@@ -272,7 +293,7 @@ bool copy_words(const mecab_node_t *first, misakid_mecab_ja_result *result) {
     }
 
     const bool is_unknown = node->stat == MECAB_UNK_NODE;
-    if ((!is_unknown && features.size() != 29) ||
+    if ((!is_unknown && features.size() != feature_schema) ||
         (is_unknown && features.size() != 6)) {
       set_result_error(result, MISAKID_MECAB_JA_ANALYSIS_FAILED,
                        "feature-parse",
@@ -281,7 +302,11 @@ bool copy_words(const mecab_node_t *first, misakid_mecab_ja_result *result) {
     }
 
     const std::string *pronunciation = is_unknown ? nullptr : &features[9];
-    const std::string *kana = is_unknown ? nullptr : &features[20];
+    const std::string *kana = nullptr;
+    if (!is_unknown && feature_schema == 26)
+      kana = &features[17];
+    else if (!is_unknown && feature_schema == 29)
+      kana = &features[20];
     size_t copied_bytes = surface_size;
     if (pronunciation != nullptr)
       copied_bytes += pronunciation->size();
@@ -382,13 +407,55 @@ misakid_mecab_ja_context_create(const uint8_t *dictionary_path,
                         "MeCab could not load the validated dictionary.");
       return context;
     }
-    if (!has_expected_dictionary_identity(
+    if (!has_compatible_dictionary_format(
             mecab_dictionary_info(context->tagger))) {
       set_context_error(context, MISAKID_MECAB_JA_DICTIONARY_LOAD_FAILED,
-                        "dictionary-identity",
-                        "The live MeCab dictionary identity does not match.");
+                        "dictionary-format",
+                        "The live MeCab dictionary format is not supported.");
       return context;
     }
+
+    // Fugashi's UniDic Tagger selects its named feature tuple from the first
+    // token produced for this same probe. Keep that behavior at initialization
+    // so an incompatible dictionary cannot fail halfway through user input.
+    constexpr char kFeatureSchemaProbe[] = "\xE6\x97\xA5\xE6\x9C\xAC";
+    const mecab_node_t *probe_nodes = mecab_sparse_tonode2(
+        context->tagger, kFeatureSchemaProbe, sizeof(kFeatureSchemaProbe) - 1);
+    if (probe_nodes == nullptr) {
+      set_context_error(context, MISAKID_MECAB_JA_DICTIONARY_LOAD_FAILED,
+                        "dictionary-schema",
+                        "MeCab could not probe the UniDic feature schema.");
+      return context;
+    }
+    const mecab_node_t *probe_word = probe_nodes;
+    while (probe_word != nullptr && probe_word->stat != MECAB_NOR_NODE &&
+           probe_word->stat != MECAB_UNK_NODE) {
+      probe_word = probe_word->next;
+    }
+    if (probe_word == nullptr || probe_word->stat != MECAB_NOR_NODE ||
+        probe_word->feature == nullptr) {
+      set_context_error(context, MISAKID_MECAB_JA_DICTIONARY_LOAD_FAILED,
+                        "dictionary-schema",
+                        "UniDic did not recognize the feature schema probe.");
+      return context;
+    }
+    const size_t probe_feature_size =
+        ::strnlen(probe_word->feature, kMaximumFieldBytes + 1);
+    std::vector<std::string> probe_features;
+    probe_features.reserve(29);
+    if (probe_feature_size > kMaximumFieldBytes ||
+        !is_valid_utf8(
+            reinterpret_cast<const uint8_t *>(probe_word->feature),
+            probe_feature_size) ||
+        !parse_csv_fields(probe_word->feature, probe_feature_size,
+                          &probe_features) ||
+        !is_supported_feature_schema(probe_features.size())) {
+      set_context_error(context, MISAKID_MECAB_JA_DICTIONARY_LOAD_FAILED,
+                        "dictionary-schema",
+                        "UniDic has an incompatible feature schema.");
+      return context;
+    }
+    context->feature_schema = probe_features.size();
     context->max_input_bytes = max_input_bytes;
     context->status = MISAKID_MECAB_JA_OK;
     return context;
@@ -411,6 +478,15 @@ misakid_mecab_ja_context_create(const uint8_t *dictionary_path,
 uint32_t
 misakid_mecab_ja_context_status(const misakid_mecab_ja_context *context) {
   return context == nullptr ? MISAKID_MECAB_JA_OUT_OF_MEMORY : context->status;
+}
+
+uint32_t misakid_mecab_ja_context_feature_field_count(
+    const misakid_mecab_ja_context *context) {
+  if (context == nullptr || context->status != MISAKID_MECAB_JA_OK ||
+      !is_supported_feature_schema(context->feature_schema)) {
+    return 0;
+  }
+  return static_cast<uint32_t>(context->feature_schema);
 }
 
 const uint8_t *misakid_mecab_ja_context_error_stage_data(
@@ -498,7 +574,7 @@ misakid_mecab_ja_result *misakid_mecab_ja_analyze(
                        "mecab-analysis", "MeCab analysis failed.");
       return result;
     }
-    if (!copy_words(nodes, result))
+    if (!copy_words(nodes, context->feature_schema, result))
       return result;
     result->status = MISAKID_MECAB_JA_OK;
     return result;

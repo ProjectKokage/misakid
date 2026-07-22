@@ -43,7 +43,7 @@ is 5,381,473 bytes with SHA-256
 CMake independently hashes that unmodified staged tree as relative path, tab,
 file SHA-256, and LF. The expected digest is
 `b963ef63d435e3bba884d5943ee60ac5621cdf1323195140757e1a5f37ca7dd4`.
-The primary `misakid-mecab-ja-build-v2-portable` native-assets profile verifies
+The primary `misakid-mecab-ja-build-v4-portable` native-assets profile verifies
 the distributed 54-file subtree directly and compiles only the standard
 16-file MeCab runtime plus the Apache-2.0 adapter shim. Its static portable
 configuration is UTF-8-only and intentionally omits iconv. Android builds link
@@ -53,9 +53,77 @@ audio, and dictionaries are not built or bundled. The standalone macOS arm64
 CMake path compiles the same 16 source files, shim, and portable configuration
 after the stronger full-source check.
 
-## UniDic resource
+## UniDic compatibility and parity resource
 
-- Version marker: `unidic-3.1.0+2021-08-31`
+The default `MecabJapaneseDictionaryProfile.compatible` contract is not pinned
+to a UniDic corpus, distribution, release, or tree checksum. It requires an
+explicit real directory,
+the non-empty `char.bin`, `matrix.bin`, `sys.dic`, and `unk.dic` runtime files,
+an absent or regular non-link `dicrc`, one UTF-8 system dictionary using MeCab
+binary format version 102, and a known-word feature layout with 26 or 29
+fields. The native initializer probes that layout before caller text is
+processed. It reads `pron` from field 9 and `kana` from field 17 or 20 for the
+26- or 29-field layout. Field count does not identify the corpus: CWJ, CSJ, and
+custom dictionaries can share a layout or release marker. The backend
+therefore reports the compatible profile's corpus as unknown and its exact
+identity as unverified. Different compatible dictionaries may produce
+different segmentation, readings, and phonemes and carry no exact Misaki
+fixture-parity claim.
+
+NINJAL's official archive lists both `unidic-cwj-3.1.0` and
+`unidic-csj-3.1.0` as distinct resources with the same release number:
+`https://clrd.ninjal.ac.jp/unidic/en/back_number_en.html`. Their shared
+29-field layout is a parser contract, not corpus identity.
+
+### unidic-lite 1.0.8 compatibility resource
+
+The 26-field provisioned test uses the external official
+`unidic-lite-1.0.8.tar.gz` source distribution from
+`https://pypi.org/project/unidic-lite/1.0.8/`: 47,356,746 bytes, SHA-256
+`db9d4572d9fdd4d00a97949d4b0741ec480ee05a7e7e2e32f547500dae27b245`.
+Its package metadata identifies the contained dictionary as UniDic 2.1.2. The
+test verifies the four required runtime files plus `dicrc` before
+initialization:
+
+| File | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `char.bin` | 262,496 | `dd31396563d8924645b80fd3c9aa7b13ca089d7748f25553a1d6bc3f9b511ae8` |
+| `dicrc` | 1,444 | `fcd17f35752de1417859a15e2e1f043d666da03f36dc632e8c0ed46887883a59` |
+| `matrix.bin` | 71,544,726 | `88fb99efe1075d9b8b40e01bb2751e4095f1612618f2490af776eb5ed39190a9` |
+| `sys.dic` | 187,680,870 | `122c4c91f026bf4b65bbe2dfd8b9f8eeb6ab56d8eb2a7287a68bca75708ba513` |
+| `unk.dic` | 5,475 | `e3b92803feeb6c2712c796b905317ec192a59729d2c1e92b2728d454169541c4` |
+
+This resource loads with a 26-field layout. It is external test evidence and
+is not distributed by this package.
+
+### Official 2023.02 compatibility resources
+
+The provisioned release test independently exercises both lightweight NINJAL
+2023.02 resources from `https://clrd.ninjal.ac.jp/unidic_archive/2302/`:
+
+| Resource | Archive bytes | Archive SHA-256 | Extracted files/bytes | `sys.dic` SHA-256 | `matrix.bin` SHA-256 |
+| --- | ---: | --- | ---: | --- | --- |
+| `unidic-cwj-202302.zip` | 603,549,853 | `601bc4b0af794d3c20c2089771b8771209390e1b35b0f20c85cf0a10c9a98c6d` | 13 / 1,124,469,285 | `048f93a7f6aed6dd1c108cdd7b947a0f3a5a3d0d1012dd1f7d3c7b133b5867d7` | `85c6fe10e81417df2257951192a391e5768981a2280f1c606f0c3f404a45e9d4` |
+| `unidic-csj-202302.zip` | 638,074,705 | `9fee27c64738a440ca7340e4243014d6151bfd00da8f01c4ef35b416e3fac1d9` | 13 / 1,150,985,193 | `83ea4290c31f74f72f974edc8c44ed37b0cbee9d1148438daa174fa06cc95db0` | `2705c0dc2865a1ce0f347bc589506c5fd9a9ccdaa749ebcfd6647cb5dafaa425` |
+
+Both dictionaries load as UTF-8 MeCab-v102 system dictionaries with 876,803
+entries and a 29-field feature layout. Their different binary hashes prove
+that the shared 2023.02 marker and layout are not resource identity. The test
+checks raw projection compatibility and keeps generic backend corpus and
+identity metadata unknown; it does not establish exact Misaki output parity.
+The archives are external provisioned resources and are not distributed by
+this package.
+
+### Exact modified unidic-py CWJ parity profile
+
+`MecabJapaneseDictionaryProfile.pinnedUnidicPyCwjParity` additionally requires
+the following complete modified unidic-py CWJ tree. These hashes identify the
+resource used to produce and verify the committed fixtures; they are not
+generic adapter requirements.
+
+- Distribution: `unidic-py`
+- Corpus: contemporary written Japanese (`cwj`)
+- Descriptive release marker: `3.1.0+2021-08-31` (not an identity)
 - Immutable recovery archive size: 524,664,138 bytes
 - Archive SHA-256:
   `39ea0eae3b1f10ba8986483592cbc83bcc92f1898bb43ecbc607010f2e98cd22`
@@ -72,7 +140,7 @@ after the stronger full-source check.
 
 The installed-tree fingerprint is SHA-256 over each sorted relative POSIX path
 encoded as: 8-byte big-endian path length, UTF-8 path, 8-byte big-endian file
-size, and the exact file bytes. The current mutable official download URL no
+size, and the exact file bytes. The mutable unidic-py download endpoint no
 longer serves the pinned archive bytes; the immutable recovery commit above is
 the reviewed source for this exact artifact.
 
@@ -98,10 +166,15 @@ executable-specification resource an explicit caller path must match.
 
 ## Native ABI ownership and limits
 
-ABI version 1 owns copies of surface, nullable pronunciation, nullable kana,
-character type, and unknown status for each word. Results remain valid across
-later calls until destroyed. A process-global mutex serializes MeCab create,
-analysis, and destroy across Dart isolates. The boundary validates UTF-8 and
-NUL, caps input at 64 MiB, words at 65,536, individual returned fields at
-1 MiB, aggregate copied result data at 64 MiB, and bounded diagnostics at
-1 KiB. C++ exceptions are contained at the C boundary.
+ABI version 3 and build identity `misakid-mecab-ja-build-v4-portable` advertise
+the dictionary contract as `unidic-features-26-29-v1`, independently of a
+particular UniDic corpus or release. Its 24-function surface additionally
+reports the detected field count for the opened context. The ABI owns copies of
+surface, nullable pronunciation, nullable kana, character type, and unknown
+status for each word.
+Results remain valid across later calls until destroyed. A process-global mutex
+serializes MeCab create, layout probing, analysis, and destroy across Dart
+isolates. The boundary validates UTF-8 and NUL, caps input at 64 MiB, words at
+65,536, individual returned fields at 1 MiB, aggregate copied result data at
+64 MiB, and bounded diagnostics at 1 KiB. C++ exceptions are contained at the
+C boundary.

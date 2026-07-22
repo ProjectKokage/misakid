@@ -213,8 +213,10 @@ class _MobileIntegrationHomeState extends State<MobileIntegrationHome> {
         padding: const EdgeInsets.all(24),
         children: <Widget>[
           const Text(
-            'UniDic 3.1.0 and the pinned ja_words.txt remain external. '
-            'Enter materialized absolute paths on the device.',
+            'A compatible UniDic, ja_words.txt, and the Open JTalk 1.11 '
+            'dictionary remain external. Enter materialized absolute paths '
+            'on the device. Exact Cutlet parity uses the fingerprinted '
+            'modified unidic-py CWJ resource.',
           ),
           const SizedBox(height: 16),
           TextField(

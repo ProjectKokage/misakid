@@ -8,18 +8,148 @@ import 'package:misakid_mecab_ja/src/dictionary_identity.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('production manifest has the exact 20-file aggregate', () {
-    expect(unidic310FileManifest, hasLength(20));
-    expect(
-      unidic310FileManifest.values.fold<int>(0, (sum, file) => sum + file.size),
-      unidic310TreeSizeBytes,
+  test('compatible profile ignores corpus-ambiguous release markers', () async {
+    final temporary = await Directory.systemTemp.createTemp(
+      'unidic-compatible-test-',
     );
-    expect(unidic310TreeSha256, hasLength(64));
-    expect(unidic310ArchiveSha256, hasLength(64));
-    expect(unidic310ArchiveSizeBytes, 524664138);
-    expect(unidic310FileManifest['sys.dic']?.size, 243373840);
+    try {
+      await _writeTree(temporary, <String, List<int>>{
+        'char.bin': <int>[1],
+        'matrix.bin': <int>[2],
+        'sys.dic': <int>[3],
+        'unk.dic': <int>[4],
+        'version': utf8.encode('unidic-3.1.0+2021-08-31'),
+        'README': utf8.encode('could be CWJ, CSJ, or custom'),
+      });
+
+      final snapshot = await CompatibleUnidicSnapshot.validate(temporary.path);
+      expect(snapshot.resolvedPath, temporary.resolveSymbolicLinksSync());
+      await snapshot.ensureUnchanged();
+
+      await File('${temporary.path}/sys.dic').writeAsBytes(<int>[9]);
+      await expectLater(
+        snapshot.ensureUnchanged(),
+        throwsA(isA<MalformedDataException>()),
+      );
+    } finally {
+      await temporary.delete(recursive: true);
+    }
+  });
+
+  test('compatible profile requires every nonempty runtime file', () async {
+    final temporary = await Directory.systemTemp.createTemp(
+      'unidic-compatible-test-',
+    );
+    try {
+      await _writeTree(temporary, <String, List<int>>{
+        'char.bin': <int>[1],
+        'matrix.bin': <int>[2],
+        'sys.dic': <int>[3],
+      });
+      await expectLater(
+        CompatibleUnidicSnapshot.validate(temporary.path),
+        throwsA(isA<MalformedDataException>()),
+      );
+      await File('${temporary.path}/unk.dic').create();
+      await expectLater(
+        CompatibleUnidicSnapshot.validate(temporary.path),
+        throwsA(isA<MalformedDataException>()),
+      );
+    } finally {
+      await temporary.delete(recursive: true);
+    }
+  });
+
+  test(
+    'compatible profile rejects linked runtime files',
+    () async {
+      final temporary = await Directory.systemTemp.createTemp(
+        'unidic-compatible-test-',
+      );
+      try {
+        await _writeTree(temporary, <String, List<int>>{
+          'char.bin': <int>[1],
+          'matrix.bin': <int>[2],
+          'sys.dic': <int>[3],
+        });
+        final target = File('${temporary.path}/target')
+          ..writeAsBytesSync(<int>[4]);
+        await Link('${temporary.path}/unk.dic').create(target.path);
+        await expectLater(
+          CompatibleUnidicSnapshot.validate(temporary.path),
+          throwsA(isA<MalformedDataException>()),
+        );
+      } finally {
+        await temporary.delete(recursive: true);
+      }
+    },
+    skip: Platform.isWindows ? 'Creating links may require elevation.' : false,
+  );
+
+  test(
+    'compatible profile rejects a linked optional dicrc',
+    () async {
+      final temporary = await Directory.systemTemp.createTemp(
+        'unidic-compatible-test-',
+      );
+      try {
+        await _writeTree(temporary, <String, List<int>>{
+          'char.bin': <int>[1],
+          'matrix.bin': <int>[2],
+          'sys.dic': <int>[3],
+          'unk.dic': <int>[4],
+        });
+        final target = File('${temporary.path}/target')
+          ..writeAsBytesSync(<int>[5]);
+        await Link('${temporary.path}/dicrc').create(target.path);
+        await expectLater(
+          CompatibleUnidicSnapshot.validate(temporary.path),
+          throwsA(isA<MalformedDataException>()),
+        );
+      } finally {
+        await temporary.delete(recursive: true);
+      }
+    },
+    skip: Platform.isWindows ? 'Creating links may require elevation.' : false,
+  );
+
+  test('compatible profile snapshots an absent optional dicrc', () async {
+    final temporary = await Directory.systemTemp.createTemp(
+      'unidic-compatible-test-',
+    );
+    try {
+      await _writeTree(temporary, <String, List<int>>{
+        'char.bin': <int>[1],
+        'matrix.bin': <int>[2],
+        'sys.dic': <int>[3],
+        'unk.dic': <int>[4],
+      });
+      final snapshot = await CompatibleUnidicSnapshot.validate(temporary.path);
+      await File('${temporary.path}/dicrc').writeAsBytes(<int>[5]);
+      await expectLater(
+        snapshot.ensureUnchanged(),
+        throwsA(isA<MalformedDataException>()),
+      );
+    } finally {
+      await temporary.delete(recursive: true);
+    }
+  });
+
+  test('production manifest has the exact 20-file aggregate', () {
+    expect(pinnedUnidicPyCwjFileManifest, hasLength(20));
     expect(
-      unidic310FileManifest['sys.dic']?.sha256,
+      pinnedUnidicPyCwjFileManifest.values.fold<int>(
+        0,
+        (sum, file) => sum + file.size,
+      ),
+      pinnedUnidicPyCwjTreeSizeBytes,
+    );
+    expect(pinnedUnidicPyCwjTreeSha256, hasLength(64));
+    expect(pinnedUnidicPyCwjArchiveSha256, hasLength(64));
+    expect(pinnedUnidicPyCwjArchiveSizeBytes, 524664138);
+    expect(pinnedUnidicPyCwjFileManifest['sys.dic']?.size, 243373840);
+    expect(
+      pinnedUnidicPyCwjFileManifest['sys.dic']?.sha256,
       'f019f95838242cd614953a25201ad0b623b9c1cbca90de2507df4510db1b192c',
     );
   });
@@ -33,7 +163,7 @@ void main() {
       };
       await _writeTree(temporary, payloads);
       final manifest = _manifest(payloads);
-      final snapshot = await validateUnidic310ForTesting(
+      final snapshot = await validatePinnedUnidicPyCwjForTesting(
         temporary.path,
         files: manifest.files,
         totalBytes: manifest.totalBytes,
@@ -60,7 +190,7 @@ void main() {
       final manifest = _manifest(payloads);
       await File('${temporary.path}/extra').writeAsString('extra');
       await expectLater(
-        validateUnidic310ForTesting(
+        validatePinnedUnidicPyCwjForTesting(
           temporary.path,
           files: manifest.files,
           totalBytes: manifest.totalBytes,
@@ -71,7 +201,7 @@ void main() {
       await File('${temporary.path}/extra').delete();
       await File('${temporary.path}/dicrc').writeAsString('wrong-data');
       await expectLater(
-        validateUnidic310ForTesting(
+        validatePinnedUnidicPyCwjForTesting(
           temporary.path,
           files: manifest.files,
           totalBytes: manifest.totalBytes,
@@ -95,7 +225,7 @@ void main() {
         final bytes = target.readAsBytesSync();
         final manifest = _manifest(<String, List<int>>{'dicrc': bytes});
         await expectLater(
-          validateUnidic310ForTesting(
+          validatePinnedUnidicPyCwjForTesting(
             temporary.path,
             files: manifest.files,
             totalBytes: manifest.totalBytes,
@@ -112,11 +242,15 @@ void main() {
 
   test('rejects relative and NUL paths before filesystem access', () async {
     await expectLater(
-      Unidic310Snapshot.validate('relative'),
+      PinnedUnidicPyCwjSnapshot.validate('relative'),
       throwsA(isA<InvalidConfigurationException>()),
     );
     await expectLater(
-      Unidic310Snapshot.validate('/tmp/bad\u0000path'),
+      PinnedUnidicPyCwjSnapshot.validate('/tmp/bad\u0000path'),
+      throwsA(isA<InvalidConfigurationException>()),
+    );
+    await expectLater(
+      CompatibleUnidicSnapshot.validate('relative'),
       throwsA(isA<InvalidConfigurationException>()),
     );
   });

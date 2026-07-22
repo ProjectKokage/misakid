@@ -11,3 +11,6 @@ __pycache__/
 *.pyc
 *.tmp
 .DS_Store
+unidic-csj-202302.zip
+unidic-cwj-202302.zip
+unidic-lite-1.0.8.tar.gz

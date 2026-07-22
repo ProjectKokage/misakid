@@ -9,7 +9,7 @@ import 'dart:ffi';
 import 'dart:typed_data';
 
 /// Native ABI version required by this Dart adapter.
-const int mecabJapaneseNativeAbiVersion = 1;
+const int mecabJapaneseNativeAbiVersion = 3;
 
 const int _maximumDictionaryPathBytes = 32768;
 const int _maximumReturnedFieldBytes = 1024 * 1024;
@@ -17,12 +17,12 @@ const int _maximumReturnedWords = 65536;
 
 /// Exact immutable identities required from a compatible native library.
 const Map<int, String> expectedMecabJapaneseNativeIdentities = <int, String>{
-  0: '0.1.0-dev.1',
+  0: '0.1.0',
   1: '0.996',
   2: 'dea0f240fad8dc8b9ea1984920a4d64a48227a40c2924a3c545eaeca50357857',
   3: 'd5ada46f7fc2b52c1c79c273eb9668ff6ad7ab276a8db9d8be119ef93440f0dc',
-  4: 'misakid-mecab-ja-build-v2-portable',
-  5: '95bd65fa96955b644c15510932ca8439f463ac8b66f57bac6dfee5e29fa03115',
+  4: 'misakid-mecab-ja-build-v4-portable',
+  5: 'unidic-features-26-29-v1',
 };
 
 /// Bounded, input-free diagnostic returned by the native analyzer.
@@ -110,6 +110,9 @@ typedef _ContextCreateDart =
     Pointer<_NativeContext> Function(Pointer<Uint8>, int, int);
 typedef _ContextStatusNative = Uint32 Function(Pointer<_NativeContext>);
 typedef _ContextStatusDart = int Function(Pointer<_NativeContext>);
+typedef _ContextFeatureFieldCountNative =
+    Uint32 Function(Pointer<_NativeContext>);
+typedef _ContextFeatureFieldCountDart = int Function(Pointer<_NativeContext>);
 typedef _ContextDataNative = Pointer<Uint8> Function(Pointer<_NativeContext>);
 typedef _ContextDataDart = Pointer<Uint8> Function(Pointer<_NativeContext>);
 typedef _ContextSizeNative = Size Function(Pointer<_NativeContext>);
@@ -173,6 +176,11 @@ external Pointer<_NativeContext> _bundledContextCreate(
 
 @Native<_ContextStatusNative>(symbol: 'misakid_mecab_ja_context_status')
 external int _bundledContextStatus(Pointer<_NativeContext> context);
+
+@Native<_ContextFeatureFieldCountNative>(
+  symbol: 'misakid_mecab_ja_context_feature_field_count',
+)
+external int _bundledContextFeatureFieldCount(Pointer<_NativeContext> context);
 
 @Native<_ContextDataNative>(symbol: 'misakid_mecab_ja_context_error_stage_data')
 external Pointer<Uint8> _bundledContextErrorStageData(
@@ -283,6 +291,11 @@ final class MecabJapaneseNativeLibrary {
           .lookupFunction<_ContextStatusNative, _ContextStatusDart>(
             'misakid_mecab_ja_context_status',
           ),
+      _contextFeatureFieldCount = library
+          .lookupFunction<
+            _ContextFeatureFieldCountNative,
+            _ContextFeatureFieldCountDart
+          >('misakid_mecab_ja_context_feature_field_count'),
       _contextErrorStageData = library
           .lookupFunction<_ContextDataNative, _ContextDataDart>(
             'misakid_mecab_ja_context_error_stage_data',
@@ -360,6 +373,7 @@ final class MecabJapaneseNativeLibrary {
       _bufferFree = _bundledBufferFree,
       _contextCreate = _bundledContextCreate,
       _contextStatus = _bundledContextStatus,
+      _contextFeatureFieldCount = _bundledContextFeatureFieldCount,
       _contextErrorStageData = _bundledContextErrorStageData,
       _contextErrorStageSize = _bundledContextErrorStageSize,
       _contextErrorMessageData = _bundledContextErrorMessageData,
@@ -421,6 +435,7 @@ final class MecabJapaneseNativeLibrary {
   final _BufferFreeDart _bufferFree;
   final _ContextCreateDart _contextCreate;
   final _ContextStatusDart _contextStatus;
+  final _ContextFeatureFieldCountDart _contextFeatureFieldCount;
   final _ContextDataDart _contextErrorStageData;
   final _ContextSizeDart _contextErrorStageSize;
   final _ContextDataDart _contextErrorMessageData;
@@ -475,6 +490,7 @@ final class MecabJapaneseNativeAnalyzer implements Finalizable {
     required MecabJapaneseNativeLibrary library,
     required Pointer<_NativeContext> context,
     required this.maxInputBytes,
+    required this.featureFieldCount,
   }) : _library = library,
        _context = context,
        _finalizer = NativeFinalizer(library._contextDestroyPointer) {
@@ -541,10 +557,18 @@ final class MecabJapaneseNativeAnalyzer implements Finalizable {
         library._contextDestroy(context);
       }
     }
+    final featureFieldCount = library._contextFeatureFieldCount(context);
+    if (featureFieldCount != 26 && featureFieldCount != 29) {
+      library._contextDestroy(context);
+      throw MecabJapaneseNativeLibraryException(
+        'The Japanese MeCab native library returned an invalid feature field count.',
+      );
+    }
     return MecabJapaneseNativeAnalyzer._(
       library: library,
       context: context,
       maxInputBytes: maxInputBytes,
+      featureFieldCount: featureFieldCount,
     );
   }
 
@@ -553,6 +577,9 @@ final class MecabJapaneseNativeAnalyzer implements Finalizable {
 
   /// Maximum UTF-8 input bytes configured on both sides of the ABI.
   final int maxInputBytes;
+
+  /// Number of fields in each known-word UniDic feature record.
+  final int featureFieldCount;
 
   Pointer<_NativeContext>? _context;
 

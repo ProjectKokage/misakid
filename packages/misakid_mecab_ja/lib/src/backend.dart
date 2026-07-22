@@ -32,6 +32,48 @@ const int defaultMecabJapaneseMaxInputBytes = 1024 * 1024;
 const int _maximumConfigurableInputBytes = 64 * 1024 * 1024;
 const int _maximumPathUtf8Bytes = 32768;
 
+/// Dictionary validation and compatibility contract for the native backend.
+enum MecabJapaneseDictionaryProfile {
+  /// Accept a caller-selected UTF-8 UniDic with a supported feature layout.
+  ///
+  /// The layout check does not identify the dictionary corpus: CWJ, CSJ, and
+  /// custom dictionaries can share it. Output can vary between dictionaries
+  /// and does not carry an exact Misaki fixture-parity claim.
+  compatible,
+
+  /// Require the exact modified unidic-py CWJ tree used by the fixtures.
+  ///
+  /// The complete tree hash, not its release marker, establishes identity.
+  pinnedUnidicPyCwjParity,
+}
+
+/// Detected fugashi-compatible UniDic feature layout.
+///
+/// This describes where the projection reads `pron` and `kana`; it does not
+/// identify the dictionary corpus, release, or exact resource bytes.
+enum MecabJapaneseUnidicFeatureLayout {
+  /// 26-field layout with `kana` at field 17.
+  fields26(26),
+
+  /// 29-field layout with `kana` at field 20.
+  fields29(29);
+
+  const MecabJapaneseUnidicFeatureLayout(this.fieldCount);
+
+  /// Number of comma-separated fields in one known-word record.
+  final int fieldCount;
+
+  static MecabJapaneseUnidicFeatureLayout _fromFieldCount(
+    int fieldCount,
+  ) => switch (fieldCount) {
+    26 => fields26,
+    29 => fields29,
+    _ => throw StateError(
+      'Native initialization returned an unsupported UniDic feature layout.',
+    ),
+  };
+}
+
 /// One owned copy of the raw MeCab projection consumed by Cutlet.
 final class MecabJapaneseRawWord {
   /// Creates one immutable raw morphology record.
@@ -46,12 +88,12 @@ final class MecabJapaneseRawWord {
   /// Exact surface bytes decoded as UTF-8.
   final String surface;
 
-  /// UniDic feature 9 (`pron`), or `null` when the feature is unavailable.
+  /// UniDic `pron`, or `null` when the feature is unavailable.
   ///
   /// A literal `*` is data and is not converted to `null`.
   final String? pronunciation;
 
-  /// UniDic feature 20 (`kana`), or `null` when the feature is unavailable.
+  /// UniDic `kana`, or `null` when the schema does not provide it.
   ///
   /// A literal `*` is data and is not converted to `null`.
   final String? kana;
@@ -67,20 +109,32 @@ final class MecabJapaneseRawWord {
 ///
 /// [analyzeRaw] exposes the exact native projection. [analyze] additionally
 /// applies jaconv 0.4.0 Katakana conversion and the pinned Cutlet longest-match
-/// grouping algorithm through the injected [wordMembership].
+/// grouping algorithm through the injected [wordMembership]. Open methods use
+/// [MecabJapaneseDictionaryProfile.compatible] unless the caller explicitly
+/// selects the strict fixture-parity profile.
+///
+/// Opening throws [InvalidConfigurationException] for invalid caller options,
+/// [BackendUnavailableException] when the selected native/resource tuple
+/// cannot initialize, and [MalformedDataException] for malformed or
+/// identity-mismatched data. Calls after successful initialization throw
+/// [BackendFailureException] when native analysis fails.
 final class MecabJapaneseCutletBackend
     implements JapaneseCutletMorphologyBackend {
   MecabJapaneseCutletBackend._({
     required MecabJapaneseNativeAnalyzer analyzer,
     required this.wordMembership,
+    required this.dictionaryProfile,
+    required this.dictionaryFeatureLayout,
     required this.info,
   }) : _analyzer = analyzer;
 
-  /// Validates and opens the exact macOS arm64 native and UniDic resources.
+  /// Validates and opens explicit macOS arm64 native and UniDic resources.
   static Future<MecabJapaneseCutletBackend> open({
     required String libraryPath,
     required String dictionaryPath,
     required String wordListPath,
+    MecabJapaneseDictionaryProfile dictionaryProfile =
+        MecabJapaneseDictionaryProfile.compatible,
     int maxInputBytes = defaultMecabJapaneseMaxInputBytes,
   }) async {
     _validateConfiguration(
@@ -96,18 +150,21 @@ final class MecabJapaneseCutletBackend
       libraryPath: libraryPath,
       dictionaryPath: dictionaryPath,
       wordMembership: wordMembership,
+      dictionaryProfile: dictionaryProfile,
       maxInputBytes: maxInputBytes,
     );
   }
 
   /// Opens the package-built native asset with mobile-friendly word-list bytes.
   ///
-  /// [dictionaryPath] must point to an already materialized, validated UniDic
-  /// 3.1.0 directory. Mobile applications commonly copy that large resource
-  /// from their app bundle or model store into application support storage.
+  /// [dictionaryPath] must point to an already materialized UniDic directory.
+  /// Mobile applications commonly copy that resource from their app bundle or
+  /// model store into application support storage.
   static Future<MecabJapaneseCutletBackend> openBundled({
     required String dictionaryPath,
     required Uint8List wordListBytes,
+    MecabJapaneseDictionaryProfile dictionaryProfile =
+        MecabJapaneseDictionaryProfile.compatible,
     int maxInputBytes = defaultMecabJapaneseMaxInputBytes,
   }) async {
     _validateBundledConfiguration(
@@ -121,6 +178,7 @@ final class MecabJapaneseCutletBackend
     return openBundledWithMembership(
       dictionaryPath: dictionaryPath,
       wordMembership: wordMembership,
+      dictionaryProfile: dictionaryProfile,
       maxInputBytes: maxInputBytes,
     );
   }
@@ -129,6 +187,8 @@ final class MecabJapaneseCutletBackend
   static Future<MecabJapaneseCutletBackend> openBundledWithMembership({
     required String dictionaryPath,
     required JapaneseCutletWordMembership wordMembership,
+    MecabJapaneseDictionaryProfile dictionaryProfile =
+        MecabJapaneseDictionaryProfile.compatible,
     int maxInputBytes = defaultMecabJapaneseMaxInputBytes,
   }) async {
     _validateBundledConfiguration(
@@ -147,6 +207,7 @@ final class MecabJapaneseCutletBackend
       library: library,
       dictionaryPath: dictionaryPath,
       wordMembership: wordMembership,
+      dictionaryProfile: dictionaryProfile,
       maxInputBytes: maxInputBytes,
       platform: _bundledPlatformLabel(),
     );
@@ -157,6 +218,8 @@ final class MecabJapaneseCutletBackend
     required String libraryPath,
     required String dictionaryPath,
     required JapaneseCutletWordMembership wordMembership,
+    MecabJapaneseDictionaryProfile dictionaryProfile =
+        MecabJapaneseDictionaryProfile.compatible,
     int maxInputBytes = defaultMecabJapaneseMaxInputBytes,
   }) async {
     _validateConfiguration(
@@ -212,6 +275,7 @@ final class MecabJapaneseCutletBackend
       library: library,
       dictionaryPath: dictionaryPath,
       wordMembership: wordMembership,
+      dictionaryProfile: dictionaryProfile,
       maxInputBytes: maxInputBytes,
       platform: mecabJapaneseSupportedPlatform,
     );
@@ -221,10 +285,18 @@ final class MecabJapaneseCutletBackend
     required MecabJapaneseNativeLibrary library,
     required String dictionaryPath,
     required JapaneseCutletWordMembership wordMembership,
+    required MecabJapaneseDictionaryProfile dictionaryProfile,
     required int maxInputBytes,
     required String platform,
   }) async {
-    final dictionary = await Unidic310Snapshot.validate(dictionaryPath);
+    final Future<UnidicDictionarySnapshot> dictionaryValidation =
+        switch (dictionaryProfile) {
+          MecabJapaneseDictionaryProfile.compatible =>
+            CompatibleUnidicSnapshot.validate(dictionaryPath),
+          MecabJapaneseDictionaryProfile.pinnedUnidicPyCwjParity =>
+            PinnedUnidicPyCwjSnapshot.validate(dictionaryPath),
+        };
+    final dictionary = await dictionaryValidation;
     MecabJapaneseNativeAnalyzer? analyzer;
     try {
       analyzer = MecabJapaneseNativeAnalyzer.create(
@@ -234,28 +306,55 @@ final class MecabJapaneseCutletBackend
       );
       await dictionary.ensureUnchanged();
       final identities = library.identities;
+      final isParityProfile =
+          dictionaryProfile ==
+          MecabJapaneseDictionaryProfile.pinnedUnidicPyCwjParity;
+      final dictionaryFeatureLayout =
+          MecabJapaneseUnidicFeatureLayout._fromFieldCount(
+            analyzer.featureFieldCount,
+          );
+      final details = <String, String>{
+        'adapterVersion': identities[0]!,
+        'abiVersion': mecabJapaneseNativeAbiVersion.toString(),
+        'platform': platform,
+        'mecabVersion': identities[1]!,
+        'nativeSourceTreeSha256': identities[2]!,
+        'nativeSourceSdistSha256': identities[3]!,
+        'nativeBuildProfile': identities[4]!,
+        'dictionary': 'unidic',
+        'dictionaryProfile': isParityProfile
+            ? 'pinned-unidic-py-cwj-parity'
+            : 'compatible',
+        'dictionaryCorpus': isParityProfile
+            ? pinnedUnidicPyCwjCorpus
+            : 'unknown',
+        'dictionaryDistribution': isParityProfile
+            ? pinnedUnidicPyCwjDistribution
+            : 'unknown',
+        'dictionaryIdentity': isParityProfile
+            ? 'verified-tree-sha256'
+            : 'unverified',
+        'dictionaryFeatureFieldCount': dictionaryFeatureLayout.fieldCount
+            .toString(),
+        'dictionaryFeatureLayoutSupport': identities[5]!,
+        'referenceFugashiVersion': '1.4.0',
+        'jaconvVersion': '0.4.0',
+        'wordMembership': wordMembership.info.name,
+        'wordMembershipVersion': wordMembership.info.version,
+      };
+      if (isParityProfile) {
+        details['dictionaryReleaseMarker'] = pinnedUnidicPyCwjReleaseMarker;
+        details['dictionaryTreeSha256'] = pinnedUnidicPyCwjTreeSha256;
+      }
       return MecabJapaneseCutletBackend._(
         analyzer: analyzer,
         wordMembership: wordMembership,
+        dictionaryProfile: dictionaryProfile,
+        dictionaryFeatureLayout: dictionaryFeatureLayout,
         info: BackendInfo(
           name: 'mecab-unidic-cutlet',
-          version: '0.996/unidic-3.1.0',
-          details: <String, String>{
-            'adapterVersion': identities[0]!,
-            'abiVersion': mecabJapaneseNativeAbiVersion.toString(),
-            'platform': platform,
-            'mecabVersion': identities[1]!,
-            'nativeSourceTreeSha256': identities[2]!,
-            'nativeSourceSdistSha256': identities[3]!,
-            'nativeBuildProfile': identities[4]!,
-            'dictionary': unidic310DictionaryName,
-            'dictionaryVersion': unidic310DictionaryVersion,
-            'dictionaryTreeSha256': identities[5]!,
-            'referenceFugashiVersion': '1.4.0',
-            'jaconvVersion': '0.4.0',
-            'wordMembership': wordMembership.info.name,
-            'wordMembershipVersion': wordMembership.info.version,
-          },
+          version: identities[1]!,
+          details: details,
         ),
       );
     } on MecabJapaneseNativeException catch (error) {
@@ -281,6 +380,14 @@ final class MecabJapaneseCutletBackend
 
   /// Exact grouping membership supplied by the caller.
   final JapaneseCutletWordMembership wordMembership;
+
+  /// Dictionary validation contract selected during initialization.
+  final MecabJapaneseDictionaryProfile dictionaryProfile;
+
+  /// Feature layout detected from the live dictionary during initialization.
+  ///
+  /// This is a parsing capability, not a CWJ/CSJ or release identity.
+  final MecabJapaneseUnidicFeatureLayout dictionaryFeatureLayout;
 
   @override
   final BackendInfo info;
@@ -424,7 +531,7 @@ String _bundledPlatformLabel() => 'native-assets-${Abi.current()}';
 void _validateSupportedPlatform() {
   if (!Platform.isMacOS || Abi.current() != Abi.macosArm64) {
     throw const BackendUnavailableException(
-      'misakid_mecab_ja 0.1.0-dev.1 supports only macOS arm64.',
+      'The explicit-library Japanese MeCab adapter supports only macOS arm64.',
     );
   }
 }

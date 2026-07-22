@@ -1,6 +1,10 @@
 name: misakid_mecab_ja
-description: Native-assets MeCab and UniDic adapter for exact Misaki Japanese Cutlet G2P.
-version: 0.1.0-dev.1
+description: >-
+  Native-assets MeCab/UniDic adapter for Japanese Cutlet G2P with compatible
+  and exact-parity dictionary profiles.
+version: 0.1.0
+repository: https://github.com/ProjectKokage/misakid
+issue_tracker: https://github.com/ProjectKokage/misakid/issues
 topics:
   - g2p
   - japanese
@@ -13,13 +17,18 @@ executables:
 environment:
   sdk: ^3.11.5
 
+platforms:
+  android:
+  ios:
+  macos:
+
 resolution: workspace
 
 dependencies:
   code_assets: ^1.2.1
   crypto: ^3.0.7
   hooks: ^2.0.2
-  misakid: ^0.1.0-dev.1
+  misakid: ^0.1.0
   native_toolchain_c: ^0.19.2
 
 dev_dependencies:

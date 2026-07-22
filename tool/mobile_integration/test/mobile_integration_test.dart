@@ -29,7 +29,7 @@ void main() {
 
     await tester.enterText(
       find.byKey(const Key('dictionaryPath')),
-      '/data/unidic-3.1.0',
+      '/data/caller-unidic',
     );
     await tester.enterText(
       find.byKey(const Key('wordListPath')),
@@ -38,7 +38,7 @@ void main() {
     await tester.tap(find.byKey(const Key('probeButton')));
     await tester.pumpAndSettle();
 
-    expect(capturedDictionaryPath, '/data/unidic-3.1.0');
+    expect(capturedDictionaryPath, '/data/caller-unidic');
     expect(capturedWordListPath, '/data/ja_words.txt');
     expect(
       find.text('G2P ready: mecab-test 1\n日本語です → ɲiʔpoŋɡo desɨ'),
