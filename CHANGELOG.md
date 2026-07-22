@@ -15,6 +15,11 @@
   15/API 35 arm64 and iOS 26.4 emulated runtimes. Physical-device and clean
   hosted-matrix validation remain before broad mobile release support is
   claimed.
+- Release `misakid_mecab_ja` 0.1.0 with an exact pinned modified-CWJ parity
+  profile and a separate corpus-agnostic compatible profile. Provision the
+  latter against unidic-lite 2.1.2's 26-field layout and the distinct official
+  NINJAL CWJ/CSJ 2023.02 29-field archives; do not infer corpus identity from
+  release or layout, and remove the unprovisioned 17-field claim.
 - Add Android, iOS, and macOS bundled-native-asset build profiles to the
   Japanese Open JTalk backend. The package vendors the exact reviewed
   safety-patched source tree, preserves C11/C++17 language boundaries, and

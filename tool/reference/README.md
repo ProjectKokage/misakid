@@ -201,15 +201,18 @@ uv pip sync \
   tool/reference/requirements-ja-cutlet-py312.txt
 ```
 
-Its full UniDic resource is the content-addressed backup of the original 3.1.0
-archive, not the mutable official S3 object or the `latest` lookup used by
+Its full UniDic resource is the content-addressed backup of the modified
+unidic-py CWJ tree used by the oracle; the 3.1.0 release number does not identify
+that resource because CWJ and CSJ can share it. The backup is used instead of the
+mutable official S3 object or the `latest` lookup used by
 `python -m unidic download`:
 
 ```text
 https://huggingface.co/drewThomasson/unidic_3.1.0_backup/resolve/9fcae6f3676c255dac3b81d8fbc83b16cc192d20/unidic-3.1.0.zip
 SHA-256: 39ea0eae3b1f10ba8986483592cbc83bcc92f1898bb43ecbc607010f2e98cd22
 Size: 524664138 bytes
-Installed version marker: unidic-3.1.0+2021-08-31
+Distribution/corpus: unidic-py / CWJ
+Installed release marker (not identity): unidic-3.1.0+2021-08-31
 Installed tree: sha256:95bd65fa96955b644c15510932ca8439f463ac8b66f57bac6dfee5e29fa03115+files:20+bytes:811662881
 Live sys.dic: charset:utf8+entries:878989+binary-version:102
 ```
@@ -245,9 +248,12 @@ ln -s "$dictionary" "$unidic_package/dicdir"
 The destination paths must not already exist; this bootstrap deliberately
 does not replace or merge an old dictionary. The exporter hashes relative
 paths, lengths, and contents across the complete installed tree, requires the
-exact version marker, and checks fugashi's live `dictionary_info` contains
+expected release marker as secondary metadata, and checks fugashi's live
+`dictionary_info` contains
 only that tree's `sys.dic` with the exact charset, entry count, and binary
-version. These three identities are recorded separately in `backendVersions`.
+version. The tree identity, descriptive release marker, and live dictionary
+metadata are recorded separately in `backendVersions`; the marker is not used
+as identity.
 The dependency lock, resource preflight, capture schema, and authoritative
 27-case golden are committed. The separate `ja_words.txt` grouping list is an
 explicit external compatibility artifact: Misakid validates its pinned
@@ -602,10 +608,11 @@ external 1.9 MB list itself is never copied into a fixture or the Dart runtime.
 The exporter wraps the actual cached
 `Cutlet.tagger`, so each non-empty case performs exactly one morphology call,
 while empty input records the upstream no-call fast path. Cutlet's outer token
-list remains `null`. `backendVersions` independently pins
-`unidic-dictionary-tree`, `unidic-dictionary-version`, and the live
+list remains `null`. `backendVersions` independently pins the
+`unidic-dictionary-tree`, records the legacy-named
+`unidic-dictionary-version` release marker, and pins the live
 `fugashi-system-dictionary` identity in addition to the Cutlet grouping-list
-identity.
+identity. The release-marker field does not identify the corpus or tree.
 
 Korean `g2pkc-default` records contain a `backendInput` object with kind
 `python-mecab-ko.MeCab.pos` and nested schema version 2. It records the exact

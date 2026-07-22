@@ -201,8 +201,10 @@ generator.
   complete pinned tables and Cutlet's algorithmic sokuon, moraic-nasal, and
   long-vowel outputs. Exact canonical digests cover all 35 Cutlet and 40
   pyopenjtalk-style symbols; a separate digest covers all 193 mora mappings.
-- Did not invent or accept a golden fixture without the exact full UniDic 3.1.0
-  resource. Fixture generation remains pending until that archive is
+- Did not invent or accept a golden fixture without the exact modified
+  unidic-py CWJ resource later pinned by complete tree hash. Its release marker
+  alone could not identify it because CWJ and CSJ can share a release number.
+  Fixture generation remained pending until that archive was
   explicitly provisioned, its installed tree and live fugashi dictionary are
   pinned, and both regeneration and read-only verification pass.
 
@@ -640,8 +642,8 @@ work is recorded below.
   ONNX conversion, a different tagger, or a Python process would not satisfy
   the compatibility and production-runtime policies.
 - At this audit point, a Cutlet adapter remained pending because the full
-  UniDic 3.1.0 installed
-  tree and live tagger have not yet passed the required pinning and fixture
+  modified unidic-py CWJ installed tree and live tagger had not yet passed the
+  required content pinning and fixture
   workflow. Exact grouping may use `misaki/data/ja_words.txt` only as an
   explicitly caller-supplied external resource whose pinned SHA-256, byte
   length, record count, and format are validated at initialization. Misakid
@@ -987,8 +989,8 @@ documented real-backend and provenance gates.
   package, and compiles only the standard 16-file MeCab 0.996 runtime plus an
   Apache-2.0 owned-result shim. No Open JTalk frontend, HTS, voice, model,
   dictionary, word list, or binary is bundled.
-- Dart streams and validates every file in the exact UniDic 3.1.0 tree: 20
-  files, 811,662,881 bytes, tree SHA-256
+- Dart streams and validates every file in the exact modified unidic-py CWJ
+  tree: 20 files, 811,662,881 bytes, tree SHA-256
   `95bd65fa96955b644c15510932ca8439f463ac8b66f57bac6dfee5e29fa03115`.
   Native initialization independently checks one UTF-8 system dictionary,
   878,989 entries, and binary version 102. The dictionary is re-statted after
@@ -1028,8 +1030,9 @@ documented real-backend and provenance gates.
   exports, deployment target, dependencies, paths, notices, and exact native
   parity; normal CI remains resource-free.
 - The supported tuple is precise: Misaki 0.9.4 Cutlet behavior, MeCab 0.996
-  from pyopenjtalk 0.4.1, the exact UniDic 3.1.0 tree, the exact explicit
-  external `ja_words.txt`, macOS 11+ arm64, and explicit resource paths.
+  from pyopenjtalk 0.4.1, the exact modified unidic-py CWJ tree, the exact
+  explicit external `ja_words.txt`, macOS 11+ arm64, and explicit resource
+  paths.
   Linux, Windows, Intel macOS, embedded NUL, cancellation, bundled resources,
   discovery, and download remain unsupported.
 
@@ -1330,27 +1333,29 @@ documented real-backend and provenance gates.
   every native-assets build. No source, binary, dictionary, or word list is
   downloaded by the hook.
 - Added a portable C++17 build profile for Android, iOS, and macOS. It compiles
-  the reviewed 16 MeCab runtime files plus the owned C ABI shim. The accepted
-  UniDic is UTF-8, so iconv is omitted as an identity conversion; the portable
-  artifact replays all 27 Cutlet cases, all 126 raw records, every grouping
-  decision, 26 outputs, and the pinned failure exactly.
+  the reviewed 16 MeCab runtime files plus the owned C ABI shim. The pinned
+  modified unidic-py CWJ fixture tree is UTF-8, so iconv is omitted as an
+  identity conversion; the portable artifact replays all 27 Cutlet cases, all
+  126 raw records, every grouping decision, 26 outputs, and the pinned failure
+  exactly.
 - Android links libc++ statically with archive symbols hidden. A Flutter release
-  APK built armv7, arm64, and x86-64 assets with exactly the 23 reviewed dynamic
-  exports, exact libc/libdl/libm dependencies, 0x4000 ELF LOAD alignment, and a
+  APK built armv7, arm64, and x86-64 assets with exactly the 24 reviewed Cutlet
+  dynamic exports, exact libc/libdl/libm dependencies, 0x4000 ELF LOAD
+  alignment, and a
   passing `zipalign -c -P 16 4` check. The first Android runtime attempt exposed
   a missing explicit `libm` dependency through an unresolved `exp` symbol; the
   hook now links it deliberately, and the artifact verifier rejects missing or
-  unexpected dynamic dependencies. Apple Clang cross-compiled the same 23
+  unexpected dynamic dependencies. Apple Clang cross-compiled the same 24
   exports into an unsigned iOS arm64 device app with platform IOS and minimum
   iOS 13. Its install name, system linkage, application rpath, native-assets
   manifest resolution, and exact export surface pass artifact verification.
 - Ran the complete device integration contract with stable Flutter 3.41.7 on
   an Android 15/API 35 arm64 emulator and an iPhone 17 Pro iOS 26.4 Simulator.
-  Each bundled native asset loaded the exact 20-file UniDic tree and
-  byte-backed `ja_words.txt`, then matched all 27 cases, all 126 raw/grouped
-  records, all 12 joins, all 26 phoneme/null-token results, and the pinned
-  failure. Debug-only network/scene configuration is source-verified and absent
-  from production manifests. Physical-device and clean hosted-matrix
+  Each bundled native asset loaded the exact 20-file modified unidic-py CWJ
+  tree and byte-backed `ja_words.txt`, then matched all 27 cases, all 126
+  raw/grouped records, all 12 joins, all 26 phoneme/null-token results, and the
+  pinned failure. Debug-only network/scene configuration is source-verified and
+  absent from production manifests. Physical-device and clean hosted-matrix
   validation remain outstanding.
 - Added `MecabJapaneseCutletBackend.openBundled` and
   `openBundledWithMembership`. The exact 1,921,140-byte grouping list can be
@@ -1371,15 +1376,141 @@ documented real-backend and provenance gates.
 - Applied the pinned Dart 3.11.5 formatter to the workspace and removed stale
   Flutter-template TODO comments from the repository-owned mobile build
   harness. No G2P behavior, fixture, generated data, or support claim changed.
-- Kept the missing canonical repository URL as an explicit publish warning;
-  no URL was invented because this Git repository has no configured remote.
+- Recorded `https://github.com/ProjectKokage/misakid` as the canonical
+  repository after configuring the matching Git remote, removing the publish
+  metadata warning without changing package behavior.
+
+## 2026-07-11: Open JTalk Android/iOS native assets
+
+- Added `OpenJtalkFrontendBackend.openBundled` without changing the pure-Dart
+  Japanese renderer or the legacy explicit-library macOS-arm64 contract. Dart
+  resolves the package code asset through a complete 23-function `@Native`
+  table, validates the same immutable ABI/source identities, and reports the
+  exact native-assets ABI in `BackendInfo`.
+- Committed the reviewed `misakid-openjtalk-safety-v1` source input as a
+  byte-stable 139-file, 5,382,103-byte tree with SHA-256
+  `8ce47a975dee79c078914df15c40df5906430e4a63be4fc2bc0987e7b5b2fccb`.
+  The hook and an independent verifier reject changed source files and verify
+  the byte-exact Open JTalk and MeCab notices within that tree. Reviewed copies
+  of the pyopenjtalk and dictionary notices are retained separately. No native
+  binary or dictionary is committed or downloaded by the build.
+- Preserved upstream language semantics by compiling Open JTalk's frontend
+  `.c` files as a private C11 archive and MeCab plus the owned ABI as C++17.
+  Open JTalk's UTF-8 tables use a plain-`char` `-1` sentinel; Android ARM
+  defaults that type to unsigned. The C profile therefore forces
+  `-fsigned-char`, and a compile-time `CHAR_MIN`/`CHAR_MAX` contract prevents a
+  silently unsafe build. Android also statically links LLVM libc++, links
+  `libm`, hides archive symbols, and applies an exact export version script.
+- Kept `open_jtalk_dic_utf_8-1.11` external. `openBundled` requires an absolute
+  real directory and streams the exact nine files, 107,304,813 bytes, and tree
+  SHA-256 before native initialization. Android applications must materialize
+  APK/Flutter assets into app storage; an exact read-only directory in an iOS
+  app bundle may be used directly.
+- Stable Flutter 3.41.7 produced one release APK containing both Japanese
+  adapters for armv7, arm64, and x86-64. Cutlet has its reviewed 24 exports and
+  Open JTalk its reviewed 23 exports; both have only libc/libdl/libm dynamic
+  dependencies, a NativeAssets mapping, and 16 KiB ELF-load and uncompressed-ZIP
+  alignment. An unsigned iOS arm64
+  device app contains both iOS-13+ frameworks with exact exports, reviewed
+  `@rpath` install names, libc++/libSystem linkage, application framework rpath,
+  and NativeAssets mappings.
+- Ran the complete Open JTalk fixture through the public bundled backend and
+  raw bindings on an Android 15/API 35 arm64 emulator and iPhone 17 iOS 26.5
+  Simulator. Both runs provisioned and revalidated the external dictionary,
+  then matched all 24 cases, all 155 NJD records and 14 fields, all 23 final
+  phoneme strings and typed token graphs, and the exact pinned whitespace
+  failure. The bundled macOS-arm64 path passes the same corpus plus lifecycle,
+  bounds, four-isolate, export, and no-stdio checks.
+- Added a separate authenticated loopback resource server and manual/tag
+  Android-emulator/iOS-simulator workflow job. Normal tests remain offline;
+  the workflow explicitly verifies the pinned dictionary archive and fixture
+  before serving only fixed routes into each application sandbox.
+- Android/iOS execution remains experimental as a release claim until physical
+  devices and the clean hosted matrix pass. Android armv7/x86-64, iOS device,
+  and iOS x64 currently have build/artifact evidence but not direct runtime
+  parity evidence.
+
+## 2026-07-11: Caller-selected UniDic layout and pinned CWJ parity profile
+
+- Removed the pinned modified unidic-py CWJ identity from the default
+  `misakid_mecab_ja` initialization path. All open methods now default to
+  `MecabJapaneseDictionaryProfile.compatible`, which validates the explicit
+  real directory, four required runtime files, and the shape and stability of
+  an optional `dicrc` before native initialization. Extra source, notice,
+  release-marker, and metadata files do not affect compatibility. The
+  compatible profile does not infer corpus or exact
+  resource identity: CWJ, CSJ, and custom dictionaries can share a feature
+  layout and release number, so it reports corpus unknown and identity
+  unverified.
+- Added the explicit `pinnedUnidicPyCwjParity` profile for the accepted 27-case
+  oracle. Only that profile hashes the complete 20-file, 811,662,881-byte
+  modified unidic-py CWJ tree and reports the verified tree identity. Its
+  `3.1.0+2021-08-31` release marker is descriptive metadata, not identity. No
+  fixture or expected output changed.
+- Bumped the owned native contract to ABI 3 and build profile
+  `misakid-mecab-ja-build-v4-portable`. The 24-function ABI replaces its
+  embedded dictionary hash and 878,989-entry check with a capability contract
+  and reports the detected feature field count. Initialization accepts one
+  nonempty UTF-8 MeCab-v102 system dictionary, probes `日本` before user input,
+  and recognizes fugashi's 17-, 26-, and 29-field UniDic layouts.
+  Pronunciation is field 9; kana is absent, field 17, or field 20 respectively.
+- Exercised the generic default against the independently provisioned
+  `unidic-lite==1.0.8` UniDic 2.1.2 tree and its 26-field layout. The native
+  smoke test verifies raw `日本` pronunciation/kana and confirms the backend
+  reports no pinned tree hash. This is feature-layout evidence, not a corpus,
+  release, or identity claim.
+- Generic dictionary output is dictionary-dependent and remains experimental;
+  exact Misaki 0.9.4 support is attached only to
+  `pinnedUnidicPyCwjParity`. The Open-JTalk-derived MeCab runtime retains its
+  reviewed portable configuration and does not interpret arbitrary `dicrc`
+  settings, so compatibility means the accepted binary/feature-layout contract
+  rather than equivalence to every fugashi installation.
+
+## 2026-07-12: `misakid_mecab_ja` 0.1.0 compatibility gate
+
+- Promoted the sibling adapter from `0.1.0-dev.1` to `0.1.0` atomically across
+  its pubspec, Dart/native identities, README, changelog, and mobile lock.
+  ABI 3 and its 24 exported functions are unchanged; identity field 5 now
+  advertises `unidic-features-26-29-v1`, so older development libraries are
+  rejected.
+- Removed the unprovisioned 17-field layout before the first stable adapter
+  release. The generic contract now accepts only its independently exercised
+  26- and 29-field projections.
+- Exercised the supplied official NINJAL `unidic-cwj-202302.zip` and
+  `unidic-csj-202302.zip` archives through the bundled native asset. Both are
+  UTF-8 MeCab-v102 dictionaries with 876,803 entries and 29 fields, and both
+  return the expected raw `講師` projection. Their archive, `sys.dic`, and
+  `matrix.bin` hashes differ, proving that shared release/layout metadata is
+  not corpus or resource identity. Generic backend metadata remains corpus
+  unknown and identity unverified for both.
+- Added the two exact archive sizes and SHA-256 values to the native source
+  manifest and release workflow. The owner-provisioned macOS-arm64 job verifies
+  and extracts both archives, runs their shared compatibility test, verifies
+  the official unidic-lite 1.0.8 source distribution and five extracted-file
+  hashes (the four required binaries plus optional `dicrc`) for the separate
+  26-field test, and continues to run strict modified unidic-py CWJ fixture
+  parity separately. No compatibility dictionary is bundled or downloaded by
+  the package.
+- Added repository-wide `.gitignore` plus root/adapter `.pubignore` guards for
+  the two supplied archives and the unidic-lite source archive. The final
+  adapter dry run is about 650 KB and the root dry run is 4 MB; none of the
+  external resources enters a publishable source tree.
+- Pinned `actions/checkout` 4.2.2 and `dart-lang/setup-dart` 1.7.2 to their
+  immutable commit SHAs in the owner-provisioned native release workflow.
+
+## 2026-07-22: Open JTalk non-code hook passes
+
+- Return immediately when the native-assets hook is invoked without a code
+  asset request, before verifying native sources or reading code-target
+  configuration. This restores Flutter web builds and non-code follow-up
+  passes in macOS development runs while leaving native builds unchanged.
 
 ## Next parity slices
 
-- Validate the Japanese Cutlet release configuration on physical iOS/Android
-  hardware and execute the clean hosted matrix before promoting broad mobile
-  release support. The complete Android/iOS emulated-runtime fixtures already
-  pass. Keep pyopenjtalk-style Japanese separate; it remains macOS arm64 only.
+- Validate both Japanese native-assets release configurations on physical
+  iOS/Android hardware and execute the clean hosted matrix before promoting
+  broad mobile release support. Both complete Android/iOS emulated-runtime
+  fixtures already pass and remain distinct backend contracts.
 - Expand the Korean native adapter only when equivalent additional-platform
   resources and CI are explicitly provisioned.
 - Expand the English transformer adapter only when equivalent Linux,

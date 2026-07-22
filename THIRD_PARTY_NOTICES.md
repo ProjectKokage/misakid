@@ -205,21 +205,37 @@ is retained in `lib/src/core/kokoro_frontend.dart`.
   16-file MeCab 0.996 runtime plus a new Apache-2.0 owned-result shim. The
   complete staged 139-file source identity is
   `dea0f240fad8dc8b9ea1984920a4d64a48227a40c2924a3c545eaeca50357857`.
-  Its explicit UniDic 3.1.0 resource is the 20-file, 811,662,881-byte tree
-  with SHA-256
+  Its tested parity resource is the modified unidic-py CWJ 20-file,
+  811,662,881-byte tree whose descriptive release marker is
+  `3.1.0+2021-08-31` and whose identity is the SHA-256
   `95bd65fa96955b644c15510932ca8439f463ac8b66f57bac6dfee5e29fa03115`;
-  no dictionary bytes are distributed. The adapter retains the exact
-  pyopenjtalk MIT notice, MeCab BSD notice, UniDic BSD-option notice, jaconv
-  MIT notice, and Cutlet MIT notice under `native/licenses/`. Their SHA-256
+  the marker alone does not identify the corpus or resource. That tree identity
+  is not a requirement of the default caller-selected dictionary profile, which
+  validates only runtime files and feature layout and reports corpus unknown and
+  identity unverified. CWJ, CSJ, and custom dictionaries can share a layout or
+  release number. Compatibility tests use the external official NINJAL
+  `unidic-cwj-202302.zip` and `unidic-csj-202302.zip` archives as distinct
+  29-field resources; they are not distributed, and their exact hashes and
+  GPLv2/LGPLv2.1/modified-BSD choice are recorded in the adapter's source
+  manifest and notices. The separate 26-field test uses the external official
+  `unidic-lite==1.0.8` source distribution and validates its exact runtime
+  files; that archive and dictionary are likewise not distributed. Its
+  metadata offers the wrapper under MIT or WTFPL and the contained UniDic
+  2.1.2 dictionary under BSD. Callers selecting another
+  compatible UniDic remain
+  responsible for that exact artifact's provenance, license, and notices. The
+  adapter retains the exact pyopenjtalk MIT notice, MeCab BSD notice, UniDic
+  BSD-option notice, jaconv MIT notice, and Cutlet MIT notice under
+  `native/licenses/`. Their SHA-256
   values are respectively
   `c38083a4d51c1ea86e08b3303a984d0c23718c5ac214058af705814d30f4bb5b`,
   `05e94c185a3e31f0c658f7011132be952b6d1a4d588b682f92da380e0a290650`,
   `770a75de30705439084f869dbcb0bc4ebcffcb7c7124c0d74f5083170318a9bb`,
   `3ce05b9340c7f51a5085c657dd790ea1e864290b66a88fe07bb6ffa1b8681ad0`,
   and `8736ad0d4636cb6dabae3e97e99c08f5c0c08b8c451f1d489b29a0d63bebf074`.
-  The adapter distributes no source tree, dictionary, grouping list, or
-  compiled binary; its independent manifest and notices travel with the
-  sibling package.
+  The adapter distributes the exact unmodified 54-file, 4,499,769-byte MeCab
+  source subtree, but no UniDic dictionary, grouping list, or compiled binary;
+  its independent manifest and notices travel with the sibling package.
 
 The Greatdane/Misaki number-conversion behavior is included in the Dart
 library at lib/src/languages/ja/number_converter.dart. That file carries a
@@ -931,10 +947,10 @@ The pinned implementation names or depends on projects including spaCy,
 num2words, pyopenjtalk, UniDic, Cutlet, fugashi, MeCab, jaconv, mojimoji,
 g2pK/g2pkc, NLTK CMUdict, PaddleSpeech, jieba, pypinyin, cn2an,
 underthesea, Viphoneme, and Mishkal. The pure root package does not distribute
-or link their external runtimes. Optional `misakid_openjtalk` and
-`misakid_mecab_ko` packages build reviewed native subsets only from explicit
-checksum-pinned source and install the applicable notices beside their
-libraries. Optional `misakid_chinese` parses caller-supplied exact resources
+or link their external runtimes. Optional `misakid_openjtalk`,
+`misakid_mecab_ja`, and `misakid_mecab_ko` packages build reviewed native
+subsets from checksum-pinned source and retain the applicable notices in their
+package manifests. Optional `misakid_chinese` parses caller-supplied resources
 with reviewed pure-Dart adaptations. No compiled binary or external dictionary
 is committed. Reviewed source adaptations and canonical data copied into this
 repository are identified in the component-specific notices above.

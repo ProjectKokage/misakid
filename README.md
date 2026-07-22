@@ -250,28 +250,47 @@ unknown status, and all 12 longest-match joins.
 
 The sibling `misakid_mecab_ja` package completes Kokoro's default Japanese mode
 without Python. It distributes the exact licensed MeCab 0.996 source subtree
-from `pyopenjtalk` 0.4.1 and compiles a small owned-result ABI through Dart's
+from `pyopenjtalk` 0.4.1 and compiles the 24-function ABI v3
+`misakid-mecab-ja-build-v4-portable` owned-result boundary through Dart's
 native-assets hook for Android armv7/arm64/x86-64, iOS device/simulator, and
-macOS. Callers explicitly supply the validated 20-file UniDic 3.1.0 directory
-and pinned Misaki `ja_words.txt` bytes; no dictionary or grouping data is
-discovered or downloaded. The word list's exact compatibility identity is
-validated at initialization but it is not redistributed; its undocumented upstream
-prehistory and inferred Wiktionary/Kaikki lineage are recorded conservatively
-in `THIRD_PARTY_NOTICES.md`.
+macOS. Its default profile accepts an explicit caller-selected UTF-8 UniDic
+using a provisioned 26- or 29-field layout. That check does not
+identify the corpus, distribution, release, or exact resource: CWJ and CSJ can
+share a layout and release number, and output may vary with the selected
+dictionary. The compatible profile therefore reports corpus unknown and
+identity unverified and carries no exact parity claim. The explicit
+`MecabJapaneseDictionaryProfile.pinnedUnidicPyCwjParity` profile validates the
+complete 20-file modified unidic-py CWJ tree used by the accepted fixture by
+tree hash. Callers also supply the pinned Misaki `ja_words.txt` bytes or an
+injected grouping membership; no
+dictionary or grouping data is discovered or downloaded. The package's pinned
+path and byte loaders validate the word list's exact compatibility identity at
+initialization; injected memberships retain their caller-owned identity. The
+word list is not redistributed; its undocumented upstream prehistory and inferred
+Wiktionary/Kaikki lineage are recorded conservatively in
+`THIRD_PARTY_NOTICES.md`.
 
-The portable UTF-8/no-iconv build matches all 27 original cases, all 126 raw
-records and fields, every grouping decision, output, and failure. Tests also
+With the pinned modified unidic-py CWJ profile, the portable UTF-8/no-iconv
+build matches all 27 original cases, all 126 raw records and fields, every
+grouping decision, output, and failure. A separate native test exercises the
+default compatible profile against unidic-lite 2.1.2's 26-field layout. Two
+more provisioned tests exercise the distinct official NINJAL
+`unidic-cwj-202302.zip` and `unidic-csj-202302.zip` resources, both 29-field;
+their archive and binary hashes differ even though the release marker and
+field count match. This is projection compatibility evidence, not a corpus
+inference or exact-output claim. Tests also
 cover byte-resource mutation isolation, owned result lifetime, repeated close,
 input bounds, concurrent isolates, reproducible source identity, exported
-symbols, resource tampering, and silent native execution. A release Flutter APK
-contains only the 23 reviewed exports for all three Android ABIs, links exactly
-`libc`/`libdl`/`libm`, and passes 16 KiB alignment checks. An unsigned iOS
-device app passes framework, native-assets-manifest, deployment-target, rpath,
-linkage, and exact-export verification. The complete 27-case fixture passes
+symbols, resource tampering, and silent native execution. The Cutlet library in
+a release Flutter APK contains only its 24 reviewed exports for all three
+Android ABIs, links exactly `libc`/`libdl`/`libm`, and passes 16 KiB alignment
+checks. An unsigned iOS device app passes framework, native-assets-manifest,
+deployment-target, rpath, linkage, and exact-export verification. The complete
+27-case fixture passes
 through the bundled asset on both an Android 15/API 35 arm64 emulator and an
 iOS 26.4 Simulator.
-Physical-device and clean hosted-matrix validation remain explicit release
-gates.
+Physical-device and clean hosted-matrix validation remain explicit gates for
+broad mobile support.
 Linux, Windows, embedded NUL, and cancellation are unsupported. See
 [`packages/misakid_mecab_ja/README.md`](packages/misakid_mecab_ja/README.md)
 for the exact resource tuple and build command.
