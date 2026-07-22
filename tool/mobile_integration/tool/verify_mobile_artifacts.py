@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the mobile harness source policy and packaged native code asset."""
+"""Verify the mobile harness source policy and packaged native code assets."""
 
 from __future__ import annotations
 
@@ -13,19 +13,11 @@ import subprocess
 import sys
 import tempfile
 import zipfile
+from dataclasses import dataclass
 from pathlib import Path
 
 
-ASSET_ID = b"package:misakid_mecab_ja/misakid_mecab_ja"
-EXPECTED_EXPORTS = frozenset(
-    (Path(__file__).with_name("expected_native_exports.txt"))
-    .read_text(encoding="utf-8")
-    .splitlines()
-)
-ANDROID_LIBRARY = "libmisakid_mecab_ja.so"
 ANDROID_PAGE_SIZE = 16 * 1024
-IOS_INSTALL_NAME = "@rpath/misakid_mecab_ja.framework/misakid_mecab_ja"
-IOS_MANIFEST_TARGET = "misakid_mecab_ja.framework/misakid_mecab_ja"
 IOS_MINIMUM_VERSION = (13, 0)
 ANDROID_ABIS = {
     "armeabi-v7a": (1, 40),
@@ -46,20 +38,62 @@ class VerificationError(RuntimeError):
     """A deterministic mobile integration invariant failed."""
 
 
+@dataclass(frozen=True)
+class NativeAsset:
+    """Expected mobile packaging identity for one native-code asset."""
+
+    name: str
+    export_manifest_name: str
+    expected_export_count: int
+
+    @property
+    def asset_id(self) -> str:
+        return f"package:{self.name}/{self.name}"
+
+    @property
+    def android_library(self) -> str:
+        return f"lib{self.name}.so"
+
+    @property
+    def ios_framework(self) -> str:
+        return f"{self.name}.framework"
+
+    @property
+    def ios_install_name(self) -> str:
+        return f"@rpath/{self.ios_manifest_target}"
+
+    @property
+    def ios_manifest_target(self) -> str:
+        return f"{self.ios_framework}/{self.name}"
+
+    @property
+    def expected_exports(self) -> frozenset[str]:
+        path = Path(__file__).with_name(self.export_manifest_name)
+        lines = path.read_text(encoding="utf-8").splitlines()
+        exports = frozenset(lines)
+        _require(
+            len(lines) == self.expected_export_count
+            and len(exports) == self.expected_export_count
+            and all(name.startswith(f"{self.name}_") for name in lines),
+            f"{path.name} must contain exactly {self.expected_export_count} "
+            f"unique {self.name}_ symbols.",
+        )
+        return exports
+
+
 def _require(condition: bool, message: str) -> None:
     if not condition:
         raise VerificationError(message)
 
 
-_require(
-    len(EXPECTED_EXPORTS) == 23
-    and all(name.startswith("misakid_mecab_ja_") for name in EXPECTED_EXPORTS),
-    "The expected native export manifest must contain exactly 23 adapter symbols.",
+NATIVE_ASSETS = (
+    NativeAsset("misakid_mecab_ja", "expected_native_exports.txt", 24),
+    NativeAsset("misakid_openjtalk", "expected_openjtalk_exports.txt", 23),
 )
 
 
 def verify_source_tree(root: Path) -> None:
-    """Reject bundled linguistic resources and validate both path dependencies."""
+    """Reject bundled resources and validate both adapter path dependencies."""
 
     root = root.resolve()
     pubspec = root / "pubspec.yaml"
@@ -69,11 +103,12 @@ def verify_source_tree(root: Path) -> None:
         pubspec_text.count("misakid:\n    path: ../..") == 2,
         "The harness must use the repository root through a path dependency.",
     )
-    _require(
-        "misakid_mecab_ja:\n    path: ../../packages/misakid_mecab_ja"
-        in pubspec_text,
-        "The harness must use misakid_mecab_ja through a path dependency.",
-    )
+    for asset in NATIVE_ASSETS:
+        dependency = f"{asset.name}:\n    path: ../../packages/{asset.name}"
+        _require(
+            pubspec_text.count(dependency) == 1,
+            f"The harness must use {asset.name} through one path dependency.",
+        )
     _require(
         re.search(r"^\s+assets\s*:", pubspec_text, re.MULTILINE) is None,
         "The harness pubspec must not bundle application assets.",
@@ -131,26 +166,27 @@ def verify_source_tree(root: Path) -> None:
     _require(not forbidden, f"Forbidden linguistic resources: {forbidden}")
     _require(not oversized, f"Unexpected large harness files: {oversized}")
 
-    package_manifest = (
-        repository_root
-        / "packages"
-        / "misakid_mecab_ja"
-        / "native"
-        / "expected_exports_macos.txt"
-    )
-    _require(
-        package_manifest.is_file(),
-        f"Missing adapter export manifest: {package_manifest}",
-    )
-    package_exports = {
-        line.removeprefix("_")
-        for line in package_manifest.read_text(encoding="utf-8").splitlines()
-        if line
-    }
-    _require(
-        package_exports == EXPECTED_EXPORTS,
-        "Harness and adapter native export manifests differ.",
-    )
+    for asset in NATIVE_ASSETS:
+        package_manifest = (
+            repository_root
+            / "packages"
+            / asset.name
+            / "native"
+            / "expected_exports_macos.txt"
+        )
+        _require(
+            package_manifest.is_file(),
+            f"Missing adapter export manifest: {package_manifest}",
+        )
+        package_lines = package_manifest.read_text(encoding="utf-8").splitlines()
+        package_exports = {line.removeprefix("_") for line in package_lines}
+        _require(
+            len(package_lines) == asset.expected_export_count
+            and len(package_exports) == asset.expected_export_count
+            and all(line.startswith(f"_{asset.name}_") for line in package_lines)
+            and package_exports == asset.expected_exports,
+            f"Harness and {asset.name} native export manifests differ.",
+        )
 
     debug_plist = _read_plist(
         root / "ios" / "Runner" / "Info-Debug.plist",
@@ -197,7 +233,10 @@ def verify_source_tree(root: Path) -> None:
         and "NSLocalNetworkUsageDescription" not in production_plist,
         "Local test networking must not leak into the production plist.",
     )
-    print("source: path dependencies and external-resource policy verified")
+    print(
+        "source: both adapter path dependencies/export manifests and "
+        "external-resource policy verified"
+    )
 
 
 def _elf_details(data: bytes) -> tuple[int, int, list[int]]:
@@ -326,7 +365,7 @@ def _android_needed_libraries(tool: Path, binary: Path) -> set[str]:
 
 
 def verify_android(apk: Path) -> None:
-    """Verify bundled ABIs plus 16-KiB ELF and APK alignment."""
+    """Verify both bundled libraries, ABIs, exports, and alignment."""
 
     apk = apk.resolve()
     _require(apk.is_file(), f"Missing release APK: {apk}")
@@ -342,67 +381,107 @@ def verify_android(apk: Path) -> None:
         manifest_names = [
             name for name in names if name.endswith("NativeAssetsManifest.json")
         ]
-        _require(manifest_names, "APK has no NativeAssetsManifest.json.")
         _require(
-            any(ASSET_ID in archive.read(name) for name in manifest_names),
-            "APK native-assets manifest does not reference misakid_mecab_ja.",
+            len(manifest_names) == 1,
+            f"APK must contain one NativeAssetsManifest.json: {manifest_names}.",
         )
-
-        packaged_abis: set[str] = set()
-        for abi, (expected_class, expected_machine) in ANDROID_ABIS.items():
-            name = f"lib/{abi}/{ANDROID_LIBRARY}"
-            _require(name in names, f"APK is missing {name}.")
-            packaged_abis.add(abi)
-            info = archive.getinfo(name)
-            _require(
-                info.compress_type == zipfile.ZIP_STORED,
-                f"{name} must be stored uncompressed.",
-            )
-            data_offset = _zip_data_offset(apk, info)
-            _require(
-                data_offset % ANDROID_PAGE_SIZE == 0,
-                f"{name} data offset {data_offset} is not 16-KiB aligned.",
-            )
-            data = archive.read(name)
-            with tempfile.TemporaryDirectory(prefix="misakid-android-") as temp:
-                binary = Path(temp) / ANDROID_LIBRARY
-                binary.write_bytes(data)
-                exports = _adapter_exports(nm, binary, elf=True)
-                needed_libraries = _android_needed_libraries(readelf, binary)
-            _require(
-                exports == EXPECTED_EXPORTS,
-                f"{name} adapter exports differ: "
-                f"missing={sorted(EXPECTED_EXPORTS - exports)}, "
-                f"extra={sorted(exports - EXPECTED_EXPORTS)}.",
-            )
-            _require(
-                needed_libraries == {"libc.so", "libdl.so", "libm.so"},
-                f"{name} dynamic dependencies differ: "
-                f"{sorted(needed_libraries)}.",
-            )
-            elf_class, machine, alignments = _elf_details(data)
-            _require(
-                (elf_class, machine) == (expected_class, expected_machine),
-                f"{name} has ELF class/machine {(elf_class, machine)}, expected "
-                f"{(expected_class, expected_machine)}.",
-            )
-            _require(
-                all(alignment >= ANDROID_PAGE_SIZE for alignment in alignments),
-                f"{name} load alignment is below 16 KiB: {alignments}.",
-            )
-
-        discovered = {
-            name.split("/")[1]
-            for name in names
-            if name.startswith("lib/") and name.endswith(f"/{ANDROID_LIBRARY}")
-        }
+        manifest_name = manifest_names[0]
+        try:
+            value = json.loads(archive.read(manifest_name))
+        except (UnicodeError, json.JSONDecodeError) as error:
+            raise VerificationError(
+                f"Invalid native-assets manifest in APK: {manifest_name}."
+            ) from error
+        _require(isinstance(value, dict), "APK native-assets manifest is not a map.")
+        native_assets = value.get("native-assets")
         _require(
-            discovered == packaged_abis,
-            f"Unexpected Android ABI set {sorted(discovered)}.",
+            isinstance(native_assets, dict),
+            "APK native-assets manifest has no native-assets map.",
         )
+        expected_architectures = {"android_arm", "android_arm64", "android_x64"}
+        _require(
+            set(native_assets) == expected_architectures,
+            f"APK native-assets architectures differ: {sorted(native_assets)}.",
+        )
+        expected_asset_ids = {asset.asset_id for asset in NATIVE_ASSETS}
+        for architecture in sorted(expected_architectures):
+            table = native_assets[architecture]
+            _require(
+                isinstance(table, dict) and set(table) == expected_asset_ids,
+                f"APK native-assets table differs for {architecture}: {table!r}.",
+            )
+            for asset in NATIVE_ASSETS:
+                _require(
+                    table[asset.asset_id] == ["absolute", asset.android_library],
+                    f"APK mapping differs for {asset.asset_id} on "
+                    f"{architecture}: {table[asset.asset_id]!r}.",
+                )
+
+        for asset in NATIVE_ASSETS:
+            packaged_abis: set[str] = set()
+            expected_exports = asset.expected_exports
+            for abi, (expected_class, expected_machine) in ANDROID_ABIS.items():
+                name = f"lib/{abi}/{asset.android_library}"
+                _require(name in names, f"APK is missing {name}.")
+                packaged_abis.add(abi)
+                info = archive.getinfo(name)
+                _require(
+                    info.compress_type == zipfile.ZIP_STORED,
+                    f"{name} must be stored uncompressed.",
+                )
+                data_offset = _zip_data_offset(apk, info)
+                _require(
+                    data_offset % ANDROID_PAGE_SIZE == 0,
+                    f"{name} data offset {data_offset} is not 16-KiB aligned.",
+                )
+                data = archive.read(name)
+                with tempfile.TemporaryDirectory(
+                    prefix=f"{asset.name}-android-"
+                ) as temp:
+                    binary = Path(temp) / asset.android_library
+                    binary.write_bytes(data)
+                    exports = _adapter_exports(nm, binary, elf=True)
+                    needed_libraries = _android_needed_libraries(readelf, binary)
+                _require(
+                    exports == expected_exports,
+                    f"{name} adapter exports differ: "
+                    f"missing={sorted(expected_exports - exports)}, "
+                    f"extra={sorted(exports - expected_exports)}.",
+                )
+                _require(
+                    needed_libraries == {"libc.so", "libdl.so", "libm.so"},
+                    f"{name} dynamic dependencies differ: "
+                    f"{sorted(needed_libraries)}.",
+                )
+                elf_class, machine, alignments = _elf_details(data)
+                _require(
+                    (elf_class, machine) == (expected_class, expected_machine),
+                    f"{name} has ELF class/machine "
+                    f"{(elf_class, machine)}, expected "
+                    f"{(expected_class, expected_machine)}.",
+                )
+                _require(
+                    all(
+                        alignment >= ANDROID_PAGE_SIZE
+                        for alignment in alignments
+                    ),
+                    f"{name} load alignment is below 16 KiB: {alignments}.",
+                )
+
+            discovered = {
+                name.split("/")[1]
+                for name in names
+                if name.startswith("lib/")
+                and name.endswith(f"/{asset.android_library}")
+            }
+            _require(
+                discovered == packaged_abis,
+                f"Unexpected {asset.name} Android ABI set "
+                f"{sorted(discovered)}.",
+            )
     print(
-        "android: 3 ABIs, libc/libdl/libm, 23 exact exports, and "
-        "16-KiB alignment verified"
+        "android: 2 libraries x 3 ABIs, libc/libdl/libm, Cutlet 24/Open "
+        "JTalk 23 exact exports, both manifests, and 16-KiB alignment verified"
     )
 
 
@@ -510,7 +589,7 @@ def _read_plist(path: Path, label: str) -> dict[str, object]:
     return value
 
 
-def _verify_ios_manifest(app: Path, binary: Path) -> None:
+def _verify_ios_manifest(app: Path, binary: Path, asset: NativeAsset) -> None:
     manifests = list(app.rglob("NativeAssetsManifest.json"))
     _require(manifests, "iOS app has no NativeAssetsManifest.json.")
     matches: list[tuple[Path, str, object]] = []
@@ -525,76 +604,95 @@ def _verify_ios_manifest(app: Path, binary: Path) -> None:
         if not isinstance(native_assets, dict):
             continue
         for architecture, table in native_assets.items():
-            if isinstance(table, dict) and ASSET_ID.decode() in table:
-                matches.append((manifest, str(architecture), table[ASSET_ID.decode()]))
-    _require(len(matches) == 1, f"Expected one iOS native-asset mapping, found {matches}.")
+            if isinstance(table, dict) and asset.asset_id in table:
+                matches.append(
+                    (manifest, str(architecture), table[asset.asset_id])
+                )
+    _require(
+        len(matches) == 1,
+        f"Expected one iOS mapping for {asset.asset_id}, found {matches}.",
+    )
     manifest, architecture, target = matches[0]
     _require(
         architecture == "ios_arm64",
         f"Native asset uses {architecture!r}, expected 'ios_arm64': {manifest}.",
     )
     _require(
-        target == ["absolute", IOS_MANIFEST_TARGET],
-        f"Native asset target differs in {manifest}: {target!r}.",
+        target == ["absolute", asset.ios_manifest_target],
+        f"{asset.name} native asset target differs in {manifest}: {target!r}.",
     )
-    resolved = app / "Frameworks" / IOS_MANIFEST_TARGET
+    resolved = app / "Frameworks" / asset.ios_manifest_target
     _require(
         resolved.resolve() == binary.resolve(),
-        f"Native-assets mapping does not resolve to {binary}.",
+        f"{asset.name} native-assets mapping does not resolve to {binary}.",
     )
 
 
 def verify_ios(app: Path) -> None:
-    """Verify the bundled native framework in an unsigned device app."""
+    """Verify both bundled native frameworks in an unsigned device app."""
 
     app = app.resolve()
     _require(app.is_dir(), f"Missing iOS application bundle: {app}")
-    framework = app / "Frameworks" / "misakid_mecab_ja.framework"
-    binary = framework / "misakid_mecab_ja"
-    _require(binary.is_file(), f"Missing bundled iOS native asset: {binary}")
-    framework_plist_path = framework / "Info.plist"
-    _require(framework_plist_path.is_file(), "Native iOS framework has no Info.plist.")
-    data = binary.read_bytes()
-    exports = _adapter_exports(Path("/usr/bin/nm"), binary, elf=False)
-    _require(
-        exports == EXPECTED_EXPORTS,
-        "iOS adapter exports differ: "
-        f"missing={sorted(EXPECTED_EXPORTS - exports)}, "
-        f"extra={sorted(exports - EXPECTED_EXPORTS)}.",
-    )
-    architectures = _macho_architectures(data)
-    _require(
-        architectures == {"arm64"},
-        f"Unsigned iOS device asset has architectures {sorted(architectures)}.",
-    )
-    _verify_ios_build_version(binary)
-    install_names = _otool_values(binary, "-D")
-    _require(
-        install_names == [IOS_INSTALL_NAME],
-        f"Native framework install name differs: {install_names}.",
-    )
-    linked = _otool_values(binary, "-L")
-    _require(
-        linked
-        == [
-            IOS_INSTALL_NAME,
-            "/usr/lib/libc++.1.dylib",
-            "/usr/lib/libSystem.B.dylib",
-        ],
-        f"Native framework linkage differs: {linked}.",
-    )
-    framework_plist = _read_plist(framework_plist_path, "native framework Info.plist")
-    _require(
-        framework_plist.get("CFBundleExecutable") == "misakid_mecab_ja"
-        and framework_plist.get("CFBundlePackageType") == "FMWK",
-        "Native framework Info.plist identity differs.",
-    )
-    plist_minimum = framework_plist.get("MinimumOSVersion")
-    _require(
-        isinstance(plist_minimum, str)
-        and _version(plist_minimum, "framework plist minimum") >= IOS_MINIMUM_VERSION,
-        f"Native framework Info.plist minimum differs: {plist_minimum!r}.",
-    )
+    binaries: list[tuple[NativeAsset, Path]] = []
+    for asset in NATIVE_ASSETS:
+        framework = app / "Frameworks" / asset.ios_framework
+        binary = framework / asset.name
+        _require(binary.is_file(), f"Missing bundled iOS native asset: {binary}")
+        framework_plist_path = framework / "Info.plist"
+        _require(
+            framework_plist_path.is_file(),
+            f"{asset.name} iOS framework has no Info.plist.",
+        )
+        data = binary.read_bytes()
+        exports = _adapter_exports(Path("/usr/bin/nm"), binary, elf=False)
+        expected_exports = asset.expected_exports
+        _require(
+            exports == expected_exports,
+            f"{asset.name} iOS exports differ: "
+            f"missing={sorted(expected_exports - exports)}, "
+            f"extra={sorted(exports - expected_exports)}.",
+        )
+        architectures = _macho_architectures(data)
+        _require(
+            architectures == {"arm64"},
+            f"{asset.name} iOS asset has architectures "
+            f"{sorted(architectures)}.",
+        )
+        _verify_ios_build_version(binary)
+        install_names = _otool_values(binary, "-D")
+        _require(
+            install_names == [asset.ios_install_name],
+            f"{asset.name} framework install name differs: {install_names}.",
+        )
+        linked = _otool_values(binary, "-L")
+        _require(
+            linked
+            == [
+                asset.ios_install_name,
+                "/usr/lib/libc++.1.dylib",
+                "/usr/lib/libSystem.B.dylib",
+            ],
+            f"{asset.name} framework linkage differs: {linked}.",
+        )
+        framework_plist = _read_plist(
+            framework_plist_path,
+            f"{asset.name} framework Info.plist",
+        )
+        _require(
+            framework_plist.get("CFBundleExecutable") == asset.name
+            and framework_plist.get("CFBundlePackageType") == "FMWK",
+            f"{asset.name} framework Info.plist identity differs.",
+        )
+        plist_minimum = framework_plist.get("MinimumOSVersion")
+        _require(
+            isinstance(plist_minimum, str)
+            and _version(plist_minimum, "framework plist minimum")
+            >= IOS_MINIMUM_VERSION,
+            f"{asset.name} framework Info.plist minimum differs: "
+            f"{plist_minimum!r}.",
+        )
+        binaries.append((asset, binary))
+
     app_plist = _read_plist(app / "Info.plist", "application Info.plist")
     executable_name = app_plist.get("CFBundleExecutable")
     _require(
@@ -608,10 +706,12 @@ def verify_ios(app: Path) -> None:
         "@executable_path/Frameworks" in rpaths,
         f"Application cannot resolve bundled frameworks; rpaths={sorted(rpaths)}.",
     )
-    _verify_ios_manifest(app, binary)
+    for asset, binary in binaries:
+        _verify_ios_manifest(app, binary, asset)
     print(
-        "ios: arm64 IOS framework, iOS 13+ minimum, install name/rpath, "
-        "native-asset resolution, and 23 exact exports verified"
+        "ios: 2 arm64 IOS frameworks, iOS 13+ minimum, install names/linkage/"
+        "rpath, both native-asset mappings, and Cutlet 24/Open JTalk 23 exact "
+        "exports verified"
     )
 
 
