@@ -208,24 +208,29 @@ and pitch-only trace markers are documented exclusions.
 
 The pure package still bundles and discovers no native frontend or dictionary.
 The sibling `misakid_openjtalk` package provides a no-Python adapter with a
-source-built native asset for Android, iOS, and macOS, while retaining its
-legacy explicit-library macOS-arm64 API. Callers always supply an absolute
-Open JTalk 1.11 dictionary path; initialization streams and validates the exact
-source/ABI/dictionary identities before opening. The owned-result ABI passes
-all 24 cases, all 155 raw words and 14 fields, all 23 successful final results
-and typed token fields, concurrent-isolate stress, and silent success/failure
-checks. The complete fixture also passes through `openBundled` on an Android
-15/API 35 arm64 emulator and iPhone 17 iOS 26.5 Simulator. Mobile physical
-devices and the clean hosted matrix remain experimental release gates. No
-native binary or 107 MB dictionary is committed.
+source-built `openBundled` native asset for Android, iOS, Linux, macOS, and
+Windows, while retaining its legacy explicit-library macOS-arm64-only API.
+Callers always supply an absolute Open JTalk 1.11 dictionary path;
+initialization streams and validates the exact source/ABI/dictionary
+identities before opening. The owned-result ABI passes all 24 cases, all 155
+raw words and 14 fields, all 23 successful final results and typed token
+fields, concurrent-isolate stress, and silent success/failure checks. The
+complete fixture also passes through `openBundled` on an Android 15/API 35
+arm64 emulator and iPhone 17 iOS 26.5 Simulator. Mobile physical devices and
+the clean hosted matrix remain experimental release gates. Linux x64/arm64 and
+Windows x64 are source-configured native-host profiles with foreign-host,
+model-free cross-link evidence only; target-host Flutter packaging, dictionary
+loading, long Japanese/space-path behavior, and parity are still unverified.
+No native binary or 107 MB dictionary is committed.
 
 The compiling
 [`example/japanese_pyopenjtalk_injected.dart`](example/japanese_pyopenjtalk_injected.dart)
 uses a fixed frontend record to demonstrate the public contract without
 claiming to be pyopenjtalk. The adapter package includes its own real-backend
 example, offline source build, full resource identities, platform limits, and
-third-party notices. Linux and Windows remain unsupported; Cutlet is provided
-separately as described below.
+third-party notices. Linux and Windows are not promoted runtime tuples until
+their target-host evidence gates pass; Cutlet is provided separately as
+described below.
 
 ## Japanese Cutlet pipeline
 

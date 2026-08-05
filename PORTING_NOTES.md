@@ -1505,8 +1505,38 @@ documented real-backend and provenance gates.
   configuration. This restores Flutter web builds and non-code follow-up
   passes in macOS development runs while leaving native builds unchanged.
 
+## 2026-07-30: Open JTalk Linux/Windows source profiles
+
+- Added exact native-assets tuples for Linux x64/arm64 and Windows x64 to
+  `OpenJtalkFrontendBackend.openBundled`. The hook requires a native,
+  same-architecture target host before compiler selection; the Windows profile
+  additionally requires the reviewed MSVC `cl.exe`/`lib.exe` path.
+- Kept the app-owned 23-function ABI unchanged. Linux emits
+  `libmisakid_openjtalk.so` with that SONAME and the ELF version script;
+  Windows emits `misakid_openjtalk.dll` with explicit adapter exports.
+- Added a Windows LLP64 feature configuration without mutating the verified
+  139-file vendor tree. The force-include maps CRT spellings, prevents Windows
+  SDK macro collisions, converts canonical UTF-8 drive/UNC paths strictly to
+  UTF-16, and uses the extended `CreateFileW` namespace independently of a
+  consuming executable's `longPathAware` manifest. Linux strict C11 builds
+  request the required POSIX declarations.
+- On a macOS arm64 development host, Zig 0.16.0 cross-linked the exact source
+  set into Linux x64 and arm64 ELF libraries and a Windows x64
+  GNU-compatibility PE DLL. Each exposed exactly the reviewed 23 adapter names;
+  both ELF files carried SONAME `libmisakid_openjtalk.so`. These model-free
+  probes are source portability evidence only, not the supported native-host
+  hook/toolchain path.
+- Linux/Windows Flutter packaging, native-assets mapping, host dependency
+  inspection, dictionary initialization, long Japanese and space-containing
+  paths, and committed fixture parity remain unverified. Neither desktop tuple
+  is promoted to supported runtime status.
+
 ## Next parity slices
 
+- Run the Open JTalk hook and Flutter packaging on native Linux x64/arm64 and
+  Windows x64 hosts, inspect the routed assets/dependencies, and execute the
+  complete fixture including a long Japanese and space-containing dictionary
+  path before promoting either desktop runtime.
 - Validate both Japanese native-assets release configurations on physical
   iOS/Android hardware and execute the clean hosted matrix before promoting
   broad mobile release support. Both complete Android/iOS emulated-runtime
