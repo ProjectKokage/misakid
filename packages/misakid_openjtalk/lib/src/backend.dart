@@ -19,7 +19,9 @@ const String openJtalkSupportedPlatform = 'macos-arm64';
 const Set<String> openJtalkBundledBuildPlatforms = <String>{
   'android',
   'ios',
+  'linux',
   'macos',
+  'windows',
 };
 
 /// Default maximum UTF-8 input size accepted by one frontend call.
@@ -105,8 +107,8 @@ final class OpenJtalkFrontendBackend implements JapaneseFrontendBackend {
   /// Opens the package-built native asset with an explicit dictionary path.
   ///
   /// [dictionaryPath] must point to an already materialized, validated Open
-  /// JTalk 1.11 dictionary directory. Mobile applications commonly copy that
-  /// resource from their app bundle into application support storage.
+  /// JTalk 1.11 dictionary directory. Applications may copy that resource
+  /// from their bundle into private application-support storage.
   static Future<OpenJtalkFrontendBackend> openBundled({
     required String dictionaryPath,
     int maxInputBytes = defaultOpenJtalkMaxInputBytes,
@@ -286,7 +288,9 @@ void _validateBundledSupportedPlatform() {
               abi == Abi.androidArm64 ||
               abi == Abi.androidX64)) ||
       (Platform.isIOS && (abi == Abi.iosArm64 || abi == Abi.iosX64)) ||
-      (Platform.isMacOS && (abi == Abi.macosArm64 || abi == Abi.macosX64));
+      (Platform.isMacOS && (abi == Abi.macosArm64 || abi == Abi.macosX64)) ||
+      (Platform.isLinux && (abi == Abi.linuxArm64 || abi == Abi.linuxX64)) ||
+      (Platform.isWindows && abi == Abi.windowsX64);
   if (!supported) {
     throw BackendUnavailableException(
       'The bundled Open JTalk native asset does not support ${abi.toString()}.',
@@ -299,7 +303,7 @@ String _bundledPlatformLabel() => 'native-assets-${Abi.current()}';
 void _validateSupportedPlatform() {
   if (!Platform.isMacOS || Abi.current() != Abi.macosArm64) {
     throw const BackendUnavailableException(
-      'misakid_openjtalk 0.1.0-dev.1 supports only macOS arm64.',
+      'misakid_openjtalk 0.1.0-dev.2 supports only macOS arm64.',
     );
   }
 }

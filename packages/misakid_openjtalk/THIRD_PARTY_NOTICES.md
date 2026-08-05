@@ -3,9 +3,9 @@
 `misakid_openjtalk` distributes the reviewed Open JTalk frontend and embedded
 MeCab source subset originally shipped in the `pyopenjtalk==0.4.1` source
 archive. The package contains the safety-v1 patched source tree so Android,
-iOS, and macOS native-assets builds do not download source. It does not bundle
-the source archive, an Open JTalk dictionary, an HTS voice, or a precompiled
-native binary.
+iOS, Linux, macOS, and Windows native-assets builds do not download source. It
+does not bundle the source archive, an Open JTalk dictionary, an HTS voice, or
+a precompiled native binary.
 
 The complete notices used for source review and binary redistribution are
 included under `native/licenses/`:
@@ -49,7 +49,9 @@ is retained as `native/licenses/llvm-exception.txt`. Applications distributing
 an Android binary produced by the hook are responsible for carrying those
 terms and any additional notices required by the exact NDK/toolchain they use.
 Apple profiles use the platform C++ runtime rather than embedding this Android
-static runtime.
+static runtime. Linux and Windows likewise use the consuming platform
+toolchain's C++ runtime; applications must retain any terms required by the
+exact compiler/runtime they distribute.
 
 ## Dart native-assets toolchain dependencies
 

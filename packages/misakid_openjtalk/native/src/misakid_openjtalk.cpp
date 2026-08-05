@@ -45,7 +45,7 @@ constexpr size_t kMaximumFieldBytes = 1024 * 1024;
 constexpr size_t kMaximumResultBytes = 64 * 1024 * 1024;
 
 constexpr std::array<const char *, 7> kIdentityValues = {
-    "0.1.0-dev.1",
+    "0.1.0-dev.2",
     "0.4.1",
     "1.11",
     "dea0f240fad8dc8b9ea1984920a4d64a48227a40c2924a3c545eaeca50357857",
@@ -64,11 +64,19 @@ struct NativeDiagnostic {
 
 thread_local NativeDiagnostic *g_current_diagnostic = nullptr;
 
+size_t bounded_string_length(const char *value, size_t maximum) {
+  size_t length = 0;
+  while (length < maximum && value[length] != '\0') {
+    ++length;
+  }
+  return length;
+}
+
 void copy_bounded(char *destination, size_t capacity, const char *source) {
   if (destination == nullptr || capacity == 0) return;
   destination[0] = '\0';
   if (source == nullptr) return;
-  const size_t length = ::strnlen(source, capacity - 1);
+  const size_t length = bounded_string_length(source, capacity - 1);
   std::memcpy(destination, source, length);
   destination[length] = '\0';
 }
@@ -227,7 +235,8 @@ bool copy_words(NJD *njd, misakid_openjtalk_result *result) {
          field <= MISAKID_OPENJTALK_CHAIN_RULE; ++field) {
       const char *value = node_string(node, field);
       if (value == nullptr) value = "";
-      const size_t length = ::strnlen(value, kMaximumFieldBytes + 1);
+      const size_t length =
+          bounded_string_length(value, kMaximumFieldBytes + 1);
       if (length > kMaximumFieldBytes ||
           total_bytes > kMaximumResultBytes - length) {
         set_result_error(result, MISAKID_OPENJTALK_RESULT_LIMIT_EXCEEDED,

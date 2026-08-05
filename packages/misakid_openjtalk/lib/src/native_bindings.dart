@@ -15,7 +15,7 @@ const int _maximumDictionaryPathBytes = 32768;
 
 /// Exact immutable identities required from a compatible native library.
 const Map<int, String> expectedOpenJtalkNativeIdentities = <int, String>{
-  0: '0.1.0-dev.1',
+  0: '0.1.0-dev.2',
   1: '0.4.1',
   2: '1.11',
   3: 'dea0f240fad8dc8b9ea1984920a4d64a48227a40c2924a3c545eaeca50357857',

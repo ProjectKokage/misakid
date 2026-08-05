@@ -68,9 +68,15 @@ void main() {
   );
 
   test('publishes the exact bundled target operating systems', () {
-    expect(openJtalkBundledBuildPlatforms, <String>{'android', 'ios', 'macos'});
+    expect(openJtalkBundledBuildPlatforms, <String>{
+      'android',
+      'ios',
+      'linux',
+      'macos',
+      'windows',
+    });
     expect(
-      () => openJtalkBundledBuildPlatforms.add('linux'),
+      () => openJtalkBundledBuildPlatforms.add('web'),
       throwsUnsupportedError,
     );
   });
@@ -133,5 +139,7 @@ bool get _isBundledSupportedHost {
               abi == Abi.androidArm64 ||
               abi == Abi.androidX64)) ||
       (Platform.isIOS && (abi == Abi.iosArm64 || abi == Abi.iosX64)) ||
-      (Platform.isMacOS && (abi == Abi.macosArm64 || abi == Abi.macosX64));
+      (Platform.isMacOS && (abi == Abi.macosArm64 || abi == Abi.macosX64)) ||
+      (Platform.isLinux && (abi == Abi.linuxArm64 || abi == Abi.linuxX64)) ||
+      (Platform.isWindows && abi == Abi.windowsX64);
 }

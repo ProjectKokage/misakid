@@ -1,9 +1,22 @@
-## Unreleased
+## 0.1.0-dev.2
 
 - Return immediately from non-code-asset hook invocations before verifying
   native sources or reading `input.config.code`. This restores Flutter web
   builds and macOS development-run follow-up passes that do not request code
   assets.
+- Add source-configured `openBundled` profiles for native Linux x64/arm64 and
+  Windows x64 builds. Desktop hooks require a same-OS, same-architecture host;
+  Windows additionally requires the reviewed MSVC `cl.exe` path.
+- Keep the adapter ABI at 23 functions. Linux uses
+  `libmisakid_openjtalk.so` with the matching SONAME and ELF version script;
+  Windows uses `misakid_openjtalk.dll` with explicit exports.
+- Add a portable Windows feature configuration and a bounded UTF-8 path shim
+  that maps canonical drive and UNC paths through the extended `CreateFileW`
+  namespace. Add strict POSIX declarations for Linux C11 compilation.
+- Cross-link the exact source set as model-free Linux x64/arm64 ELF artifacts
+  and a Windows x64 PE GNU-compatibility probe. Target-host Flutter packaging,
+  loading, long Japanese/space-path initialization, and fixture parity remain
+  unverified for both desktop platforms.
 
 ## 0.1.0-dev.1
 

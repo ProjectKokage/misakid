@@ -8,7 +8,7 @@ The package has two native-library paths:
 
 - `OpenJtalkFrontendBackend.openBundled` uses the native asset built from the
   package's vendored, safety-patched sources. Build profiles are implemented
-  for Android, iOS, and macOS.
+  for Android, iOS, Linux, macOS, and Windows.
 - `OpenJtalkFrontendBackend.open` retains the original explicit-library
   contract. Its reviewed CMake build remains limited to macOS 11 or newer on
   arm64.
@@ -31,15 +31,18 @@ The native-assets build hook recognizes the following runtime ABI tuples:
 | --- | --- | --- |
 | Android | `androidArm`, `androidArm64`, `androidX64` | A stable Flutter 3.41.7 release APK passes artifact checks for armv7, arm64, and x86-64; complete committed-fixture parity passes locally on an Android 15/API 35 arm64 emulator. Other runtime ABIs and physical devices remain experimental. |
 | iOS | `iosArm64`, `iosX64` | A stable Flutter 3.41.7 unsigned arm64 device application passes framework/artifact checks; complete committed-fixture parity passes locally on an iPhone 17 iOS 26.5 Simulator. Physical-device runtime and other tuples remain experimental. |
+| Linux | `linuxArm64`, `linuxX64` | The exact sources cross-link as arm64 and x64 ELF libraries with the reviewed 23 exports and `libmisakid_openjtalk.so` SONAME. No Linux-host Flutter build, dictionary load, or parity run has completed. |
 | macOS | `macosArm64`, `macosX64` | arm64 build and provisioned parity verified; x64 is implemented but not provisioned. |
+| Windows | `windowsX64` | The exact sources cross-link as an x64 PE DLL with the reviewed 23 exports under a GNU compatibility probe. The supported hook profile requires MSVC; no Windows-host MSVC/Flutter build, dictionary load, or parity run has completed. |
 
-Android x86 (32-bit), Android RISC-V, 32-bit iOS, Windows, Linux, and other ABI
-tuples are not accepted by `openBundled`. Unsupported tuples fail before
-dictionary hashing with a typed `BackendUnavailableException`. This FFI
-adapter cannot be imported on Dart web; web applications should depend only
-on the platform-neutral `misakid` core.
+Android x86 (32-bit), Android RISC-V, 32-bit iOS, Windows arm64/x86, Linux
+x86/RISC-V, and other ABI tuples are not accepted by `openBundled`.
+Unsupported tuples fail before dictionary hashing with a typed
+`BackendUnavailableException`. This FFI adapter cannot be imported on Dart
+web; web applications should depend only on the platform-neutral `misakid`
+core.
 
-`openJtalkBundledBuildPlatforms` reports the three configured operating-system
+`openJtalkBundledBuildPlatforms` reports the five configured operating-system
 profiles. It is not a claim that every architecture or runtime tuple has
 completed provisioned testing. `openJtalkSupportedPlatform` remains
 `macos-arm64` for compatibility with the legacy explicit-library path.
@@ -55,9 +58,9 @@ hosted Android/iOS matrix.
 
 The package build hook runs automatically when a consuming Dart or Flutter
 build requests native code assets. It verifies the complete vendored source
-identity before compiling. Configure the normal Android, iOS, or macOS native
-toolchain for the consuming application; there is no package-specific source
-bootstrap command and no network access in the hook.
+identity before compiling. Configure the normal platform native toolchain for
+the consuming application; there is no package-specific source bootstrap
+command and no network access in the hook.
 
 Provide the dictionary as a real directory, then pass its absolute filesystem
 path:
@@ -86,7 +89,7 @@ streams and hashes the dictionary. Conversion is synchronous and the backend
 is reusable. `close` is idempotent; a native finalizer is only a leak-safety
 fallback.
 
-### Provide the external dictionary on Android and iOS
+### Provide the external dictionary
 
 Obtain `open_jtalk_dic_utf_8-1.11.tar.gz` explicitly from the Open JTalk
 1.11.1 release and verify it before adding it to an application-controlled
@@ -133,9 +136,37 @@ that instead provisions the dictionary after installation should materialize
 it in application-support storage using the same staging discipline as
 Android.
 
-On either platform, keep the validated files unchanged for the backend's
+On every platform, keep the validated files unchanged for the backend's
 lifetime because MeCab may memory-map them. This package supplies neither a
 downloader nor a dictionary extraction/materialization helper.
+
+### Desktop toolchains
+
+Linux builds require a same-architecture native Linux host with an x64 or
+arm64 clang/GCC-compatible C/C++17 toolchain, an archiver, the platform C++
+runtime, `libm`, and pthread. The emitted asset is
+`libmisakid_openjtalk.so` with the same SONAME and the reviewed 23-symbol
+version-script surface.
+
+Windows builds are deliberately x64-only and require an x64 Windows host plus
+the MSVC `cl.exe`/`lib.exe` toolchain supplied by the application's Visual
+Studio Developer Command Prompt configuration. A configured clang or GCC
+driver is rejected before compilation because the pinned `native_toolchain_c`
+Windows C++ link path is reviewed only for MSVC. The emitted asset is
+`misakid_openjtalk.dll`; the adapter header uses `__declspec(dllexport)` on
+exactly the 23 ABI functions. Dictionary paths remain UTF-8 at the Dart
+boundary, are converted strictly to UTF-16, and canonical drive/UNC paths are
+mapped to the extended `CreateFileW` namespace. This avoids dependence on the
+active ANSI code page or the consuming executable's `longPathAware` manifest.
+Target-host initialization with long Japanese and space-containing paths is
+still a required runtime evidence gate.
+
+The normal application build invokes the hook; there is no separate desktop
+bootstrap step. A successful foreign-host cross-link is only source
+portability evidence. Linux- and Windows-host Flutter packaging, native asset
+mapping, dependency inspection, dictionary initialization, and committed
+fixture parity remain required before either desktop target is called
+verified.
 
 ## Native-assets build profiles
 
@@ -148,15 +179,18 @@ The hook compiles the upstream-language boundaries explicitly:
 
 The C/C++ split is intentional: `.c` frontend files are not reinterpreted as
 C++. Open JTalk's UTF-8 C rule tables also depend on signed 8-bit `char`
-semantics. The C profile passes `-fsigned-char`, and `silent_stdio.c` rejects a
-target at compile time unless `CHAR_MIN == -128` and `CHAR_MAX == 127`. This is
-a portability invariant, not an assumption inherited from the build host.
+semantics. Clang/GCC profiles pass `-fsigned-char`; MSVC's signed default is
+checked rather than changed. `silent_stdio.c` rejects every target at compile
+time unless `CHAR_MIN == -128` and `CHAR_MAX == 127`. This is a portability
+invariant, not an assumption inherited from the build host.
 
-All profiles use hidden visibility, section-level dead-code elimination, and
-stable file-prefix mapping. Android links the NDK C++ runtime statically
-(`c++_static`), links `libm`, hides symbols from static archives, and applies a
-version script for the reviewed 23-symbol C ABI. iOS and macOS use the platform
-C++ runtime and dead stripping. See
+Clang/GCC profiles use hidden visibility and section-level dead-code
+elimination; all profiles apply their toolchain's stable path mapping. Android
+links the NDK C++ runtime statically (`c++_static`) and `libm`. Linux links its
+platform C++ runtime, `libm`, and pthread. Both ELF profiles hide archive
+symbols and apply the reviewed 23-symbol Android version script. Windows uses
+`__declspec(dllexport)`. iOS and macOS use the platform C++ runtime and dead
+stripping. See
 [native/SOURCE_MANIFEST.md](native/SOURCE_MANIFEST.md) for the exact source
 identity and build record.
 
@@ -258,6 +292,14 @@ On macOS arm64, the bundled native asset and provisioned adapter suite verify:
 
 The legacy explicit macOS arm64 dylib remains covered by the same frontend
 parity contract.
+
+On 2026-07-30, model-free foreign-host probes cross-linked the exact configured
+source set for Linux x64, Linux arm64, and Windows x64. Both ELF artifacts had
+the `libmisakid_openjtalk.so` SONAME and exactly 23 public adapter symbols; the
+PE artifact had exactly the same 23 exported names. The Windows probe used a
+GNU-compatible cross toolchain, not the supported MSVC hook path. These probes
+did not load the dictionary or execute G2P and do not replace target-host
+Flutter packaging or provisioned parity evidence.
 
 Stable Flutter 3.41.7 release packaging has also completed these mobile gates:
 

@@ -13,7 +13,7 @@ void main() {
     },
     skip: _isSupportedHost
         ? false
-        : 'The build-hook native asset supports Android, iOS, and macOS.',
+        : 'The build-hook native asset does not support this host ABI.',
   );
 }
 
@@ -24,5 +24,7 @@ bool get _isSupportedHost {
               abi == Abi.androidArm64 ||
               abi == Abi.androidX64)) ||
       (Platform.isIOS && (abi == Abi.iosArm64 || abi == Abi.iosX64)) ||
-      (Platform.isMacOS && (abi == Abi.macosArm64 || abi == Abi.macosX64));
+      (Platform.isMacOS && (abi == Abi.macosArm64 || abi == Abi.macosX64)) ||
+      (Platform.isLinux && (abi == Abi.linuxArm64 || abi == Abi.linuxX64)) ||
+      (Platform.isWindows && abi == Abi.windowsX64);
 }

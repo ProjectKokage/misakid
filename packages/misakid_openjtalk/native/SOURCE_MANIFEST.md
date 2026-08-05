@@ -84,6 +84,17 @@ bounded structured errors without input text or configured paths. Provisioned
 macOS arm64 tests prove that valid analysis and invalid native dictionary
 loading produce byte-empty stdout and stderr.
 
+The same app-owned force-include supplies the Windows portability boundary
+without changing the identity-pinned vendor tree. It selects the Windows CRT
+`_strdup` spelling, prevents Windows SDK `min`, `max`, and `ERROR` macros from
+colliding with MeCab identifiers, and redirects the vendored `CreateFileA`
+mapping call through a bounded `MB_ERR_INVALID_CHARS` conversion followed by
+`CreateFileW`. The public ABI therefore continues to accept UTF-8 paths
+independently of the active Windows ANSI code page. Canonical absolute drive
+and UNC paths are mapped to `\\?\` and `\\?\UNC\` respectively, while an
+already extended path is preserved. This keeps long dictionary mappings
+independent of the consuming executable's `longPathAware` manifest.
+
 The legacy build tool first proves the unmodified 139-file identity, copies
 only those files into a dedicated staging directory, then applies these two
 context-checked changes. CMake independently enumerates and verifies the
@@ -119,13 +130,14 @@ The build hook intentionally uses two compiler profiles:
    as C++17. The final routed native asset links the private C archive.
 
 This preserves each upstream file's source-language semantics rather than
-compiling the `.c` frontend as C++. Both profiles use hidden visibility,
-function/data sections, stable file-prefix mapping, and the force-included
-silent-stdio header.
+compiling the `.c` frontend as C++. Clang/GCC profiles use hidden visibility
+and function/data sections; every profile uses its compiler's stable path
+mapping and the force-included silent-stdio/Windows-compatibility header.
 
 Open JTalk's UTF-8 C rule tables require signed 8-bit plain-`char` behavior.
-The C11 profile therefore always passes `-fsigned-char`. The C-compiled
-`silent_stdio.c` also contains a compile-time assertion requiring
+Clang/GCC C11 profiles therefore pass `-fsigned-char`; MSVC's default is left
+unchanged. The C-compiled `silent_stdio.c` contains a compile-time assertion
+requiring
 `CHAR_MIN == -128` and `CHAR_MAX == 127`; a target that cannot provide those
 semantics fails its build. This invariant is required even when the build host
 would happen to default to signed `char`.
@@ -134,14 +146,18 @@ would happen to default to signed `char`.
 
 | Target profile | Accepted runtime ABIs | Link/export policy |
 | --- | --- | --- |
-| Android | `androidArm`, `androidArm64`, `androidX64` | Link `c++_static` and `libm`; garbage-collect sections; exclude static-archive symbols; apply `exports_android.map` for the exact 23-symbol adapter ABI. |
+| Android | `androidArm`, `androidArm64`, `androidX64` | Link `c++_static` and `libm`; garbage-collect sections; exclude static-archive symbols; apply the established `exports_android.map` for the exact 23-symbol adapter ABI. |
 | iOS | `iosArm64`, `iosX64` | Link the platform C++ runtime and dead-strip unused sections; route one native framework asset through Dart native assets. |
+| Linux | `linuxArm64`, `linuxX64` | Require a same-architecture native Linux host; link the platform C++ runtime, `libm`, and pthread; garbage-collect sections, hide the frontend archive, reuse the byte-identical established `exports_android.map`, and set SONAME `libmisakid_openjtalk.so`. |
 | macOS | `macosArm64`, `macosX64` | Link the platform C++ runtime and dead-strip unused sections; route the package native asset. |
+| Windows | `windowsX64` | Require an x64 Windows host and the native-assets MSVC `cl.exe`/`lib.exe` configuration, compile as UTF-8, and export the 23 ABI functions with `__declspec(dllexport)`. Windows arm64/x86 and clang/GCC hook drivers are rejected. |
 
-The hook ignores unsupported operating systems. Dart rejects unsupported ABI
-tuples before opening the dictionary. Stable Flutter 3.41.7 release packaging
-has completed for Android armv7/arm64/x86-64 and an unsigned iOS arm64 device
-application. The Android libraries have exact 23-export surfaces, only
+The hook ignores unsupported operating systems and rejects unsupported
+architectures for configured operating systems before compiler execution.
+Dart rejects unsupported runtime ABI tuples before opening the dictionary.
+Stable Flutter 3.41.7 release packaging has completed for Android
+armv7/arm64/x86-64 and an unsigned iOS arm64 device application. The Android
+libraries have exact 23-export surfaces, only
 `libc`/`libdl`/`libm` dynamic dependencies, NativeAssets mappings, and 16 KiB
 ELF/ZIP alignment. Both iOS frameworks have platform `IOS` and minimum-iOS-13
 metadata, reviewed `@rpath` install names, platform libc++/libSystem linkage,
@@ -161,6 +177,15 @@ so broad mobile support remains experimental.
 The bundled macOS arm64 asset has completed build, full frontend parity,
 lifecycle, four-isolate, exact 23-export, and no-stdio verification. Bundled
 macOS x64 is not yet provisioned.
+
+On 2026-07-30, foreign-host, model-free Zig probes cross-linked the exact
+configured source set as Linux x64 ELF, Linux arm64 ELF, and Windows x64 PE.
+Both ELF artifacts carried SONAME `libmisakid_openjtalk.so`; all three
+artifacts exposed the reviewed 23 adapter names. The Windows probe exercised a
+GNU compatibility target, not the supported MSVC hook path. No Linux/Windows
+Flutter package, native-assets mapping, host loader, dictionary, or G2P parity
+result is implied by these probes. Target-host runtime initialization with a
+long Japanese and space-containing dictionary path also remains untested.
 
 The Android final asset statically embeds the NDK LLVM libc++ runtime requested
 as `c++_static`. Its Apache-2.0 with LLVM exception terms are retained in the

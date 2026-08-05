@@ -206,7 +206,7 @@ packages:
       path: "../../packages/misakid_openjtalk"
       relative: true
     source: path
-    version: "0.1.0-dev.1"
+    version: "0.1.0-dev.2"
   native_toolchain_c:
     dependency: transitive
     description:
