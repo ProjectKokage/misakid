@@ -71,8 +71,26 @@ final class OpenJtalkDictionarySnapshot {
 
   /// Streams and validates every file in the pinned dictionary.
   static Future<OpenJtalkDictionarySnapshot> validate(String path) async {
+    return _open(path, verifyContents: true);
+  }
+
+  /// Opens a structurally valid dictionary previously verified by its owner.
+  ///
+  /// This does not authenticate file contents. It is only for app-private
+  /// installs whose exact sizes and SHA-256 identities were checked in a
+  /// staging directory before atomic promotion.
+  static Future<OpenJtalkDictionarySnapshot> fromVerifiedInstall(
+    String path,
+  ) async {
+    return _open(path, verifyContents: false);
+  }
+
+  static Future<OpenJtalkDictionarySnapshot> _open(
+    String path, {
+    required bool verifyContents,
+  }) async {
     try {
-      return await _validateReadable(path);
+      return await _validateReadable(path, verifyContents: verifyContents);
     } on MisakiException {
       rethrow;
     } on FileSystemException catch (error) {
@@ -89,8 +107,9 @@ final class OpenJtalkDictionarySnapshot {
   }
 
   static Future<OpenJtalkDictionarySnapshot> _validateReadable(
-    String path,
-  ) async {
+    String path, {
+    required bool verifyContents,
+  }) async {
     final rootType = await FileSystemEntity.type(path, followLinks: false);
     if (rootType == FileSystemEntityType.notFound) {
       throw const BackendUnavailableException(
@@ -148,13 +167,17 @@ final class OpenJtalkDictionarySnapshot {
           'Open JTalk dictionary file `$name` has the wrong type or size.',
         );
       }
+      final snapshot = _FileSnapshot.fromStat(statBeforeHash);
+      if (!verifyContents) {
+        snapshots[name] = snapshot;
+        continue;
+      }
       final digest = await sha256.bind(file.openRead()).first;
       final typeAfterHash = await FileSystemEntity.type(
         file.path,
         followLinks: false,
       );
       final statAfterHash = await file.stat();
-      final snapshot = _FileSnapshot.fromStat(statBeforeHash);
       if (typeAfterHash != FileSystemEntityType.file ||
           !snapshot.matches(statAfterHash)) {
         throw MalformedDataException(
@@ -175,12 +198,14 @@ final class OpenJtalkDictionarySnapshot {
         ..addByte(10);
       snapshots[name] = snapshot;
     }
-    final treeHash = sha256.convert(treeRecords.takeBytes()).toString();
-    if (totalBytes != openJtalkDictionarySizeBytes ||
-        treeHash != openJtalkDictionaryTreeSha256) {
-      throw const MalformedDataException(
-        'The Open JTalk dictionary tree identity does not match the pinned release.',
-      );
+    if (verifyContents) {
+      final treeHash = sha256.convert(treeRecords.takeBytes()).toString();
+      if (totalBytes != openJtalkDictionarySizeBytes ||
+          treeHash != openJtalkDictionaryTreeSha256) {
+        throw const MalformedDataException(
+          'The Open JTalk dictionary tree identity does not match the pinned release.',
+        );
+      }
     }
     return OpenJtalkDictionarySnapshot._(
       resolvedPath: resolvedPath,

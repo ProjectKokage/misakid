@@ -4,11 +4,16 @@
 Japanese G2P engine. It runs without Python and keeps FFI, filesystem, and
 native lifecycle code outside the pure-Dart `misakid` core.
 
-The package has two native-library paths:
+The package has two native-library paths and one explicit verified-install
+variant:
 
 - `OpenJtalkFrontendBackend.openBundled` uses the native asset built from the
   package's vendored, safety-patched sources. Build profiles are implemented
   for Android, iOS, Linux, macOS, and Windows.
+- `OpenJtalkFrontendBackend.openBundledFromVerifiedInstall` uses the same
+  native asset but skips a second dictionary content scan when an application
+  already verified the exact files in private staging and installed them
+  atomically.
 - `OpenJtalkFrontendBackend.open` retains the original explicit-library
   contract. Its reviewed CMake build remains limited to macOS 11 or newer on
   arm64.
@@ -89,6 +94,14 @@ streams and hashes the dictionary. Conversion is synchronous and the backend
 is reusable. `close` is idempotent; a native finalizer is only a leak-safety
 fallback.
 
+Applications with an app-private installer may instead call
+`openBundledFromVerifiedInstall` after checking every pinned file size and
+SHA-256 in staging and atomically promoting the complete directory. That entry
+point still requires the exact nine regular filenames and sizes, snapshots
+their metadata across native open, and lets Open JTalk parse the dictionary,
+but it does not authenticate the installed bytes again. Use `openBundled` for
+every other resource path.
+
 ### Provide the external dictionary
 
 Obtain `open_jtalk_dic_utf_8-1.11.tar.gz` explicitly from the Open JTalk
@@ -119,9 +132,9 @@ unk.dic
 Their installed total is 107,304,813 bytes (about 107 MB), with canonical tree
 SHA-256
 `8b26c37228c9e9b92333e612e1144c958f2788d219e46c8652f698a089be1ccc`.
-The adapter verifies every individual size and SHA-256 as well as the file set,
-total, and tree identity. Links, subdirectories, extra entries, missing files,
-and modified bytes are rejected.
+The default `open` and `openBundled` entry points verify every individual size
+and SHA-256 as well as the file set, total, and tree identity. Links,
+subdirectories, extra entries, missing files, and modified bytes are rejected.
 
 Android Flutter/APK assets are not directly usable as the required filesystem
 directory. An Android application must copy or extract the nine files into its

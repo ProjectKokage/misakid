@@ -1,5 +1,9 @@
 ## 0.1.0-dev.2
 
+- Add `openBundledFromVerifiedInstall` for app-private dictionaries whose exact
+  file identities were checked in staging before atomic promotion. The
+  existing `open` and `openBundled` entry points retain full runtime
+  verification by default.
 - Return immediately from non-code-asset hook invocations before verifying
   native sources or reading `input.config.code`. This restores Flutter web
   builds and macOS development-run follow-up passes that do not request code

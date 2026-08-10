@@ -21,6 +21,12 @@ void main() {
       ),
       throwsA(isA<InvalidConfigurationException>()),
     );
+    await expectLater(
+      OpenJtalkFrontendBackend.openBundledFromVerifiedInstall(
+        dictionaryPath: 'relative-dictionary',
+      ),
+      throwsA(isA<InvalidConfigurationException>()),
+    );
   });
 
   test('rejects malformed path text before filesystem access', () async {
@@ -37,6 +43,12 @@ void main() {
       );
       await expectLater(
         OpenJtalkFrontendBackend.openBundled(
+          dictionaryPath: _absoluteMissingPath(suffix),
+        ),
+        throwsA(isA<InvalidConfigurationException>()),
+      );
+      await expectLater(
+        OpenJtalkFrontendBackend.openBundledFromVerifiedInstall(
           dictionaryPath: _absoluteMissingPath(suffix),
         ),
         throwsA(isA<InvalidConfigurationException>()),
@@ -58,6 +70,13 @@ void main() {
         );
         await expectLater(
           OpenJtalkFrontendBackend.openBundled(
+            dictionaryPath: _absoluteMissingPath('dictionary'),
+            maxInputBytes: limit,
+          ),
+          throwsA(isA<InvalidConfigurationException>()),
+        );
+        await expectLater(
+          OpenJtalkFrontendBackend.openBundledFromVerifiedInstall(
             dictionaryPath: _absoluteMissingPath('dictionary'),
             maxInputBytes: limit,
           ),
@@ -117,7 +136,17 @@ void main() {
         throwsA(isA<MalformedDataException>()),
       );
       await expectLater(
+        OpenJtalkDictionarySnapshot.fromVerifiedInstall(temporary.path),
+        throwsA(isA<MalformedDataException>()),
+      );
+      await expectLater(
         OpenJtalkDictionarySnapshot.validate(
+          '${temporary.path}/does-not-exist',
+        ),
+        throwsA(isA<BackendUnavailableException>()),
+      );
+      await expectLater(
+        OpenJtalkDictionarySnapshot.fromVerifiedInstall(
           '${temporary.path}/does-not-exist',
         ),
         throwsA(isA<BackendUnavailableException>()),
@@ -126,7 +155,67 @@ void main() {
       await temporary.delete(recursive: true);
     }
   });
+
+  test(
+    'verified install inspection skips content identity and detects mutation',
+    () async {
+      final temporary = await Directory.systemTemp.createTemp(
+        'misakid-openjtalk-verified-install-',
+      );
+      try {
+        for (final entry in _dictionaryFiles.entries) {
+          final output = await File(
+            '${temporary.path}/${entry.key}',
+          ).open(mode: FileMode.write);
+          await output.truncate(entry.value);
+          await output.close();
+        }
+
+        await expectLater(
+          OpenJtalkDictionarySnapshot.validate(temporary.path),
+          throwsA(isA<MalformedDataException>()),
+        );
+        final dictionary = File('${temporary.path}/sys.dic');
+        final wrongLength = await dictionary.open(mode: FileMode.append);
+        await wrongLength.writeByte(1);
+        await wrongLength.close();
+        await expectLater(
+          OpenJtalkDictionarySnapshot.fromVerifiedInstall(temporary.path),
+          throwsA(isA<MalformedDataException>()),
+        );
+        final restored = await dictionary.open(mode: FileMode.write);
+        await restored.truncate(_dictionaryFiles['sys.dic']!);
+        await restored.close();
+
+        final snapshot = await OpenJtalkDictionarySnapshot.fromVerifiedInstall(
+          temporary.path,
+        );
+
+        final changed = await dictionary.open(mode: FileMode.append);
+        await changed.writeByte(1);
+        await changed.close();
+        await expectLater(
+          snapshot.ensureUnchanged(),
+          throwsA(isA<MalformedDataException>()),
+        );
+      } finally {
+        await temporary.delete(recursive: true);
+      }
+    },
+  );
 }
+
+const _dictionaryFiles = <String, int>{
+  'COPYING': 5865,
+  'char.bin': 262496,
+  'left-id.def': 77672,
+  'matrix.bin': 3792262,
+  'pos-id.def': 1923,
+  'rewrite.def': 7457,
+  'right-id.def': 77672,
+  'sys.dic': 103073776,
+  'unk.dic': 5690,
+};
 
 String _absoluteMissingPath(String name) => Platform.isWindows
     ? 'C:\\definitely-missing\\$name'

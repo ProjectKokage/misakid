@@ -210,9 +210,11 @@ The pure package still bundles and discovers no native frontend or dictionary.
 The sibling `misakid_openjtalk` package provides a no-Python adapter with a
 source-built `openBundled` native asset for Android, iOS, Linux, macOS, and
 Windows, while retaining its legacy explicit-library macOS-arm64-only API.
-Callers always supply an absolute Open JTalk 1.11 dictionary path;
-initialization streams and validates the exact source/ABI/dictionary
-identities before opening. The owned-result ABI passes all 24 cases, all 155
+Callers always supply an absolute Open JTalk 1.11 dictionary path. The default
+entry points stream and validate the exact source/ABI/dictionary identities
+before opening; an explicit bundled verified-install entry point avoids
+rehashing an app-private dictionary already validated in staging and installed
+atomically. The owned-result ABI passes all 24 cases, all 155
 raw words and 14 fields, all 23 successful final results and typed token
 fields, concurrent-isolate stress, and silent success/failure checks. The
 complete fixture also passes through `openBundled` on an Android 15/API 35

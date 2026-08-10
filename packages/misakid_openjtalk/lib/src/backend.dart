@@ -32,10 +32,10 @@ const int _maximumPathUtf8Bytes = 32768;
 
 /// Explicit native Open JTalk frontend for [JapanesePyopenjtalkEngine].
 ///
-/// Open the backend once with [open] or [openBundled], reuse it for synchronous
-/// conversions, and call [close] when finished. The caller supplies the
-/// dictionary; this package never searches for or downloads native code or
-/// resources.
+/// Open the backend once with [open], [openBundled], or
+/// [openBundledFromVerifiedInstall], reuse it for synchronous conversions,
+/// and call [close] when finished. The caller supplies the dictionary; this
+/// package never searches for or downloads native code or resources.
 final class OpenJtalkFrontendBackend implements JapaneseFrontendBackend {
   OpenJtalkFrontendBackend._({
     required OpenJtalkNativeFrontend frontend,
@@ -101,6 +101,7 @@ final class OpenJtalkFrontendBackend implements JapaneseFrontendBackend {
       dictionaryPath: dictionaryPath,
       maxInputBytes: maxInputBytes,
       platform: openJtalkSupportedPlatform,
+      verifyDictionaryContents: true,
     );
   }
 
@@ -112,6 +113,31 @@ final class OpenJtalkFrontendBackend implements JapaneseFrontendBackend {
   static Future<OpenJtalkFrontendBackend> openBundled({
     required String dictionaryPath,
     int maxInputBytes = defaultOpenJtalkMaxInputBytes,
+  }) => _openBundled(
+    dictionaryPath: dictionaryPath,
+    maxInputBytes: maxInputBytes,
+    verifyDictionaryContents: true,
+  );
+
+  /// Opens the bundled native asset from a caller-verified dictionary install.
+  ///
+  /// Use this only when the exact dictionary sizes and SHA-256 identities were
+  /// checked in app-private staging before an atomic directory rename. This
+  /// path checks the pinned file structure and sizes and detects changes during
+  /// native open, but it does not hash the installed files again.
+  static Future<OpenJtalkFrontendBackend> openBundledFromVerifiedInstall({
+    required String dictionaryPath,
+    int maxInputBytes = defaultOpenJtalkMaxInputBytes,
+  }) => _openBundled(
+    dictionaryPath: dictionaryPath,
+    maxInputBytes: maxInputBytes,
+    verifyDictionaryContents: false,
+  );
+
+  static Future<OpenJtalkFrontendBackend> _openBundled({
+    required String dictionaryPath,
+    required int maxInputBytes,
+    required bool verifyDictionaryContents,
   }) async {
     _validateBundledConfiguration(
       dictionaryPath: dictionaryPath,
@@ -130,6 +156,7 @@ final class OpenJtalkFrontendBackend implements JapaneseFrontendBackend {
       dictionaryPath: dictionaryPath,
       maxInputBytes: maxInputBytes,
       platform: _bundledPlatformLabel(),
+      verifyDictionaryContents: verifyDictionaryContents,
     );
   }
 
@@ -138,10 +165,11 @@ final class OpenJtalkFrontendBackend implements JapaneseFrontendBackend {
     required String dictionaryPath,
     required int maxInputBytes,
     required String platform,
+    required bool verifyDictionaryContents,
   }) async {
-    final dictionary = await OpenJtalkDictionarySnapshot.validate(
-      dictionaryPath,
-    );
+    final dictionary = verifyDictionaryContents
+        ? await OpenJtalkDictionarySnapshot.validate(dictionaryPath)
+        : await OpenJtalkDictionarySnapshot.fromVerifiedInstall(dictionaryPath);
     OpenJtalkNativeFrontend? frontend;
     try {
       frontend = OpenJtalkNativeFrontend.create(
