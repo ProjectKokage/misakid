@@ -82,13 +82,17 @@ String _generate() {
       );
     }
     final text = utf8.decode(bytes, allowMalformed: false);
-    if (text.contains("'''")) {
+    // Re-emit the pinned payload as compact JSON. jsonDecode yields an
+    // insertion-ordered LinkedHashMap and jsonEncode replays that order, so the
+    // embedded string decodes to exactly the upstream value while collapsing
+    // ~385k pretty-printed lines to one line per lexicon.
+    final payload = jsonEncode(_validateJson(source, text));
+    if (payload.contains("'''") || payload.endsWith("'")) {
       throw StateError(
         '${source.fileName} cannot be embedded as a raw string.',
       );
     }
-    _validateJson(source, text);
-    inputs.add((source, text));
+    inputs.add((source, payload));
   }
 
   final output = StringBuffer()
@@ -99,25 +103,28 @@ String _generate() {
   for (final (source, _) in inputs) {
     output.writeln('// ${source.fileName} SHA-256: ${source.sha256}');
   }
+  for (final (source, payload) in inputs) {
+    output.writeln(
+      '// ${source.name}LexiconJson SHA-256: '
+      '${sha256.convert(utf8.encode(payload))}',
+    );
+  }
   output
     ..writeln()
     ..writeln('// dart format off');
-  for (final (source, text) in inputs) {
+  for (final (source, payload) in inputs) {
     output
-      ..writeln('/// Pinned ${source.fileName} UTF-8 JSON payload.')
+      ..writeln('/// Pinned ${source.fileName} UTF-8 JSON payload, compacted.')
       ..writeln('const String ${source.name}LexiconJson = r\'\'\'')
-      ..write(text);
-    if (!text.endsWith('\n')) {
-      output.writeln();
-    }
-    output.writeln("''';");
-    output.writeln();
+      ..writeln(payload)
+      ..writeln("''';")
+      ..writeln();
   }
   output.writeln('// dart format on');
   return output.toString();
 }
 
-void _validateJson(_Source source, String text) {
+Map<String, Object?> _validateJson(_Source source, String text) {
   final decoded = jsonDecode(text);
   if (decoded is! Map<String, Object?> || decoded.length != source.entries) {
     throw StateError(
@@ -135,6 +142,7 @@ void _validateJson(_Source source, String text) {
       throw StateError('${source.fileName} has a non-string value at $key.');
     }
   }
+  return decoded;
 }
 
 final class _Source {
