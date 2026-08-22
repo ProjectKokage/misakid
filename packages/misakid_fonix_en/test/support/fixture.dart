@@ -13,7 +13,7 @@ Uint8List testManifestBytes({Map<String, Object?>? override}) {
     'modelId': 'misakid-en-us-ctc-test',
     'version': 'test-1',
     'dialect': 'en-US',
-    'architecture': 'misakid-conv-ctc-v1',
+    'architecture': 'misakid-medium-conv-bigru-ctc',
     'normalization': 'none',
     'model': <String, Object?>{
       'file': 'model.onnx',

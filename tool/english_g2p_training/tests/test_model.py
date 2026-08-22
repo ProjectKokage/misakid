@@ -15,26 +15,31 @@ def _small_model() -> EnglishG2pModel:
     model = EnglishG2pModel(
         12,
         7,
-        channels=8,
-        dilations=(1, 2),
+        embedding_channels=8,
+        convolution_channels=8,
+        convolution_dilations=(1, 2),
+        gru_hidden_size=6,
+        gru_layers=1,
+        slot_embedding_channels=4,
+        classifier_channels=8,
         dropout=0.0,
     )
     model.eval()
     return model
 
 
-def test_model_shape_and_padding_do_not_change_the_prefix() -> None:
+def test_same_length_batch_matches_individual_inference() -> None:
     model = _small_model()
-    padded = torch.tensor([[2, 3, 0, 0], [2, 3, 4, 5]], dtype=torch.int64)
-    short = torch.tensor([[2, 3]], dtype=torch.int64)
+    batched = torch.tensor([[2, 3], [4, 5]], dtype=torch.int64)
 
     with torch.inference_mode():
-        padded_logits = model(padded)
-        short_logits = model(short)
+        batched_logits = model(batched)
+        first_logits = model(batched[:1])
+        second_logits = model(batched[1:])
 
-    assert padded_logits.shape == (2, 32, 7)
-    assert short_logits.shape == (1, 16, 7)
-    torch.testing.assert_close(padded_logits[0, :16], short_logits[0])
+    assert batched_logits.shape == (2, 16, 7)
+    torch.testing.assert_close(batched_logits[:1], first_logits)
+    torch.testing.assert_close(batched_logits[1:], second_logits)
 
 
 def test_export_has_dynamic_contract_and_matches_torch(tmp_path: Path) -> None:
@@ -46,9 +51,13 @@ def test_export_has_dynamic_contract_and_matches_torch(tmp_path: Path) -> None:
     assert session.get_inputs()[0].name == INPUT_NAME
     assert session.get_outputs()[0].name == OUTPUT_NAME
 
-    inputs = np.asarray([[2, 3, 4]], dtype=np.int64)
-    with torch.inference_mode():
-        expected = model(torch.from_numpy(inputs)).numpy()
-    actual = session.run([OUTPUT_NAME], {INPUT_NAME: inputs})[0]
-    assert isinstance(actual, np.ndarray)
-    np.testing.assert_allclose(actual, expected, rtol=1.0e-5, atol=2.0e-5)
+    for inputs in (
+        np.asarray([[2, 3, 4]], dtype=np.int64),
+        np.asarray([[2, 3], [4, 5]], dtype=np.int64),
+        np.asarray([[2, 3, 4, 5, 6]], dtype=np.int64),
+    ):
+        with torch.inference_mode():
+            expected = model(torch.from_numpy(inputs)).numpy()
+        actual = session.run([OUTPUT_NAME], {INPUT_NAME: inputs})[0]
+        assert isinstance(actual, np.ndarray)
+        np.testing.assert_allclose(actual, expected, rtol=1.0e-5, atol=2.0e-5)

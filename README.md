@@ -118,15 +118,19 @@ than being silently omitted.
 
 The repository-owned UV project at
 [`tool/english_g2p_training`](tool/english_g2p_training/README.md) trains and
-exports the `misakid-conv-ctc-v1` en-US graph solely from the exact pinned
-Apache-2.0 `us_gold.json` and `us_silver.json` inputs. The first accepted
-candidate, `v1-2a7c1108d14e`, is a 692,643-byte opset-17 ONNX graph with SHA-256
-`2a7c1108d14ec0a161ef9012ce518920878268a17d0ec86a7e1eac8e9d93b005`.
-Its independently assigned 2,187-word held-out test split measured 56.24%
-whole-word accuracy and 8.84% phone error rate, passing the frozen 55%/12%
-gates. Torch/ONNX decoded parity and the real Fonix adapter both pass the 32
-bounded exported cases. Weights and reports remain external to Git; a
-consuming application must distribute and verify the exact model separately.
+exports the `misakid-medium-conv-bigru-ctc` en-US graph solely from the exact
+pinned Apache-2.0 `us_gold.json` and `us_silver.json` inputs. V1,
+`v1-5ce8863c502d`, has 1,173,871 parameters and is a 4,708,739-byte opset-17
+ONNX graph with SHA-256
+`5ce8863c502da27ad043e91bec1a6d8ff2b6b654d1e645d68645b1818e6230b9`.
+Its independently assigned 2,187-word held-out test split measured 71.38%
+whole-word accuracy and 5.31% phone error rate, clearing the fixed 67%/7%
+gates. Warm raw ONNX Runtime p95 was 896 microseconds on the qualifying macOS
+arm64 host, under the fixed 2 ms gate. Torch/ONNX decoded parity and the real
+Fonix adapter both pass the 32 bounded exported cases. The prior 692,643-byte
+graph was an unfrozen prototype and is not V1. Weights and reports remain
+external to Git; a consuming application must distribute and verify the exact
+model separately.
 
 `englishPhonemeInventory` exposes the frozen American/British inventory for
 either rendering version. It covers built-in lexicon/eSpeak output; custom

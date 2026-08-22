@@ -12,6 +12,7 @@ dependencies = [
 
 [project.scripts]
 misakid-train-english-g2p = "misakid_g2p_training.cli:main"
+misakid-promote-english-g2p = "misakid_g2p_training.promotion:main"
 
 [dependency-groups]
 dev = [

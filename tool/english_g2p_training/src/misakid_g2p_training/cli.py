@@ -16,9 +16,9 @@ def main(arguments: Sequence[str] | None = None) -> int:
     )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--repo-root", type=Path, default=_default_repo_root())
-    parser.add_argument("--epochs", type=int, default=12)
+    parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch-size", type=int, default=512)
-    parser.add_argument("--learning-rate", type=float, default=0.002)
+    parser.add_argument("--learning-rate", type=float, default=0.001)
     parser.add_argument("--weight-decay", type=float, default=0.0001)
     parser.add_argument("--maximum-examples", type=int)
     parser.add_argument("--threads", type=int, default=4)
@@ -44,11 +44,12 @@ def main(arguments: Sequence[str] | None = None) -> int:
     print(
         json.dumps(
             {
-                "candidateAccepted": result.candidate_accepted,
+                "candidateAccepted": False,
                 "modelSha256": result.model_sha256,
                 "modelSizeBytes": result.model_size_bytes,
                 "output": str(result.output),
                 "test": result.test_metrics.to_json(),
+                "trainingGatesPassed": result.training_gates_passed,
                 "version": result.version,
             },
             sort_keys=True,

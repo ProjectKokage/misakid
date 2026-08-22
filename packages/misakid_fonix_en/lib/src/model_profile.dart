@@ -7,7 +7,7 @@ import 'package:misakid/misaki.dart';
 const int _maximumManifestBytes = 256 * 1024;
 const int _maximumModelBytes = 32 * 1024 * 1024;
 const int _maximumLogitBytes = 2 * 1024 * 1024;
-const String _architecture = 'misakid-conv-ctc-v1';
+const String _architecture = 'misakid-medium-conv-bigru-ctc';
 const String _dialect = 'en-US';
 const String _normalization = 'none';
 const String _modelFile = 'model.onnx';

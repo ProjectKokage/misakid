@@ -49,7 +49,7 @@ final class FonixEnglishG2pBackend implements AsyncEnglishFallbackBackend {
            'modelId': profile.modelId,
            'modelSha256': profile.modelSha256,
            'modelBytes': profile.modelSizeBytes.toString(),
-           'architecture': 'misakid-conv-ctc-v1',
+           'architecture': 'misakid-medium-conv-bigru-ctc',
            'dialect': 'en-US',
            'provider': 'cpu',
            'maximumGraphemeCodePoints': profile.maximumGraphemeCodePoints

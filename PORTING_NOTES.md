@@ -1538,25 +1538,31 @@ documented real-backend and provenance gates.
   preprocessing, context, rendering, token metadata, unknown-marker, and
   Kokoro chunking behavior remain shared with the synchronous implementation.
 - Added `misakid_fonix_en`, accepting only the closed
-  `misakid-conv-ctc-v1` en-US manifest. One worker isolate owns one CPU Fonix
+  `misakid-medium-conv-bigru-ctc` en-US manifest. One worker isolate owns one CPU Fonix
   session and at most one pending request. The adapter bounds grapheme scalars,
   copied messages, output shape, logits, and inventories; rejects unsupported
   scalars and non-finite or malformed output; cancels and drains native work;
   recovers after settled cancellation; and closes idempotently.
 - Added a Python 3.12 UV tooling subproject that deterministically validates,
   merges, groups, and splits the exact pinned Apache-2.0 `us_silver.json` and
-  `us_gold.json`; trains a compact Conv-CTC graph on CPU; exports ONNX opset
-  17; verifies Torch/ONNX numerical and decoded parity; evaluates only the
-  held-out split; and atomically emits model, manifest, report, and bounded
-  parity records outside the checkout.
-- Candidate `v1-2a7c1108d14e` is 692,643 bytes with SHA-256
-  `2a7c1108d14ec0a161ef9012ce518920878268a17d0ec86a7e1eac8e9d93b005`.
-  Its independently assigned 2,187-example test split produced 1,230 exact
-  words (56.24%) and 1,774 edits across 20,069 reference phones (8.84% PER),
-  passing the frozen 55% minimum word-accuracy and 12% maximum-PER gates.
-  Torch/ORT decoded parity and the real Fonix adapter pass all 32 exported
-  cases. This validates the app-owned contract and basic function; it neither
-  claims subjective TTS quality nor parity with Misaki's PeterReid BART mode.
+  `us_gold.json`; trains a 1,173,871-parameter medium convolutional/BiGRU CTC
+  graph on CPU without padded bidirectional batches; exports ONNX opset 17;
+  verifies Torch/ONNX numerical and decoded parity; evaluates only the held-out
+  split; benchmarks warm batch-1 inference; and atomically emits model,
+  manifest, report, and bounded parity records outside the checkout.
+- Training emits only `candidate-*`. Promotion to V1 requires at least 67%
+  exact-word accuracy, at most 7% PER, a model no larger than 6 MiB, warm raw
+  ONNX Runtime p95 below 2 ms on the qualifying macOS arm64 host, Torch/ONNX
+  parity, and an identity-bound receipt from the real Fonix-isolate test.
+- V1 `v1-5ce8863c502d` is 4,708,739 bytes with SHA-256
+  `5ce8863c502da27ad043e91bec1a6d8ff2b6b654d1e645d68645b1818e6230b9`.
+  Its independently assigned 2,187-example test split produced 1,561 exact
+  words (71.38%) and 1,066 edits across 20,069 reference phones (5.31% PER).
+  Warm raw ONNX Runtime p95 was 896 microseconds. Torch/ORT decoded parity and
+  the real Fonix adapter pass all 32 exported cases. The earlier 692,643-byte
+  graph remains an unfrozen prototype. This validates the app-owned contract
+  and basic function; it neither claims subjective TTS quality nor parity with
+  Misaki's PeterReid BART mode.
 - Model weights and generated reports remain external to Git. A consuming
   application must provide an immutable distribution location and verify the
   manifest, size, and SHA-256 before creating the adapter.

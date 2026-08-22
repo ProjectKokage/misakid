@@ -3,16 +3,19 @@
 - Add `AsyncEnglishG2pEngine` and `KokoroAsyncEnglishG2pFrontend`, preserving
   the deterministic English pipeline and Kokoro chunking while allowing a
   cancellable asynchronous unknown-word backend.
-- Add the optional `misakid_fonix_en` adapter with a closed en-US Conv-CTC
+- Add the optional `misakid_fonix_en` adapter with a closed en-US medium
+  convolutional/BiGRU CTC
   manifest, exact model identity, one isolate-owned CPU Fonix session, bounded
   inputs/messages/logits, cancellation and drain, recovery, and idempotent
   close behavior.
 - Add a locked UV training/export project for the app-owned en-US fallback.
   It deterministically merges and splits the two pinned Apache-2.0 American
   lexicons, trains on CPU, exports opset-17 ONNX, checks Torch/ORT parity, and
-  emits external manifest/report/parity artifacts. Candidate
-  `v1-2a7c1108d14e` passes the frozen held-out quality gates and all 32 real
-  Fonix parity cases; model bytes remain outside Git.
+  emits external manifest/report/parity artifacts. The 1,173,871-parameter
+  `v1-5ce8863c502d` graph passes the fixed 67% word-accuracy, 7% PER, 6 MiB,
+  warm-latency, Torch/ORT, and 32-case real-Fonix gates; its exact model bytes
+  remain outside Git. The earlier 692,643-byte graph remains an unfrozen
+  prototype and is not V1.
 - Promote the duplicate-key-rejecting bounded JSON parser into the shared root
   library and reuse it in both optional neural-model adapters.
 - Add immutable Kokoro handoff chunks that reproduce the pinned Kokoro 0.9.4

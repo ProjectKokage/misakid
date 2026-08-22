@@ -4,6 +4,7 @@ library;
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:misakid_fonix_en/misakid_fonix_en.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';
@@ -13,6 +14,7 @@ void main() {
   final modelPath = Platform.environment['MISAKID_FONIX_EN_MODEL'];
   final parityPath = Platform.environment['MISAKID_FONIX_EN_PARITY'];
   final runtimePath = Platform.environment['MISAKID_FONIX_EN_RUNTIME'];
+  final receiptPath = Platform.environment['MISAKID_FONIX_EN_RECEIPT'];
   final missing = <String>[
     if (manifestPath == null) 'MISAKID_FONIX_EN_MANIFEST',
     if (modelPath == null) 'MISAKID_FONIX_EN_MODEL',
@@ -27,6 +29,8 @@ void main() {
       final modelFile = _regularFile(modelPath!);
       final parityFile = _regularFile(parityPath!);
       final runtimeFile = _regularFile(runtimePath!);
+      final manifestBytes = manifestFile.readAsBytesSync();
+      final modelBytes = modelFile.readAsBytesSync();
       final parityBytes = parityFile.readAsBytesSync();
       if (parityBytes.isEmpty || parityBytes.length > 256 * 1024) {
         fail('The provisioned parity file has an invalid byte length.');
@@ -43,8 +47,8 @@ void main() {
       }
 
       final backend = await FonixEnglishG2pBackend.open(
-        manifestBytes: manifestFile.readAsBytesSync(),
-        modelBytes: modelFile.readAsBytesSync(),
+        manifestBytes: manifestBytes,
+        modelBytes: modelBytes,
         runtimeSource: OrtRuntimeSource.file(
           absolutePath: runtimeFile.absolute.path,
           allowedRoot: runtimeFile.parent.absolute.path,
@@ -82,12 +86,61 @@ void main() {
       } finally {
         await backend.close();
       }
+      if (receiptPath != null) {
+        _writeReceipt(receiptPath, <String, Object?>{
+          'schemaVersion': 1,
+          'kind': 'misakid-fonix-en-parity',
+          'passed': true,
+          'architecture': 'misakid-medium-conv-bigru-ctc',
+          'modelId': backend.profile.modelId,
+          'candidateVersion': backend.profile.version,
+          'modelSha256': backend.profile.modelSha256,
+          'candidateManifestSha256': sha256.convert(manifestBytes).toString(),
+          'paritySha256': sha256.convert(parityBytes).toString(),
+          'cases': rawCases.length,
+          'environment': <String, Object?>{
+            'operatingSystem': Platform.operatingSystem,
+            'operatingSystemVersion': Platform.operatingSystemVersion,
+            'dart': Platform.version,
+            'runtimeFile': path.basename(runtimeFile.path),
+          },
+        });
+      }
     },
     skip: missing.isEmpty
         ? false
         : 'Requires provisioned paths: ${missing.join(', ')}.',
     timeout: const Timeout(Duration(minutes: 2)),
   );
+}
+
+void _writeReceipt(String receiptPath, Map<String, Object?> value) {
+  if (!path.isAbsolute(receiptPath)) {
+    fail('MISAKID_FONIX_EN_RECEIPT must be absolute.');
+  }
+  final output = File(receiptPath);
+  if (output.existsSync()) {
+    fail('MISAKID_FONIX_EN_RECEIPT must not already exist.');
+  }
+  final parent = output.parent;
+  if (parent.statSync().type != FileSystemEntityType.directory) {
+    fail('MISAKID_FONIX_EN_RECEIPT parent must already exist.');
+  }
+  final staging = File('$receiptPath.staging-${pid.toString()}');
+  if (staging.existsSync()) {
+    fail('The Fonix parity receipt staging path already exists.');
+  }
+  try {
+    staging.writeAsStringSync(
+      '${const JsonEncoder.withIndent('  ').convert(value)}\n',
+      flush: true,
+    );
+    staging.renameSync(receiptPath);
+  } finally {
+    if (staging.existsSync()) {
+      staging.deleteSync();
+    }
+  }
 }
 
 File _regularFile(String filePath) {
