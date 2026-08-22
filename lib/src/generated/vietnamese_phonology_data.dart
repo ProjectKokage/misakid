@@ -1,8 +1,6 @@
-// GENERATED FILE. DO NOT EDIT.
-// Generator: tool/generators/generate_vietnamese_phonology_data.py
+// DERIVED DATA. Review behavior tests before editing.
 // Upstream: hexgrad/misaki fba1236595f2d2bf21d414ba6e57d25256afada3 (0.9.4)
 // Source: Viphoneme 616a505fdbe83b23bd30a358819e6dded0e1de4a (MIT)
-// vi.py SHA-256: be333eac8211063eafd3304b13eafa2f2250af0a950b47f231f7758fb08d951e
 
 // dart format off
 /// Pinned Vietnamese phonology table `Cus_onsets`.

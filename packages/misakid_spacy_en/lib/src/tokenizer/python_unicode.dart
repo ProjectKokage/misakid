@@ -226,11 +226,6 @@ String _unicodeRegExpEscape(int scalar) => scalar <= 0xffff
     : '\\u{${scalar.toRadixString(16)}}';
 
 // BEGIN GENERATED UNICODE DATA.
-// Generator:
-//   tool/generators/generate_python312_spacy_unicode.dart
-// Canonical source:
-//   tool/upstream_data/python-3.12.11-unicode-15.0.0/spacy_unicode_tables.json
-// Source SHA-256: 1e7928f616c36560748f466b047720011faa0c49db1b459a443eec318e01da6f
 // Decoded behavior SHA-256: 68d7a4099fb5f72477218518178e89c1e8446b65dfdb2790f4747efb11bf4ffc
 
 const int _alphabeticDataCount = 659;

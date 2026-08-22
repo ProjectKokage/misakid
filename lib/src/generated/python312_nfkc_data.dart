@@ -1,15 +1,8 @@
-// GENERATED FILE. DO NOT EDIT.
-// Generator: tool/generators/generate_python312_nfkc.dart
-// Canonical source: tool/upstream_data/python-3.12.11-unicode-15.0.0/nfkc_tables.json
-// Source SHA-256: 3d278827be7b9a477ce3ad354ef6e5419a29f14ed25dd4668d3221e845e0122a
+// DERIVED DATA. Review behavior tests before editing.
 // CPython 3.12.11, Unicode 15.0.0, NFC/NFKC
 
 /// Unicode data version used by the pinned CPython runtime.
 const String python312UnicodeVersion = '15.0.0';
-
-/// SHA-256 of the canonical generated-table source.
-const String python312NfkcSourceSha256 =
-    '3d278827be7b9a477ce3ad354ef6e5419a29f14ed25dd4668d3221e845e0122a';
 
 /// Exhaustive scalar NFKC output digest.
 const String python312NfkcScalarDigestSha256 =

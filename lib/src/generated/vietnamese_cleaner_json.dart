@@ -1,10 +1,6 @@
-// GENERATED FILE. DO NOT EDIT.
-// Generator: tool/generators/generate_vietnamese_data.dart
+// DERIVED DATA. Review behavior tests before editing.
 // Upstream: hexgrad/misaki fba1236595f2d2bf21d414ba6e57d25256afada3 (0.9.4)
 // Mapping source: Vinorm 577c9cd9bf499e074801b703a5fd1eaad8300d43 (MIT)
-// vi_acronyms.json SHA-256: 5da337cdde5231e72680fa4bf29f5dfe906f769492e9ee950ac2d73a28eba529
-// vi_symbols.json SHA-256: d963c9261f6ae0211c5941a357dff58f3599b5db98ed38e4cc722bc67ffcb728
-// vi_teencode.json SHA-256: e35baf886a44a92e08c5d900abbcf921eb69efa198821e2a9de85ca8f5dfa7f3
 
 // dart format off
 /// Pinned vi_acronyms.json UTF-8 JSON payload.

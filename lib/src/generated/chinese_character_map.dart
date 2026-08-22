@@ -1,8 +1,6 @@
-// GENERATED FILE. DO NOT EDIT.
-// Generator: tool/generators/generate_chinese_character_map.dart
+// DERIVED DATA. Review behavior tests before editing.
 // Upstream: hexgrad/misaki fba1236595f2d2bf21d414ba6e57d25256afada3 (0.9.4)
 // Source: PaddlePaddle/PaddleSpeech d7bf91561d5a8a025f3cfc4bd7b28368fd98d102 (Apache-2.0)
-// char_convert.py SHA-256: 84341ec93b420a28467ccfee223d23e262f7ee0a4da00402f662c656b119e190
 
 // dart format off
 /// Parallel simplified-character scalars from the pinned table.

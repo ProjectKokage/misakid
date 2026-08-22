@@ -140,7 +140,7 @@ lib/
     generated/
 test/{core,languages,contracts,parity}/
 test/fixtures/upstream/<commit>/
-tool/{reference,upstream_data,generators}/
+tool/reference/
 example/
 benchmark/
 ```
@@ -149,9 +149,9 @@ Also maintain `PORTING_STATUS.md`, `PORTING_NOTES.md`, and
 `THIRD_PARTY_NOTICES.md`.
 
 - Public entrypoints stay small; never export files below `lib/src`.
-- Keep canonical source data and generators outside the public library.
-- Commit deterministic generated artifacts required by consumers, mark them
-  generated, and never hand-edit them.
+- Keep upstream source provenance in the notices and porting notes.
+- Commit derived tables required by consumers and cover their observable
+  behavior with focused tests.
 - Put native, process, or model integrations in sibling adapter packages when
   they would make the core platform-specific or materially heavier.
 - Examples must compile against public APIs only.
@@ -285,24 +285,17 @@ must be obtained by an explicit user/tooling step, pinned by version and
 checksum, and excluded from normal source control unless their license and size
 make vendoring intentional.
 
-## Data and generated code
+## Data and derived tables
 
 The English lexicons and language data are part of behavior, not incidental
 resources.
 
-- Store a byte-for-byte canonical copy of upstream source data under
-  `tool/upstream_data/`, organized by upstream commit.
-- Record source repository, path, commit, license, and SHA-256 for every copied
-  data file.
-- Generate runtime tables with a deterministic tool under `tool/generators/`.
-- Generated output must include a header naming the generator, source files,
-  upstream commit, and checksums.
-- Sort map keys and otherwise stabilize serialization so repeated generation
-  produces no diff.
-- Commit generated runtime data needed by consumers; package use must not
-  require a generator or Python.
-- Validate generated tables at generation time and with a small runtime
-  integrity test.
+- Record source repository, path, revision, and license for derived data.
+- Keep the committed runtime tables as the implementation source of truth;
+  normal development does not retain a second copy of their upstream inputs.
+- Verify observable table behavior with focused tests and parity fixtures.
+- If an explicit upstream-sync task needs temporary extraction or generation,
+  review the resulting table diff and remove the temporary inputs afterward.
 - Load large immutable data lazily and cache it per isolate. Never parse the
   full lexicon for every conversion.
 - Keep the pure core free of `dart:io`. If a compact binary representation is
@@ -460,7 +453,7 @@ Useful invariants:
 - tokens retain source order;
 - output symbols belong to the declared inventory, punctuation/whitespace, or
   unknown marker;
-- data generation is byte-for-byte reproducible; and
+- derived table behavior is covered; and
 - related metadata arrays have consistent lengths.
 
 Translate upstream `assert` invariants into tests and explicit validation when
@@ -594,7 +587,7 @@ A change is complete only when:
 - all declared modes have exact parity coverage;
 - token and metadata semantics are covered where available;
 - unsupported modes fail explicitly;
-- generated data is reproducible and validated;
+- derived table behavior is validated;
 - public API and examples are documented;
 - required attribution and notices are present;
 - formatting, analysis, tests, and applicable publish dry runs pass;

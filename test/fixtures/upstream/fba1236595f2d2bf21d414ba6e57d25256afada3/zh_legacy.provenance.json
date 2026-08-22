@@ -21,9 +21,7 @@
   },
   "caseCount": 24,
   "caseCorpus": "tool/reference/cases/zh_legacy.jsonl",
-  "caseCorpusSha256": "dc2b7c89b4f1fb3744de73f05b4aa4040565dd705cd15f3a9a78666f4ae061a0",
   "dependencyLock": "tool/reference/requirements-zh-py312.txt",
-  "dependencyLockSha256": "75ba60d6332ea92a78d4665df152a7d1fea8655c6bdfdc55280666b1bebe67ce",
   "distributions": [
     {
       "metadataSha256": "66320967996f85fa211f1216a7bf5f921d13b41b0de5db97f389daddbc54eaf4",
@@ -82,9 +80,7 @@
     }
   ],
   "exporter": "tool/reference/export_fixtures.py",
-  "exporterSha256": "1be16dede8befed73be9dbde3b8f728abffe6bc4765a2ae674ff717bed6fe3c1",
   "fixture": "zh_legacy.jsonl",
-  "fixtureSha256": "30a1f8988aa19cc68cbba5bd9e256159e23e2c9be87fd19a6a990a1141c49096",
   "mode": {
     "englishFallback": null,
     "name": "legacy",
@@ -111,19 +107,16 @@
     {
       "license": "Apache-2.0 (pinned upstream repository)",
       "path": "misaki/zh.py",
-      "sha256": "97d16aec581832845d2566cb24da2ba045d4552fb65a5017a6eac8feef654c81",
       "sizeBytes": 3320
     },
     {
       "license": "MIT adaptation; exact provenance and notice are recorded in THIRD_PARTY_NOTICES.md",
       "path": "misaki/transcription.py",
-      "sha256": "14f0f1b5eb89c5b684229a30ae8b0c19c8266b537967786a2079ba887f5fbc32",
       "sizeBytes": 9354
     },
     {
       "license": "dependency resolution record for the pinned upstream repository",
       "path": "uv.lock",
-      "sha256": "52d912cb52640c6b472c40258ee9c49edb63c1397ac1fb85c0dc17ad06654bd9",
       "sizeBytes": 520905
     }
   ],

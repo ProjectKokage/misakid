@@ -21,16 +21,13 @@
   },
   "caseCount": 20,
   "caseCorpus": "tool/reference/cases/en_american_espeak_fallback.jsonl",
-  "caseCorpusSha256": "6071b763e2e5292825d08d1ba512296f9849a867fd0d5debcd64198c6db6f6b8",
   "dependencyLock": "tool/reference/requirements-en-espeak-py312.txt",
-  "dependencyLockSha256": "2066ade3a06ef6d6f086d3939a6a166055ac485a7bc057c6ccc0cdf1165d713b",
   "fallbackPolicy": {
     "constructorArgument": "misaki.espeak.EspeakFallback",
     "effectiveFallback": "eSpeak-ng 1.52.0 through phonemizer-fork 3.3.2",
     "mode": "american-espeak-fallback"
   },
   "fixture": "en_american_espeak_fallback.jsonl",
-  "fixtureSha256": "9e194cd61ab34777cd5c9b2ea920afb043ab58eefabd7fde9e94ef20eb9f2710",
   "generatedBy": "tool/reference/export_fixtures.py",
   "model": {
     "distribution": "en-core-web-sm",
@@ -49,28 +46,23 @@
   "sourceFiles": [
     {
       "license": "Apache-2.0 (pinned upstream repository)",
-      "path": "misaki/en.py",
-      "sha256": "a9c36c90a3fa6c6084e9042fd8e19f6049add4f1435d8fe5ca1b77f3529a98f4"
+      "path": "misaki/en.py"
     },
     {
       "license": "Apache-2.0 (pinned upstream repository)",
-      "path": "misaki/espeak.py",
-      "sha256": "ebc39e807eeae7b99322109d8477aa16b605427f9cc852a4b1f6f72c45806a09"
+      "path": "misaki/espeak.py"
     },
     {
       "license": "Apache-2.0 (pinned upstream repository)",
-      "path": "misaki/token.py",
-      "sha256": "5ff6ce45da6766cdc1e3d5c91b0b2b093d912b8df6f2da327af56f88ad43f073"
+      "path": "misaki/token.py"
     },
     {
       "license": "Apache-2.0 (author-published hexgrad/misaki dataset revision b65a6b4398e053983b9c360f0682b720e362859d)",
-      "path": "misaki/data/us_gold.json",
-      "sha256": "dc414872a49a28ae6c141463d502fd945f3b2fde040484fdc47d00cc4612686f"
+      "path": "misaki/data/us_gold.json"
     },
     {
       "license": "Apache-2.0 (author-published hexgrad/misaki dataset revision b65a6b4398e053983b9c360f0682b720e362859d)",
-      "path": "misaki/data/us_silver.json",
-      "sha256": "de8f67be911bb6c659187b4a65fd966b6a30e56350e0f790d763210b053ac475"
+      "path": "misaki/data/us_silver.json"
     }
   ],
   "upstreamCommit": "fba1236595f2d2bf21d414ba6e57d25256afada3",

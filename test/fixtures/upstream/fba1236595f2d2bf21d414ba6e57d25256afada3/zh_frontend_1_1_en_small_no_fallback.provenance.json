@@ -23,7 +23,6 @@
   },
   "caseCount": 14,
   "caseCorpus": "tool/reference/cases/zh_frontend_1_1_en_small_no_fallback.jsonl",
-  "caseCorpusSha256": "e2d91145b5c2411e375af6c66755c98e16beebd74dfd9f381e78ec22bb4ee3f3",
   "coverage": [
     "American and British English with legacy and 2.0 rendering",
     "English-only and multiple mixed Chinese/English segments",
@@ -36,16 +35,13 @@
   ],
   "dependencyLocks": [
     {
-      "path": "tool/reference/requirements-en-no-fallback-py312.txt",
-      "sha256": "dd5c6ab110e810ebc8a5932bbb3df1ba5ac752e1ad9850192eecdcfad9314d41"
+      "path": "tool/reference/requirements-en-no-fallback-py312.txt"
     },
     {
-      "path": "tool/reference/requirements-zh-py312.txt",
-      "sha256": "75ba60d6332ea92a78d4665df152a7d1fea8655c6bdfdc55280666b1bebe67ce"
+      "path": "tool/reference/requirements-zh-py312.txt"
     },
     {
-      "path": "tool/reference/requirements-zh-en-callback-py312.txt",
-      "sha256": "c857f49ac57ebab9cd51de2eeadcb20ccfb55341aac61f0eeaf29d8633d47031"
+      "path": "tool/reference/requirements-zh-en-callback-py312.txt"
     }
   ],
   "environment": {
@@ -59,11 +55,9 @@
   },
   "expectedFailures": [],
   "exporter": {
-    "path": "tool/reference/export_fixtures.py",
-    "sha256": "f0c17f3b954d72496f30b10d9cdcc5566f73ad31c4aec3d6c941c9268a99714b"
+    "path": "tool/reference/export_fixtures.py"
   },
   "fixture": "zh_frontend_1_1_en_small_no_fallback.jsonl",
-  "fixtureSha256": "b5f6b39b489dc023a39ccb42f35cd5030acecb3426d474f9556ff876cceb7599",
   "mode": {
     "englishDialectOptions": [
       "american",
@@ -103,8 +97,7 @@
       ],
       "policy": "every source and destination RECORD hash and size verified; native/shared files, symlinks, special files, missing files, and unexpected versions rejected",
       "source": "/private/tmp/misaki-oracle-zh",
-      "tool": "tool/reference/prepare_zh_en_callback_oracle.py",
-      "toolSha256": "ccce260fdbab60f0cfb33aa31b675f41ea0fcfad26f851981f3feb2a35d09484"
+      "tool": "tool/reference/prepare_zh_en_callback_oracle.py"
     }
   },
   "oracleVerification": {
@@ -194,28 +187,22 @@
   "schemaVersion": 1,
   "sourceFiles": [
     {
-      "path": "misaki/zh.py",
-      "sha256": "97d16aec581832845d2566cb24da2ba045d4552fb65a5017a6eac8feef654c81"
+      "path": "misaki/zh.py"
     },
     {
-      "path": "misaki/zh_frontend.py",
-      "sha256": "002023955e31c692cea2dcd0dea1836df84a9ff8dab966f5ae43ce276bdd1c0c"
+      "path": "misaki/zh_frontend.py"
     },
     {
-      "path": "misaki/tone_sandhi.py",
-      "sha256": "2a0adc3854c137759f304417d844582d7fd902c57d84733d94137a4bc756c301"
+      "path": "misaki/tone_sandhi.py"
     },
     {
-      "path": "misaki/en.py",
-      "sha256": "a9c36c90a3fa6c6084e9042fd8e19f6049add4f1435d8fe5ca1b77f3529a98f4"
+      "path": "misaki/en.py"
     },
     {
-      "path": "misaki/token.py",
-      "sha256": "5ff6ce45da6766cdc1e3d5c91b0b2b093d912b8df6f2da327af56f88ad43f073"
+      "path": "misaki/token.py"
     },
     {
-      "path": "uv.lock",
-      "sha256": "52d912cb52640c6b472c40258ee9c49edb63c1397ac1fb85c0dc17ad06654bd9"
+      "path": "uv.lock"
     }
   ],
   "successCount": 14,

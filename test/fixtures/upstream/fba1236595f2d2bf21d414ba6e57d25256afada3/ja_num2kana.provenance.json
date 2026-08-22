@@ -1,17 +1,14 @@
 {
   "backendVersions": {},
   "caseCorpus": "tool/reference/cases/ja_num2kana.jsonl",
-  "caseCorpusSha256": "fd40625c79952003fe0ec1f3e5b57ce14b57eb8cfb88ad23b292f6fda334e3f9",
   "fixture": "ja_num2kana.jsonl",
-  "fixtureSha256": "bd3e519fbe6ff9adcef5f2fd56b5298a93fde2d951fc8d3e11b0e7fe5ff3fdbc",
   "generatedBy": "tool/reference/export_fixtures.py",
   "pythonVersion": "3.12.11",
   "schemaVersion": 1,
   "sourceFiles": [
     {
       "license": "MIT (as declared in the pinned source header)",
-      "path": "misaki/num2kana.py",
-      "sha256": "26ca4b39ac7165104e53971bd2459df6466ff8140e1dac836a3bf1f9e811e2d2"
+      "path": "misaki/num2kana.py"
     }
   ],
   "upstreamCommit": "fba1236595f2d2bf21d414ba6e57d25256afada3",

@@ -37,9 +37,7 @@
   },
   "caseCount": 34,
   "caseCorpus": "tool/reference/cases/ko_g2pkc_default.jsonl",
-  "caseCorpusSha256": "440177fe633b45c0066c9f06b39d6c8575d2a35bcfd2033380416f7206415171",
   "dependencyLock": "tool/reference/requirements-ko-g2pkc-py312.txt",
-  "dependencyLockSha256": "a6dd6c9479f7c4a50ea71dd51c14cf9feb61c9075b86a1279cc2847ed078e1f0",
   "fixture": "ko_g2pkc_default.jsonl",
   "expectedFailures": [
     {
@@ -48,7 +46,6 @@
       "cause": "Pinned process_num leaves name unbound for a nonzero digit at position 16"
     }
   ],
-  "fixtureSha256": "cc70ca1907d94d4ba0c55aed9ed269c13be41ee8c3c68d83140e48a7a8033019",
   "generatedBy": "tool/reference/export_fixtures.py",
   "mode": {
     "morphology": "pinned KOG2P use_dict=True path",
@@ -91,63 +88,51 @@
   "sourceFiles": [
     {
       "license": "Apache-2.0 (pinned upstream repository)",
-      "path": "misaki/ko.py",
-      "sha256": "444155010ad824659f019e8fe0e0cdf2669b846506dbb2ce7a0e1443530bf3c9"
+      "path": "misaki/ko.py"
     },
     {
       "license": "Apache-2.0 (copied/adapted g2pkc provenance recorded in THIRD_PARTY_NOTICES.md)",
-      "path": "misaki/g2pkc/README.md",
-      "sha256": "d524b5cbb0713a18e4e28454509ac4458fafbb8597c7888fd5b5aced2d0f9725"
+      "path": "misaki/g2pkc/README.md"
     },
     {
       "license": "Apache-2.0 (copied/adapted g2pkc provenance recorded in THIRD_PARTY_NOTICES.md)",
-      "path": "misaki/g2pkc/__init__.py",
-      "sha256": "da28d02dc1522ffa1ee96c44cc9aa954b85a1945c289c4ea4a594cfab95a2097"
+      "path": "misaki/g2pkc/__init__.py"
     },
     {
       "license": "Apache-2.0 (copied/adapted g2pkc provenance recorded in THIRD_PARTY_NOTICES.md)",
-      "path": "misaki/g2pkc/english.py",
-      "sha256": "b484b8dbd9cd3f8296a200255874072cf021147e495f1017f65d4e0a342df062"
+      "path": "misaki/g2pkc/english.py"
     },
     {
       "license": "Apache-2.0 (copied/adapted g2pkc provenance recorded in THIRD_PARTY_NOTICES.md)",
-      "path": "misaki/g2pkc/g2pk.py",
-      "sha256": "e2685e1fbc5ef32addd43edbef833734f311d47060533e6c8b0014ef70269970"
+      "path": "misaki/g2pkc/g2pk.py"
     },
     {
       "license": "Apache-2.0 (copied/adapted g2pkc provenance recorded in THIRD_PARTY_NOTICES.md)",
-      "path": "misaki/g2pkc/idioms.txt",
-      "sha256": "d49682e430bf7743715d0510a5e1b32cd902db80fcdeaea783d9abcaec3f7ac5"
+      "path": "misaki/g2pkc/idioms.txt"
     },
     {
       "license": "Apache-2.0 (copied/adapted g2pkc provenance recorded in THIRD_PARTY_NOTICES.md)",
-      "path": "misaki/g2pkc/numerals.py",
-      "sha256": "cf0d8bbca3750ff53289a9386afc223bfcd8ed3ce9c6a288a9ee997899000581"
+      "path": "misaki/g2pkc/numerals.py"
     },
     {
       "license": "Apache-2.0 (copied/adapted g2pkc provenance recorded in THIRD_PARTY_NOTICES.md)",
-      "path": "misaki/g2pkc/regular.py",
-      "sha256": "8e376b276548d915d281cf75d2b1574e03eb660f00b8b04d7086434d5b030fe9"
+      "path": "misaki/g2pkc/regular.py"
     },
     {
       "license": "Apache-2.0 (copied/adapted g2pkc provenance recorded in THIRD_PARTY_NOTICES.md)",
-      "path": "misaki/g2pkc/rules.txt",
-      "sha256": "b7e6b3ddeec1b1406aac0ba98665da9921a2088faaf4843a1f8120e83c4ce33f"
+      "path": "misaki/g2pkc/rules.txt"
     },
     {
       "license": "Apache-2.0 (copied/adapted g2pkc provenance recorded in THIRD_PARTY_NOTICES.md)",
-      "path": "misaki/g2pkc/special.py",
-      "sha256": "b582ba792e3e63776f78ea5e535223bede0bd379cf35a7b4092c602d6597a9cb"
+      "path": "misaki/g2pkc/special.py"
     },
     {
       "license": "Apache-2.0 (copied/adapted g2pkc provenance recorded in THIRD_PARTY_NOTICES.md)",
-      "path": "misaki/g2pkc/table.csv",
-      "sha256": "61aca8535fd75f16ca71df59bc5eeab625073edfd50732fda3f12b30ccade31f"
+      "path": "misaki/g2pkc/table.csv"
     },
     {
       "license": "Apache-2.0 (copied/adapted g2pkc provenance recorded in THIRD_PARTY_NOTICES.md)",
-      "path": "misaki/g2pkc/utils.py",
-      "sha256": "4fc55b1cdee023b48ba5b91f7a628e9c0bb573ed618d942d8e50519bb4f9a4a5"
+      "path": "misaki/g2pkc/utils.py"
     }
   ],
   "upstreamCommit": "fba1236595f2d2bf21d414ba6e57d25256afada3",

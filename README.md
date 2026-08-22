@@ -8,13 +8,11 @@ Misaki 0.9.4 at commit
 `PORTING_STATUS.md` are checked with exact JSONL fixtures exported from
 Python.
 
-Python is used only by repository-local development tooling: the pinned
-upstream oracle, read-only fixture verification, and deterministic generated-
-data checks. The published root library excludes those scripts, fixture tests,
-Python environments, and root fixture-generator inputs; sibling adapter build
-manifests needed by their published offline builders remain included.
-Conversion and consumer use require no Python; the full repository test suite
-does provision Python to check generator reproducibility.
+Python is used only by repository-local development tooling for the pinned
+upstream oracle and read-only fixture verification. The published root library
+excludes those scripts, fixture tests, and Python environments; sibling adapter
+build manifests needed by their published offline builders remain included.
+Conversion and consumer use require no Python.
 
 This package is under active pre-1.0 development. Japanese is the primary
 mobile target: the Kokoro-default Cutlet mode now has a vendored, reproducible
@@ -555,10 +553,9 @@ dart pub publish --dry-run
 
 Python fixture generation is a separate, explicit workflow under
 `tool/reference/`; parity tests consume committed fixtures rather than
-regenerating expected results. Some repository data-integrity tests invoke
-standard-library Python generators in read-only `--check` mode. Porting
-decisions and provenance are recorded in [PORTING_NOTES.md](PORTING_NOTES.md)
-and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+regenerating expected results. Porting decisions and provenance are recorded
+in [PORTING_NOTES.md](PORTING_NOTES.md) and
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 The manifest-driven read-only aggregate currently verifies 431 cases across
 17 accepted fixture files, with separate interpreters for English transformer,
 transformer-plus-eSpeak, Cutlet, and the combined Chinese/English callback

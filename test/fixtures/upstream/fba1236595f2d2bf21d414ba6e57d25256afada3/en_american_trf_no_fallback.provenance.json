@@ -13,16 +13,13 @@
   },
   "caseCount": 38,
   "caseCorpus": "tool/reference/cases/en_american_trf_no_fallback.jsonl",
-  "caseCorpusSha256": "10e7dd90c1c9a27e2f9eae2c16f10037636361c76b030c87027a65bb2bf0c04d",
   "dependencyLock": "tool/reference/requirements-en-trf-py312.txt",
-  "dependencyLockSha256": "ba6ff423296bb16365a4c5093234648ba7d683826b4c81b478d5d0036f60d7ba",
   "fallbackPolicy": {
     "constructorArgument": "truthy _DisabledFallback callable",
     "effectiveFallback": null,
     "mode": "american-no-fallback"
   },
   "fixture": "en_american_trf_no_fallback.jsonl",
-  "fixtureSha256": "67a04546f6b9e85e01459f1ea2a5666d44613865d1d0125fcb79d9c3e43a3e16",
   "generatedBy": "tool/reference/export_fixtures.py",
   "model": {
     "distribution": "en-core-web-trf",
@@ -46,23 +43,19 @@
   "sourceFiles": [
     {
       "license": "Apache-2.0 (pinned upstream repository)",
-      "path": "misaki/en.py",
-      "sha256": "a9c36c90a3fa6c6084e9042fd8e19f6049add4f1435d8fe5ca1b77f3529a98f4"
+      "path": "misaki/en.py"
     },
     {
       "license": "Apache-2.0 (pinned upstream repository)",
-      "path": "misaki/token.py",
-      "sha256": "5ff6ce45da6766cdc1e3d5c91b0b2b093d912b8df6f2da327af56f88ad43f073"
+      "path": "misaki/token.py"
     },
     {
       "license": "Apache-2.0 (author-published hexgrad/misaki dataset revision b65a6b4398e053983b9c360f0682b720e362859d)",
-      "path": "misaki/data/us_gold.json",
-      "sha256": "dc414872a49a28ae6c141463d502fd945f3b2fde040484fdc47d00cc4612686f"
+      "path": "misaki/data/us_gold.json"
     },
     {
       "license": "Apache-2.0 (author-published hexgrad/misaki dataset revision b65a6b4398e053983b9c360f0682b720e362859d)",
-      "path": "misaki/data/us_silver.json",
-      "sha256": "de8f67be911bb6c659187b4a65fd966b6a30e56350e0f790d763210b053ac475"
+      "path": "misaki/data/us_silver.json"
     }
   ],
   "upstreamCommit": "fba1236595f2d2bf21d414ba6e57d25256afada3",

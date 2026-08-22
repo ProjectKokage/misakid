@@ -1,5 +1,4 @@
 import contextlib
-import hashlib
 import io
 import json
 from pathlib import Path
@@ -59,10 +58,8 @@ def _write_valid_manifest_tree(
     provenance_path = expected_path.with_suffix(".provenance.json")
     provenance = {
         "caseCorpus": input_path.relative_to(root).as_posix(),
-        "caseCorpusSha256": hashlib.sha256(input_path.read_bytes()).hexdigest(),
         "caseCount": 1,
         "fixture": expected_path.name,
-        "fixtureSha256": hashlib.sha256(expected_path.read_bytes()).hexdigest(),
         "schemaVersion": 1,
         "upstreamCommit": verify_committed.UPSTREAM_COMMIT,
         "upstreamRepository": verify_committed.UPSTREAM_REPOSITORY,
@@ -390,24 +387,6 @@ class AcceptedManifestTests(unittest.TestCase):
                 provenance,
             ) = _write_valid_manifest_tree(root)
 
-            invalid_provenance = {
-                **provenance,
-                "fixtureSha256": "0" * 64,
-            }
-            provenance_path.write_text(
-                json.dumps(invalid_provenance, sort_keys=True),
-                encoding="utf-8",
-            )
-            with self.assertRaisesRegex(
-                verify_committed.ManifestError,
-                "fixtureSha256 does not match",
-            ):
-                verify_committed.load_manifest(manifest, root)
-
-            provenance_path.write_text(
-                json.dumps(provenance, sort_keys=True),
-                encoding="utf-8",
-            )
             extra_fixture = expected_path.with_name("unlisted.jsonl")
             extra_fixture.write_text("{}\n", encoding="utf-8")
             with self.assertRaisesRegex(

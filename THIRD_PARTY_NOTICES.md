@@ -9,10 +9,10 @@ The Dart implementation now contains pure-Dart adaptations of the Japanese
 number converter and pyopenjtalk-style rendering pipeline; English pipeline
 stages; Chinese transcription, legacy rendering, and text normalization; and
 the Korean rule pipeline, Vietnamese cleaner/phonology pipeline, and Hebrew
-backend boundary. The repository includes
-exact canonical copies and deterministic pure-Dart runtime embeddings of the
-four Apache-licensed English lexicons, the reviewed Vietnamese dictionaries
-and tables, and Unicode 15 normalization and scalar property data, plus
+backend boundary. The repository includes pure-Dart runtime tables derived
+from the four Apache-licensed English lexicons, the reviewed Vietnamese
+dictionaries and tables, and Unicode 15 normalization and scalar property
+data, plus
 executable-reference tooling and derived parity fixtures. It contains no model,
 compiled native artifact, or bundled external dictionary. The pure root
 package has no production Pub dependency; optional sibling adapters use the
@@ -332,10 +332,9 @@ present in either reviewed subtree.
 This resolves the Korean code-and-data license blocker for material derived
 from these exact files. A Dart adaptation must identify the two source
 revisions above, carry a prominent modification notice, retain applicable
-attribution, and keep the root Apache License. This package now includes Dart
-adaptations of those files plus byte-for-byte canonical copies of
-`idioms.txt` and `table.csv` under `tool/upstream_data/`; runtime tables are
-deterministically generated from those checksum-pinned inputs.
+attribution, and keep the root Apache License. This package includes Dart
+adaptations and committed runtime tables derived from those files. Their
+upstream revisions and licenses remain recorded here.
 
 The optional `packages/misakid_mecab_ko` adapter does not reuse the opaque
 wheel dylib from the feasibility proof. Its offline verifier accepts only the
@@ -643,9 +642,9 @@ underthesea parity.
 
 The Viphoneme, CodeLinkIO, and Vinorm reviews resolve the other named
 Vietnamese code/data sources subject to retaining the notices below and
-prominent modification notices. The Dart library now includes adaptations of
-the reviewed Viphoneme and cleaner stages, deterministic generated runtime
-tables, and byte-for-byte canonical generator inputs under `tool/`.
+prominent modification notices. The Dart library includes adaptations of the
+reviewed Viphoneme and cleaner stages plus committed runtime tables derived
+from them.
 
 ##### CodeLinkIO cleaner MIT notice
 
@@ -865,39 +864,29 @@ alter the provenance blocker above or establish support for the named model.
 
 #### Unicode 14/15 normalization, case, and scalar-property data
 
-The pure-Dart NFC/NFKC runtime contains generated normalization and scalar
+The pure-Dart NFC/NFKC runtime contains derived normalization and scalar
 property data corresponding exactly to the Unicode Character Database 15.0.0
-used by CPython 3.12.11. The
-canonical derived JSON, deterministic extractor/generator identities, counts,
-and SHA-256 values are recorded in
-`tool/upstream_data/python-3.12.11-unicode-15.0.0/manifest.json`. No Python
-runtime or `unorm_dart` code is distributed or invoked by the package.
+used by CPython 3.12.11. Focused tests cover the committed tables' behavior.
+No Python runtime or `unorm_dart` code is distributed or invoked by the
+package.
 The pure-Dart spaCy adapter adds a separate accepted capture of CPython
 3.12.11's `str.lower`, `str.isspace`, Unicode `re` word class, and internal
 alphabetic, digit, uppercase, cased, and case-ignorable predicates. Its
-canonical `spacy_unicode_tables.json` has SHA-256
-`1e7928f616c36560748f466b047720011faa0c49db1b459a443eec318e01da6f`
-and decoded behavior digest
+decoded behavior digest is
 `68d7a4099fb5f72477218518178e89c1e8446b65dfdb2790f4747efb11bf4ffc`.
-The same manifest records the checksum-pinned CPython 3.12.11 executable,
-extractor, deterministic generator, counts, generated runtime, and
-reproducibility test. CPython is covered by the Python Software Foundation
-License Version 2; no CPython source or binary is redistributed.
+CPython is covered by the Python Software Foundation License Version 2; no
+CPython source or binary is redistributed.
 Vietnamese's CPython-3.11.15/Unicode-14 NFC candidate reuses those stable
 canonical tables and carries the complete reviewed delta: ten Unicode-15
 combining marks are treated as unassigned class-zero starters. Exhaustive
 scalar and sequence digests cover both database versions; the exact-3.11.13
 comparison remains a support gate.
 
-Vietnamese lower/upper/whitespace behavior also uses a separately accepted
-CPython-3.11.15/Unicode-14 candidate payload under
-`tool/upstream_data/python-3.11-unicode-14.0.0/manifest.json`. It records all
-non-identity mappings and the Cased/Case_Ignorable ranges required for
-context-sensitive Final_Sigma behavior. The generated runtime is 74 KB;
-normal package use neither invokes Python nor reads the canonical JSON.
-The manifest marks exact CPython 3.11.13 verification pending and pins the
-separate comparator that must pass before these tables are treated as target
-oracle evidence.
+Vietnamese lower/upper/whitespace behavior uses separately accepted
+CPython-3.11.15/Unicode-14 candidate tables. They include all non-identity
+mappings and the Cased/Case_Ignorable ranges required for context-sensitive
+Final_Sigma behavior. Exact CPython 3.11.13 verification remains pending
+before these tables are treated as target-oracle evidence.
 
 Unicode data files are licensed under Unicode License v3 (Unicode-3.0). The
 complete applicable notice is:

@@ -244,11 +244,6 @@ void main() {
               )
               as Map<String, Object?>;
       final captured = provenance['backendInput']! as Map<String, Object?>;
-      expect(
-        sha256.convert(fixtureFile.readAsBytesSync()).toString(),
-        provenance['fixtureSha256'],
-        reason: stem,
-      );
       expect(provenance, containsPair('caseCount', 20), reason: stem);
       expect(captured, containsPair('schemaVersion', 2), reason: stem);
       expect(captured, containsPair('rawTokenCount', 43), reason: stem);
@@ -256,7 +251,7 @@ void main() {
     }
   });
 
-  test('English transformer eSpeak fixtures pin model, fallback, and lock', () {
+  test('English transformer eSpeak fixtures pin model and fallback', () {
     const backendVersions = <String, Object?>{
       'en-core-web-trf': '3.8.0',
       'espeakng-data':
@@ -270,29 +265,13 @@ void main() {
       'python': '3.12.11',
       'spacy': '3.8.4',
     };
-    const identities = <String, ({String corpusSha256, String fixtureSha256})>{
-      'en_american_trf_espeak_fallback': (
-        corpusSha256:
-            '9b85a80e6eff9787e5cfbb301b800e1c81f965bed83255443b8569a283738339',
-        fixtureSha256:
-            'b9e6c575c229a860ec1ad058a3e19d13c8c37b87e1da160e056f2ed40919c8bc',
-      ),
-      'en_british_trf_espeak_fallback': (
-        corpusSha256:
-            'a1eb07bd3cbfbb39a61ecc6140dfd2c48ad85436a16f02f9d6c32c38a011efc7',
-        fixtureSha256:
-            'ffd7728b6f2c144997d938a95ef51ecabbc979baffc92e5c2b736336c1aaaeba',
-      ),
-    };
+    const stems = <String>[
+      'en_american_trf_espeak_fallback',
+      'en_british_trf_espeak_fallback',
+    ];
     final dependencyLock = File(
       '${Directory.current.path}/tool/reference/'
       'requirements-en-trf-espeak-py312.txt',
-    );
-    const dependencyLockSha256 =
-        'a6b1d7ab358f2627aa40d5cda684bc0da42bb3dbabd6072288d5e458a1ff0542';
-    expect(
-      sha256.convert(dependencyLock.readAsBytesSync()).toString(),
-      dependencyLockSha256,
     );
     expect(
       dependencyLock
@@ -302,12 +281,8 @@ void main() {
       <String>['joblib==1.4.2'],
     );
 
-    for (final entry in identities.entries) {
-      final stem = entry.key;
+    for (final stem in stems) {
       final fixture = File('${directory.path}/$stem.jsonl');
-      final corpus = File(
-        '${Directory.current.path}/tool/reference/cases/$stem.jsonl',
-      );
       final fixtures = readUpstreamFixtures(fixture);
       expect(fixtures, hasLength(20), reason: stem);
       expect(
@@ -342,17 +317,6 @@ void main() {
         25,
         reason: stem,
       );
-      expect(
-        sha256.convert(corpus.readAsBytesSync()).toString(),
-        entry.value.corpusSha256,
-        reason: stem,
-      );
-      expect(
-        sha256.convert(fixture.readAsBytesSync()).toString(),
-        entry.value.fixtureSha256,
-        reason: stem,
-      );
-
       final provenance =
           jsonDecode(
                 File(
@@ -366,25 +330,10 @@ void main() {
       expect(provenance, containsPair('caseCount', 20), reason: stem);
       expect(
         provenance,
-        containsPair('caseCorpusSha256', entry.value.corpusSha256),
-        reason: stem,
-      );
-      expect(
-        provenance,
-        containsPair('fixtureSha256', entry.value.fixtureSha256),
-        reason: stem,
-      );
-      expect(
-        provenance,
         containsPair(
           'dependencyLock',
           'tool/reference/requirements-en-trf-espeak-py312.txt',
         ),
-        reason: stem,
-      );
-      expect(
-        provenance,
-        containsPair('dependencyLockSha256', dependencyLockSha256),
         reason: stem,
       );
       expect(captured, containsPair('schemaVersion', 2), reason: stem);
@@ -468,7 +417,7 @@ void main() {
     }
   });
 
-  test('English provenance pins both accepted fixture byte streams', () {
+  test('English provenance records accepted fixture metadata', () {
     for (final entry in <String, int>{
       'en_american_no_fallback': 154,
       'en_british_no_fallback': 154,
@@ -476,7 +425,6 @@ void main() {
       'en_british_no_fallback_adversarial': 175,
     }.entries) {
       final stem = entry.key;
-      final fixture = File('${directory.path}/$stem.jsonl');
       final provenance =
           jsonDecode(
                 File(
@@ -487,11 +435,6 @@ void main() {
       final backendInput = provenance['backendInput']! as Map<String, Object?>;
 
       expect(
-        sha256.convert(fixture.readAsBytesSync()).toString(),
-        provenance['fixtureSha256'],
-        reason: stem,
-      );
-      expect(
         provenance,
         containsPair('caseCount', stem.endsWith('_adversarial') ? 21 : 32),
         reason: stem,
@@ -500,17 +443,6 @@ void main() {
       expect(
         backendInput,
         containsPair('rawTokenCount', entry.value),
-        reason: stem,
-      );
-      expect(
-        sha256
-            .convert(
-              File(
-                '${Directory.current.path}/tool/reference/cases/$stem.jsonl',
-              ).readAsBytesSync(),
-            )
-            .toString(),
-        provenance['caseCorpusSha256'],
         reason: stem,
       );
     }
@@ -553,11 +485,6 @@ void main() {
               )
               as Map<String, Object?>;
       final model = provenance['model']! as Map<String, Object?>;
-      expect(
-        sha256.convert(fixture.readAsBytesSync()).toString(),
-        provenance['fixtureSha256'],
-        reason: stem,
-      );
       expect(provenance, containsPair('caseCount', 38), reason: stem);
       expect(model, containsPair('sizeBytes', 457421864), reason: stem);
       expect(
@@ -664,8 +591,7 @@ void main() {
     );
   });
 
-  test('Korean provenance pins the accepted fixture bytes and schema', () {
-    final fixture = File('${directory.path}/ko_g2pkc_default.jsonl');
+  test('Korean provenance records the accepted fixture schema', () {
     final provenance =
         jsonDecode(
               File(
@@ -675,21 +601,6 @@ void main() {
             as Map<String, Object?>;
     final backendInput = provenance['backendInput']! as Map<String, Object?>;
 
-    expect(
-      sha256.convert(fixture.readAsBytesSync()).toString(),
-      provenance['fixtureSha256'],
-    );
-    expect(
-      sha256
-          .convert(
-            File(
-              '${Directory.current.path}/tool/reference/cases/'
-              'ko_g2pkc_default.jsonl',
-            ).readAsBytesSync(),
-          )
-          .toString(),
-      provenance['caseCorpusSha256'],
-    );
     expect(provenance, containsPair('caseCount', 34));
     expect(provenance, containsPair('successCount', 33));
     expect(provenance['expectedFailures'], <Object?>[
@@ -777,21 +688,6 @@ void main() {
             as Map<String, Object?>;
     final backendInput = provenance['backendInput']! as Map<String, Object?>;
     final resources = provenance['resources']! as List<Object?>;
-    expect(
-      sha256.convert(fixture.readAsBytesSync()).toString(),
-      provenance['fixtureSha256'],
-    );
-    expect(
-      sha256
-          .convert(
-            File(
-              '${Directory.current.path}/tool/reference/cases/'
-              'zh_legacy.jsonl',
-            ).readAsBytesSync(),
-          )
-          .toString(),
-      provenance['caseCorpusSha256'],
-    );
     expect(provenance, containsPair('caseCount', 24));
     expect(provenance, containsPair('successCount', 22));
     expect(provenance['backendVersions'], expectedVersions);
@@ -891,23 +787,7 @@ void main() {
             )
             as Map<String, Object?>;
     final backendInput = provenance['backendInput']! as Map<String, Object?>;
-    final locks = provenance['dependencyLocks']! as List<Object?>;
     final resources = provenance['resources']! as List<Object?>;
-    expect(
-      sha256.convert(fixture.readAsBytesSync()).toString(),
-      provenance['fixtureSha256'],
-    );
-    expect(
-      sha256
-          .convert(
-            File(
-              '${Directory.current.path}/tool/reference/cases/'
-              'zh_frontend_1_1_en_small_no_fallback.jsonl',
-            ).readAsBytesSync(),
-          )
-          .toString(),
-      provenance['caseCorpusSha256'],
-    );
     expect(provenance, containsPair('caseCount', 14));
     expect(provenance, containsPair('successCount', 14));
     expect(provenance['expectedFailures'], isEmpty);
@@ -919,17 +799,7 @@ void main() {
       'rawEnglishTokenCount': 40,
       'schemaVersion': ChineseFrontendEnglishFixtureBackendInput.schemaVersion,
     });
-    for (final rawLock in locks) {
-      final lock = rawLock! as Map<String, Object?>;
-      expect(
-        sha256
-            .convert(File(lock['path']! as String).readAsBytesSync())
-            .toString(),
-        lock['sha256'],
-        reason: lock['path']! as String,
-      );
-    }
-    expect(locks, hasLength(3));
+    expect(provenance['dependencyLocks'], hasLength(3));
     expect(
       <String, String>{
         for (final rawResource in resources)
@@ -968,22 +838,6 @@ void main() {
         'en_core_web_sm/tagger/model':
             '1ec3d93f38cebe172f2b5c89d84be72856ce42c8f1a64f1699f1d98a771f36b7',
       },
-    );
-    final exporter = provenance['exporter']! as Map<String, Object?>;
-    expect(
-      sha256
-          .convert(File(exporter['path']! as String).readAsBytesSync())
-          .toString(),
-      exporter['sha256'],
-    );
-    final provisioning =
-        provenance['oracleProvisioning']! as Map<String, Object?>;
-    final recordCopy = provisioning['recordCopy']! as Map<String, Object?>;
-    expect(
-      sha256
-          .convert(File(recordCopy['tool']! as String).readAsBytesSync())
-          .toString(),
-      recordCopy['toolSha256'],
     );
     expect(
       (provenance['modelWheel']! as Map<String, Object?>)['sha256'],

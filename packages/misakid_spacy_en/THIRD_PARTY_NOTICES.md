@@ -96,22 +96,15 @@ Thinc hash behavior used by the pinned model.
 ## Unicode data
 
 Generated CPython 3.12.11 property/case tables correspond to Unicode 15.0.0.
-They were captured from the checksum-pinned CPython executable
-`1699bf8aa705a8bb71613bef5cdd7d7c8c9d9a188a841f41679aa9b5830b8f60`
-using `str.lower`, `str.isspace`, Unicode `re` word semantics, and CPython's
+They were captured from CPython 3.12.11 using `str.lower`, `str.isspace`,
+Unicode `re` word semantics, and CPython's
 internal alphabetic, digit, uppercase, cased, and case-ignorable predicates.
-The canonical JSON is
-`tool/upstream_data/python-3.12.11-unicode-15.0.0/spacy_unicode_tables.json`
-(SHA-256
-`1e7928f616c36560748f466b047720011faa0c49db1b459a443eec318e01da6f`),
-with decoded behavior digest
+The committed tables have decoded behavior digest
 `68d7a4099fb5f72477218518178e89c1e8446b65dfdb2790f4747efb11bf4ffc`.
-Its extractor, deterministic Dart generator, exact counts, and generated
-runtime identity are recorded in the adjacent repository manifest. Normal
-package use does not invoke Python or read the canonical JSON. CPython 3.12.11
-is distributed under the Python Software Foundation License Version 2; no
-CPython source or binary is redistributed by this package. Unicode data is
-licensed under Unicode License v3 (`Unicode-3.0`).
+Normal package use does not invoke Python. CPython 3.12.11 is distributed under
+the Python Software Foundation License Version 2; no CPython source or binary
+is redistributed by this package. Unicode data is licensed under Unicode
+License v3 (`Unicode-3.0`).
 
 ```text
 UNICODE LICENSE V3 COPYRIGHT AND PERMISSION NOTICE

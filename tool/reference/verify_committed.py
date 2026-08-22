@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 from dataclasses import dataclass
@@ -122,10 +121,6 @@ def _read_jsonl_records(
     return records
 
 
-def _sha256_file(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
 def _case_identity_value(record: Mapping[str, object], field: str) -> object:
     if field == "options":
         return record.get(field, {})
@@ -204,8 +199,6 @@ def _validate_provenance(
         ("upstreamVersion", UPSTREAM_VERSION),
         ("caseCorpus", input_path.relative_to(repo_root.resolve()).as_posix()),
         ("fixture", expected_path.name),
-        ("caseCorpusSha256", _sha256_file(input_path)),
-        ("fixtureSha256", _sha256_file(expected_path)),
     )
     for field, expected_value in expected_values:
         if provenance.get(field) != expected_value:

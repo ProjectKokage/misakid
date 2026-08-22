@@ -26,9 +26,7 @@
   },
   "caseCount": 24,
   "caseCorpus": "tool/reference/cases/ja_pyopenjtalk.jsonl",
-  "caseCorpusSha256": "a1d3b63d72350f8838fe8e85a702d8b2b5c1053194b7c57565418b646a771606",
   "dependencyLock": "tool/reference/requirements-ja-py312.txt",
-  "dependencyLockSha256": "7ec600135bd3b0084489c9b0e71dac8e5e8bcf4f70680c748101ca4f7b45ddf5",
   "dictionary": {
     "archiveSha256": "fe6ba0e43542cef98339abdffd903e062008ea170b04e7e2a35da805902f382a",
     "archiveSizeBytes": 23646843,
@@ -49,22 +47,18 @@
     }
   ],
   "exporter": "tool/reference/export_fixtures.py",
-  "exporterSha256": "4e6292596ee8cfa3d3296971dcc830dc77cf44bddbfef708e0fc34a29def4be0",
   "fixture": "ja_pyopenjtalk.jsonl",
-  "fixtureSha256": "fb9832f6f4a62187d119f7acceca8e432004d1c069326fb239899a752b5e2b7e",
   "pyopenjtalkPackageMetadataSha256": "254a4a539c336ab36019e8baa83062b8c6874bc51a8648a47e8995eae56bd2c6",
   "pythonVersion": "3.12.11",
   "schemaVersion": 1,
   "sourceFiles": [
     {
       "license": "Apache-2.0 (pinned upstream repository)",
-      "path": "misaki/ja.py",
-      "sha256": "5870e02433629475e95eaa0b023ac4948a9335e3dafbda0b6641156516c03c22"
+      "path": "misaki/ja.py"
     },
     {
       "license": "Apache-2.0 (pinned upstream repository)",
-      "path": "misaki/token.py",
-      "sha256": "5ff6ce45da6766cdc1e3d5c91b0b2b093d912b8df6f2da327af56f88ad43f073"
+      "path": "misaki/token.py"
     }
   ],
   "successCount": 23,

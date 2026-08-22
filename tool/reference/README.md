@@ -358,20 +358,10 @@ No English behavior is substituted. Dependency checks, import, initialization,
 tokenization, and conversion run under a rejecting network guard.
 
 The production Dart cleaner does not delegate observable case conversion to
-the host runtime. Its candidate Unicode-14 lower/upper, whitespace, and
-Final_Sigma tables were exported from CPython 3.11.15 and can be reproduced
-only with that exact runtime:
-
-```sh
-python3.11 tool/reference/export_python311_case.py \
-  --output tool/upstream_data/python-3.11-unicode-14.0.0/case_maps.json \
-  --check
-dart run tool/generators/generate_python311_case.dart --check
-```
-
-Changing the accepted JSON requires the exporter's explicit `--accept` flag
-and review of the manifest counts and exhaustive digests. It is derived
-Unicode behavior, not a Vietnamese phoneme golden.
+the host runtime. Its committed Unicode-14 lower/upper, whitespace, and
+Final_Sigma tables capture CPython 3.11.15 behavior. Focused exhaustive-digest
+tests cover those tables; they are derived Unicode behavior, not a Vietnamese
+phoneme golden.
 
 The locked target remains CPython 3.11.13. Once that runtime is provisioned,
 the target check is:

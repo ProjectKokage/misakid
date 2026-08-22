@@ -50,12 +50,6 @@ jobs:
           test "$(wc -c < "$MISAKID_SPACY_EN_MODEL_DIR/tagger/model")" = 19829
           test "$(sha256sum "$MISAKID_SPACY_EN_MODEL_DIR/tagger/model" | cut -d ' ' -f 1)" = 1ec3d93f38cebe172f2b5c89d84be72856ce42c8f1a64f1699f1d98a771f36b7
       - run: dart pub get
-      - name: Check deterministic Unicode data generation
-        run: |
-          python tool/reference/export_python312_spacy_unicode.py \
-            --output tool/upstream_data/python-3.12.11-unicode-15.0.0/spacy_unicode_tables.json \
-            --check
-          dart run tool/generators/generate_python312_spacy_unicode.dart --check
       - name: Analyze and document the adapter
         working-directory: packages/misakid_spacy_en
         run: |

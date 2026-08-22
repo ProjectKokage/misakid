@@ -1,14 +1,7 @@
-// GENERATED FILE. DO NOT EDIT.
-// Generator: tool/generators/generate_vietnamese_cleaner_tables.py
+// DERIVED DATA. Review behavior tests before editing.
 // Upstream: hexgrad/misaki fba1236595f2d2bf21d414ba6e57d25256afada3 (0.9.4)
 // Sources/licenses: Viphoneme, CodeLinkIO, and Vinorm; see
 // THIRD_PARTY_NOTICES.md. The unlicensed num2vi.py is excluded.
-// abbreviation_vi.py SHA-256: c027efb3cfc19911d1e5b50c07704a82b2372d86aadd0bd370351341e07d407e
-// acronym_vi.py SHA-256: c8666d780b61f2423b71d18fd96b6bc8aa686c532d82a6bab7e9515612c286dd
-// currency_vi.py SHA-256: 1e27d758a8556092c69cbafa660b3792fcbcbe0da92447428d0d63c2cee7009a
-// letter_vi.py SHA-256: 281b8fc3b068b6a293b2e3635f395226be10038a0f82965f886f1277fedc9cfc
-// measurement_vi.py SHA-256: 44eea187ec67e8329f2c486411b5d5c03d0bc7c366246e2c85378c9d1f7d9710
-// symbol_vi.py SHA-256: dfe4a22e17a432ee00f24842a6ee08063a3b3e4a1fb1c738d813f53ed6dbb405
 
 // dart format off
 /// Pinned cleaner table `_abbreviations_vi` from `abbreviation_vi.py`.

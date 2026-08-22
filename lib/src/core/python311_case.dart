@@ -2,8 +2,7 @@
 // for the pinned 3.11.13 Vietnamese oracle.
 //
 // This is host-independent and preserves isolated UTF-16 surrogates. The
-// generated tables and Final_Sigma properties come from the accepted CPython
-// reference export in tool/upstream_data/.
+// tables and Final_Sigma properties capture the accepted CPython behavior.
 
 import '../generated/python311_case_data.dart';
 

@@ -31,7 +31,6 @@
   },
   "caseCount": 26,
   "caseCorpus": "tool/reference/cases/zh_frontend_1_1.jsonl",
-  "caseCorpusSha256": "bef79cb256aa30ce97a56c62d20aef7f5f7b8932b24857cbf1e15de91b0502f6",
   "coverage": [
     "empty and CPython-whitespace-only fast paths",
     "traditional, full-width, punctuation, quotes, brackets, and internal whitespace",
@@ -42,7 +41,6 @@
     "rare Basic Han, supplementary Han, emoji, and variation selectors"
   ],
   "dependencyLock": "tool/reference/requirements-zh-py312.txt",
-  "dependencyLockSha256": "75ba60d6332ea92a78d4665df152a7d1fea8655c6bdfdc55280666b1bebe67ce",
   "distributions": [
     {
       "metadataSha256": "66320967996f85fa211f1216a7bf5f921d13b41b0de5db97f389daddbc54eaf4",
@@ -103,9 +101,7 @@
   },
   "expectedFailures": [],
   "exporter": "tool/reference/export_fixtures.py",
-  "exporterSha256": "1be16dede8befed73be9dbde3b8f728abffe6bc4765a2ae674ff717bed6fe3c1",
   "fixture": "zh_frontend_1_1.jsonl",
-  "fixtureSha256": "57478d39cde81f4676347cd01c9600d834f2da0f2834e4e448e7f1b4728cad5e",
   "licenses": [
     {
       "license": "Apache-2.0",
@@ -242,37 +238,31 @@
     {
       "license": "Apache-2.0 (pinned upstream repository)",
       "path": "misaki/zh.py",
-      "sha256": "97d16aec581832845d2566cb24da2ba045d4552fb65a5017a6eac8feef654c81",
       "sizeBytes": 3320
     },
     {
       "license": "Apache-2.0 adaptation of PaddleSpeech d7bf91561d5a8a025f3cfc4bd7b28368fd98d102",
       "path": "misaki/zh_frontend.py",
-      "sha256": "002023955e31c692cea2dcd0dea1836df84a9ff8dab966f5ae43ce276bdd1c0c",
       "sizeBytes": 9448
     },
     {
       "license": "Apache-2.0 adaptation of PaddleSpeech d7bf91561d5a8a025f3cfc4bd7b28368fd98d102",
       "path": "misaki/tone_sandhi.py",
-      "sha256": "2a0adc3854c137759f304417d844582d7fd902c57d84733d94137a4bc756c301",
       "sizeBytes": 20100
     },
     {
       "license": "Apache-2.0 (pinned upstream repository)",
       "path": "misaki/token.py",
-      "sha256": "5ff6ce45da6766cdc1e3d5c91b0b2b093d912b8df6f2da327af56f88ad43f073",
       "sizeBytes": 433
     },
     {
       "license": "MIT adaptation; imported by zh.py but not invoked by frontend-1.1",
       "path": "misaki/transcription.py",
-      "sha256": "14f0f1b5eb89c5b684229a30ae8b0c19c8266b537967786a2079ba887f5fbc32",
       "sizeBytes": 9354
     },
     {
       "license": "dependency resolution record for the pinned upstream repository",
       "path": "uv.lock",
-      "sha256": "52d912cb52640c6b472c40258ee9c49edb63c1397ac1fb85c0dc17ad06654bd9",
       "sizeBytes": 520905
     }
   ],

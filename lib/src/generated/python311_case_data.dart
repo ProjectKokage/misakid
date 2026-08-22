@@ -1,15 +1,8 @@
-// GENERATED FILE. DO NOT EDIT.
-// Generator: tool/generators/generate_python311_case.dart
-// Canonical source: tool/upstream_data/python-3.11-unicode-14.0.0/case_maps.json
-// Source SHA-256: f6ab81284aad17b08281af1e2619efca74aec171dfb1701796ea327b3810d9b1
+// DERIVED DATA. Review behavior tests before editing.
 // CPython 3.11.15, Unicode 14.0.0 case behavior
 
 /// Unicode data version used by the Vietnamese oracle.
 const String python311CaseUnicodeVersion = '14.0.0';
-
-/// SHA-256 of the canonical generated-table source.
-const String python311CaseSourceSha256 =
-    'f6ab81284aad17b08281af1e2619efca74aec171dfb1701796ea327b3810d9b1';
 
 /// Exhaustive scalar lowercase-output digest.
 const String python311LowercaseDigestSha256 =

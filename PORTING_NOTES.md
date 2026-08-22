@@ -4,6 +4,16 @@ This file records compatibility decisions, upstream observations, intentional
 divergences, and fixture-impacting changes. It is not a roadmap or a claim of
 support; see PORTING_STATUS.md for the current support matrix.
 
+## 2026-08-23: Retired permanent generator inputs
+
+- Removed repository copies of upstream generator inputs and the one-consumer
+  generators that produced already committed runtime tables.
+- Runtime behavior is unchanged: focused data tests, exhaustive behavior
+  digests, and accepted parity fixtures continue to cover the committed tables.
+- Upstream revisions and licensing provenance remain in this file and
+  `THIRD_PARTY_NOTICES.md`; an explicit future upstream sync may use temporary
+  extraction tooling without keeping a second source tree in Git.
+
 ## 2026-07-10: Phase 0 compliance baseline
 
 - Established hexgrad/misaki commit

@@ -5,7 +5,6 @@
   },
   "caseCount": 11,
   "caseCorpus": "tool/reference/cases/kokoro_frontend.jsonl",
-  "caseCorpusSha256": "06d3de24a7faf525c675ccbb95897f05e9ab328f1f8dec6daff3a2671647cfe5",
   "environment": {
     "networkPolicy": "No network-capable dependency was imported; Hugging Face access was replaced with a rejecting in-memory stub",
     "pythonHashSeedDependence": "none",
@@ -13,9 +12,7 @@
     "pythonVersion": "3.12.11"
   },
   "exporter": "tool/reference/export_kokoro_frontend.py",
-  "exporterSha256": "d66d3d5af129da3e8bed45e6519aaefa89f519551138931d3f1736055a41beeb",
   "fixture": "kokoro_frontend.jsonl",
-  "fixtureSha256": "c9e13cd06eb0db95523d27f0966bd16a8d45730aa0800afffe7b56f972a4ebc8",
   "oracleVerification": {
     "configuredEnglishUnknownMarker": "",
     "execution": "Loaded and executed the unmodified pinned kokoro/pipeline.py KPipeline.__init__, __call__, en_tokenize, waterfall_last, tokens_to_ps, and tokens_to_text implementations",
@@ -27,7 +24,6 @@
     {
       "license": "Apache-2.0 (pinned Kokoro repository)",
       "path": "kokoro/pipeline.py",
-      "sha256": "499982bbc23a1019681cdb4c327c1d911e7034e240721b95686ff1a8f15c2a9a",
       "sizeBytes": 18113
     }
   ],

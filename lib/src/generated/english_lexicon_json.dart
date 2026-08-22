@@ -1,15 +1,6 @@
-// GENERATED FILE. DO NOT EDIT.
-// Generator: tool/generators/generate_english_lexicons.dart
+// DERIVED DATA. Review behavior tests before editing.
 // Upstream: hexgrad/misaki fba1236595f2d2bf21d414ba6e57d25256afada3 (0.9.4)
 // Dataset: hexgrad/misaki b65a6b4398e053983b9c360f0682b720e362859d (Apache-2.0)
-// gb_gold.json SHA-256: 29e62f4b60261c88f7f3c2c7811ca3825978948090b72d2b27d565b729282f71
-// gb_silver.json SHA-256: 48131e2d92ccc41655f4543e87e0f938e71463eb5a54be7f0693bb712ebb6bce
-// us_gold.json SHA-256: dc414872a49a28ae6c141463d502fd945f3b2fde040484fdc47d00cc4612686f
-// us_silver.json SHA-256: de8f67be911bb6c659187b4a65fd966b6a30e56350e0f790d763210b053ac475
-// gbGoldLexiconJson SHA-256: 186be65d8b3f1fa8847e66358447484fbe9a03681cb5163a3246d536b0ec7c7e
-// gbSilverLexiconJson SHA-256: dff712feb32c7e287951d8bedebd966fe27a20233fa40f557feff6c0add6466f
-// usGoldLexiconJson SHA-256: acce8d48062d5d9ddbb95abf1e9a5fe3a61716c70f9cbcb514cd48d406a5388d
-// usSilverLexiconJson SHA-256: 7f90a125388084b9081108f0ca0dc64c8f448b849a8397b31ed752753663bbf8
 
 // dart format off
 /// Pinned gb_gold.json UTF-8 JSON payload, compacted.

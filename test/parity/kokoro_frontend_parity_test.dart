@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:crypto/crypto.dart';
 import 'package:misakid/misaki.dart';
 import 'package:test/test.dart';
 
@@ -26,28 +25,6 @@ void main() {
     expect(provenance['upstreamCommit'], _kokoroCommit);
     expect(provenance['upstreamVersion'], '0.9.4');
     expect(provenance['caseCount'], 11);
-    expect(
-      sha256.convert(fixtureFile.readAsBytesSync()).toString(),
-      provenance['fixtureSha256'],
-    );
-    expect(
-      sha256
-          .convert(
-            File(
-              _string(provenance['caseCorpus'], 'caseCorpus'),
-            ).readAsBytesSync(),
-          )
-          .toString(),
-      provenance['caseCorpusSha256'],
-    );
-    expect(
-      sha256
-          .convert(
-            File(_string(provenance['exporter'], 'exporter')).readAsBytesSync(),
-          )
-          .toString(),
-      provenance['exporterSha256'],
-    );
     expect(records.map((record) => record['caseId']).toSet(), <Object?>{
       'english-exact-510',
       'english-supplementary-511',

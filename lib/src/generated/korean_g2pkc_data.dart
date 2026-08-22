@@ -1,9 +1,6 @@
-// GENERATED FILE. DO NOT EDIT.
-// Generator: tool/generators/generate_korean_g2pkc_data.dart
+// DERIVED DATA. Review behavior tests before editing.
 // Upstream: hexgrad/misaki fba1236595f2d2bf21d414ba6e57d25256afada3 (0.9.4)
 // Source license/provenance: see THIRD_PARTY_NOTICES.md
-// idioms.txt SHA-256: d49682e430bf7743715d0510a5e1b32cd902db80fcdeaea783d9abcaec3f7ac5
-// table.csv SHA-256: 61aca8535fd75f16ca71df59bc5eeab625073edfd50732fda3f12b30ccade31f
 
 // dart format off
 /// Ordered substitutions from pinned `idioms.txt`.

@@ -26,9 +26,7 @@
   },
   "caseCount": 27,
   "caseCorpus": "tool/reference/cases/ja_cutlet.jsonl",
-  "caseCorpusSha256": "7eb170aec3e004a3457a74e245dcf8851e13cb2d2e206c844e282acda26fac10",
   "dependencyLock": "tool/reference/requirements-ja-cutlet-py312.txt",
-  "dependencyLockSha256": "e3b2766a1221e9253a5c190f4125ada6dd46771855574815907b6b0b0bf4caf4",
   "dictionary": {
     "archiveSha256": "39ea0eae3b1f10ba8986483592cbc83bcc92f1898bb43ecbc607010f2e98cd22",
     "archiveSizeBytes": 524664138,
@@ -60,9 +58,7 @@
     }
   ],
   "exporter": "tool/reference/export_fixtures.py",
-  "exporterSha256": "3cefd07402b6eaa5ce1da9f4182d58c81b645cf00dab704dd40bfcb9a51a3e66",
   "fixture": "ja_cutlet.jsonl",
-  "fixtureSha256": "c599ac58455263a9c9e100f175e9eaa07d1b9e77194a075dea6d02d3a1627a48",
   "groupingResource": {
     "gitBlob": "fb3b5b1f87e8dcf113857f96ffe845869a616908",
     "path": "misaki/data/ja_words.txt",
@@ -89,31 +85,26 @@
     {
       "license": "Apache-2.0 (pinned Misaki repository) and adapted Cutlet MIT notice recorded in THIRD_PARTY_NOTICES.md",
       "path": "misaki/cutlet.py",
-      "sha256": "7695fc7d853ae4e99679dff4ca0c8404d4804a6fb1059a9d6ad02baeabc4d4de",
       "sizeBytes": 13809
     },
     {
       "license": "Apache-2.0 (pinned upstream repository)",
       "path": "misaki/ja.py",
-      "sha256": "5870e02433629475e95eaa0b023ac4948a9335e3dafbda0b6641156516c03c22",
       "sizeBytes": 12573
     },
     {
       "license": "MIT adaptation; exact Greatdane and Misaki provenance recorded in THIRD_PARTY_NOTICES.md",
       "path": "misaki/num2kana.py",
-      "sha256": "26ca4b39ac7165104e53971bd2459df6466ff8140e1dac836a3bf1f9e811e2d2",
       "sizeBytes": 12956
     },
     {
       "license": "External compatibility artifact; undocumented upstream prehistory and inferred Wiktionary/Kaikki lineage recorded in THIRD_PARTY_NOTICES.md",
       "path": "misaki/data/ja_words.txt",
-      "sha256": "a93a8e8aee24db307a32becb8bf01c4c2908ecf37e6c91f7a705fafdfeba67ff",
       "sizeBytes": 1921140
     },
     {
       "license": "dependency resolution record for the pinned upstream repository",
       "path": "uv.lock",
-      "sha256": "52d912cb52640c6b472c40258ee9c49edb63c1397ac1fb85c0dc17ad06654bd9",
       "sizeBytes": 520905
     }
   ],
