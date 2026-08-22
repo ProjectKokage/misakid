@@ -120,6 +120,42 @@ void main() {
     });
   });
 
+  group('KokoroAsyncEnglishG2pFrontend', () {
+    test(
+      'awaits segments in source order and preserves their indices',
+      () async {
+        final engine = _AsyncRecordingEngine((text) async {
+          await Future<void>.delayed(Duration.zero);
+          return G2pResult(
+            phonemes: 'ignored',
+            tokens: <MisakiToken>[_englishToken(text, phonemes: 'p')],
+          );
+        });
+
+        final chunks = await KokoroAsyncEnglishG2pFrontend(
+          engine: engine,
+        ).convert(' one\n\n two ');
+
+        expect(engine.inputs, <String>['one', ' two']);
+        expect(chunks.map((chunk) => chunk.graphemes), <String>['one', 'two']);
+        expect(chunks.map((chunk) => chunk.textIndex), <int>[0, 1]);
+        expect(() => chunks.clear(), throwsUnsupportedError);
+      },
+    );
+
+    test('rejects a non-empty unknown marker before conversion', () {
+      expect(
+        () => KokoroAsyncEnglishG2pFrontend(
+          engine: _AsyncRecordingEngine(
+            (_) async => G2pResult(phonemes: '', tokens: const <MisakiToken>[]),
+            unknownMarker: '❓',
+          ),
+        ),
+        throwsA(isA<InvalidConfigurationException>()),
+      );
+    });
+  });
+
   group('KokoroNonEnglishG2pFrontend', () {
     test('packs sentence units to a 400-code-point pre-G2P target', () {
       final first = '${_repeat('😀', 199)}.';
@@ -220,6 +256,22 @@ final class _RecordingEngine implements UnknownMarkerG2pEngine {
 
   @override
   G2pResult convert(String text) {
+    inputs.add(text);
+    return callback(text);
+  }
+}
+
+final class _AsyncRecordingEngine implements AsyncUnknownMarkerG2pEngine {
+  _AsyncRecordingEngine(this.callback, {this.unknownMarker = ''});
+
+  final Future<G2pResult> Function(String text) callback;
+  final List<String> inputs = <String>[];
+
+  @override
+  final String unknownMarker;
+
+  @override
+  Future<G2pResult> convert(String text) {
     inputs.add(text);
     return callback(text);
   }

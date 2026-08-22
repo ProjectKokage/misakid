@@ -1,0 +1,26 @@
+name: misakid_fonix_en
+description: Bounded Fonix ONNX Runtime adapter for Misakid English neural G2P.
+version: 0.1.0-dev.1
+publish_to: none
+
+topics:
+  - english
+  - g2p
+  - onnx
+  - phonemes
+
+environment:
+  sdk: ^3.11.5
+
+resolution: workspace
+
+dependencies:
+  crypto: ^3.0.7
+  fonix:
+    path: ../../../fonix
+  misakid: ^0.1.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  path: ^1.9.1
+  test: ^1.25.6

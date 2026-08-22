@@ -1,4 +1,4 @@
-import 'package:misakid_bart_en/src/strict_json.dart';
+import 'package:misakid/misaki.dart';
 import 'package:test/test.dart';
 
 void main() {

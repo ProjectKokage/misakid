@@ -48,3 +48,13 @@ abstract interface class EnglishFallbackBackend implements MisakiBackend {
   /// Attempts a fallback pronunciation for [token].
   EnglishPronunciation? pronounce(MisakiToken token);
 }
+
+/// Optional asynchronous context-free fallback pronunciation boundary.
+///
+/// Model- and process-backed implementations use this contract so native work
+/// never blocks the synchronous English G2P API. Implementations remain
+/// responsible for documenting their cancellation and disposal contracts.
+abstract interface class AsyncEnglishFallbackBackend implements MisakiBackend {
+  /// Attempts a fallback pronunciation for [token].
+  Future<EnglishPronunciation?> pronounce(MisakiToken token);
+}

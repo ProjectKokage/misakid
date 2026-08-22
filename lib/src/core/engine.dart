@@ -24,3 +24,12 @@ abstract interface class AsyncG2pEngine {
   /// Converts [text] into exact phoneme output and optional token details.
   Future<G2pResult> convert(String text);
 }
+
+/// An asynchronous G2P engine whose unresolved-token marker is inspectable.
+///
+/// Kokoro's English frontend uses this capability to validate its required
+/// empty-unknown-marker configuration before invoking a model-backed engine.
+abstract interface class AsyncUnknownMarkerG2pEngine implements AsyncG2pEngine {
+  /// Exact text rendered for a token that remains unresolved.
+  String get unknownMarker;
+}

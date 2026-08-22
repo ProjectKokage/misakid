@@ -118,6 +118,46 @@ final class KokoroEnglishG2pFrontend {
   }
 }
 
+/// Kokoro 0.9.4's token-aware English frontend for asynchronous G2P engines.
+///
+/// This has the same segmentation, token reconstruction, punctuation
+/// waterfall, and 510-code-point limits as [KokoroEnglishG2pFrontend]. It
+/// processes default line-feed segments in source order and awaits each exact
+/// token result before chunking it.
+final class KokoroAsyncEnglishG2pFrontend {
+  /// Creates an asynchronous English frontend backed by [engine].
+  KokoroAsyncEnglishG2pFrontend({required this.engine}) {
+    if (engine.unknownMarker.isNotEmpty) {
+      throw InvalidConfigurationException(
+        'Kokoro 0.9.4 English G2P requires an empty unknown marker; '
+        'the configured engine uses `${engine.unknownMarker}`.',
+      );
+    }
+  }
+
+  /// Exact asynchronous English G2P engine used for each source segment.
+  final AsyncUnknownMarkerG2pEngine engine;
+
+  /// Converts [text] into immutable Kokoro-compatible English chunks.
+  Future<List<KokoroG2pChunk>> convert(String text) async {
+    final chunks = <KokoroG2pChunk>[];
+    final segments = _splitDefaultSegments(text);
+    for (var textIndex = 0; textIndex < segments.length; textIndex++) {
+      final segment = segments[textIndex];
+      if (_pythonStrip(segment).isEmpty) {
+        continue;
+      }
+      chunks.addAll(
+        KokoroEnglishG2pFrontend.chunkResult(
+          await engine.convert(segment),
+          textIndex: textIndex,
+        ),
+      );
+    }
+    return List<KokoroG2pChunk>.unmodifiable(chunks);
+  }
+}
+
 /// Kokoro 0.9.4's pre-G2P chunking contract for non-English languages.
 ///
 /// Unlike [KokoroEnglishG2pFrontend], this frontend groups source sentences to

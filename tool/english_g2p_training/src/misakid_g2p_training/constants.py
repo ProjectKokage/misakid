@@ -1,0 +1,22 @@
+"""Frozen training and runtime contract constants."""
+
+UPSTREAM_COMMIT = "fba1236595f2d2bf21d414ba6e57d25256afada3"
+UPSTREAM_VERSION = "0.9.4"
+ARCHITECTURE = "misakid-conv-ctc-v1"
+DIALECT = "en-US"
+NORMALIZATION = "none"
+MODEL_FILE = "model.onnx"
+INPUT_NAME = "grapheme_ids"
+OUTPUT_NAME = "logits"
+MAXIMUM_GRAPHEMES = 64
+SLOTS_PER_GRAPHEME = 8
+MAXIMUM_BATCH_SIZE = 1
+ONNX_OPSET = 17
+SEED = 1729
+
+CHANNELS = 96
+DILATIONS = (1, 2, 4, 8, 1)
+DROPOUT = 0.1
+
+MINIMUM_WORD_ACCURACY = 0.55
+MAXIMUM_PHONE_ERROR_RATE = 0.12

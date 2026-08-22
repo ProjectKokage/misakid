@@ -6,8 +6,6 @@ import 'dart:typed_data';
 
 import 'package:misakid/misaki.dart';
 
-import 'strict_json.dart';
-
 const Set<String> _allowedConfigKeys = <String>{
   'activation_dropout',
   'activation_function',

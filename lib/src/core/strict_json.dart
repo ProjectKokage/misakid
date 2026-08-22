@@ -4,7 +4,7 @@
 /// Decodes bounded JSON while rejecting duplicate object keys.
 ///
 /// Dart's standard decoder intentionally keeps the last duplicate key. Model
-/// resources are untrusted, so this package uses a small strict parser instead.
+/// resources are untrusted, so Misakid uses a small strict parser instead.
 Object? decodeStrictJson(String source) => _StrictJsonParser(source).parse();
 
 const int _maximumJsonDepth = 32;

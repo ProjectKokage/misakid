@@ -6,8 +6,6 @@ import 'dart:typed_data';
 
 import 'package:misakid/misaki.dart';
 
-import 'strict_json.dart';
-
 const int _maximumSafetensorsHeaderBytes = 1024 * 1024;
 const int _maximumSafetensorsTensorCount = 128;
 const int _maximumSafetensorsRank = 4;

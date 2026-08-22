@@ -749,6 +749,22 @@ domain provenance, and the applicable Unicode/CPython notices. The four
 consumed model-file sizes and hashes are fixed in that package's
 `RESOURCE_MANIFEST.md` and checked before parsing.
 
+#### App-owned en-US neural fallback and Fonix adapter
+
+The repository-owned `tool/english_g2p_training` project trains the
+`misakid-conv-ctc-v1` graph only from the exact pinned `us_silver.json` and
+`us_gold.json` inputs identified above. Those author-published inputs declare
+Apache-2.0. Gold `DEFAULT` pronunciations override exact silver spellings;
+case-fold-equivalent spellings remain in the same deterministic split. No
+eSpeak, PeterReid weight, or unrecorded corpus is used.
+
+The optional `misakid_fonix_en` package is original Apache-2.0 Misakid adapter
+code and redistributes no model or runtime. It depends on the project-owned
+Fonix package, whose selected repository license is GPLv3 and whose notices
+govern the ONNX Runtime selected by a consuming application. Candidate model
+weights remain external to this repository and retain the source-data
+provenance and manifest emitted by the training tool.
+
 #### English eSpeak fixture oracle and adapter
 
 The accepted American and British eSpeak-fallback fixtures were produced by

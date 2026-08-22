@@ -8,12 +8,14 @@ library;
 export 'misaki.dart';
 export 'src/languages/en/backends.dart'
     show
+        AsyncEnglishFallbackBackend,
         EnglishFallbackBackend,
         EnglishPronunciation,
         EnglishPronunciationBackend,
         EnglishTokenizerBackend;
 export 'src/languages/en/context.dart' show EnglishTokenContext;
-export 'src/languages/en/engine.dart' show EnglishG2pEngine;
+export 'src/languages/en/engine.dart'
+    show AsyncEnglishG2pEngine, EnglishG2pEngine;
 export 'src/languages/en/espeak_fallback.dart'
     show EnglishEspeakBackend, EnglishEspeakFallback;
 export 'src/languages/en/inventory.dart' show englishPhonemeInventory;

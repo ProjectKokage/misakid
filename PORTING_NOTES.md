@@ -1531,6 +1531,36 @@ documented real-backend and provenance gates.
   paths, and committed fixture parity remain unverified. Neither desktop tuple
   is promoted to supported runtime status.
 
+## 2026-08-22: App-owned asynchronous en-US neural fallback
+
+- Added `AsyncEnglishG2pEngine` and `KokoroAsyncEnglishG2pFrontend`. Only the
+  unknown-word backend becomes asynchronous; deterministic lexicon,
+  preprocessing, context, rendering, token metadata, unknown-marker, and
+  Kokoro chunking behavior remain shared with the synchronous implementation.
+- Added `misakid_fonix_en`, accepting only the closed
+  `misakid-conv-ctc-v1` en-US manifest. One worker isolate owns one CPU Fonix
+  session and at most one pending request. The adapter bounds grapheme scalars,
+  copied messages, output shape, logits, and inventories; rejects unsupported
+  scalars and non-finite or malformed output; cancels and drains native work;
+  recovers after settled cancellation; and closes idempotently.
+- Added a Python 3.12 UV tooling subproject that deterministically validates,
+  merges, groups, and splits the exact pinned Apache-2.0 `us_silver.json` and
+  `us_gold.json`; trains a compact Conv-CTC graph on CPU; exports ONNX opset
+  17; verifies Torch/ONNX numerical and decoded parity; evaluates only the
+  held-out split; and atomically emits model, manifest, report, and bounded
+  parity records outside the checkout.
+- Candidate `v1-2a7c1108d14e` is 692,643 bytes with SHA-256
+  `2a7c1108d14ec0a161ef9012ce518920878268a17d0ec86a7e1eac8e9d93b005`.
+  Its independently assigned 2,187-example test split produced 1,230 exact
+  words (56.24%) and 1,774 edits across 20,069 reference phones (8.84% PER),
+  passing the frozen 55% minimum word-accuracy and 12% maximum-PER gates.
+  Torch/ORT decoded parity and the real Fonix adapter pass all 32 exported
+  cases. This validates the app-owned contract and basic function; it neither
+  claims subjective TTS quality nor parity with Misaki's PeterReid BART mode.
+- Model weights and generated reports remain external to Git. A consuming
+  application must provide an immutable distribution location and verify the
+  manifest, size, and SHA-256 before creating the adapter.
+
 ## Next parity slices
 
 - Run the Open JTalk hook and Flutter packaging on native Linux x64/arm64 and

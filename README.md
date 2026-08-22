@@ -30,7 +30,11 @@ frontend-1.1 without an English callback, and the exact frontend-1.1
 small-model/no-fallback English callback profile are supported by explicit
 pure-Dart resource packages. English American and British small-model modes are
 supported without fallback by a pure-Dart tokenizer/tagger using explicit
-`en_core_web_sm==3.8.0` resources; their eSpeak-fallback variants are supported
+`en_core_web_sm==3.8.0` resources. An app-owned asynchronous en-US neural
+fallback, its deterministic UV training/export project, and its bounded Fonix
+adapter are available for Kokage without eSpeak; this is a separate product
+profile, not parity with Misaki's PeterReid BART fallback. The eSpeak-fallback
+variants are supported
 on macOS arm64 with a second explicit native adapter. English transformer
 no-fallback and eSpeak-fallback modes are also supported on macOS arm64 with
 the exact external `en_core_web_trf==3.8.0` resources and package-owned
@@ -101,6 +105,28 @@ phones, preprocessing disabled, custom unknown markers, and both phoneme
 versions. The compiling
 [`example/english_injected.dart`](example/english_injected.dart) shows the full
 public engine with a fixed tokenizer record.
+
+`AsyncEnglishG2pEngine` preserves the same deterministic English stages while
+allowing only the unknown-word backend to be asynchronous. Its frontend,
+`KokoroAsyncEnglishG2pFrontend`, preserves Kokoro's distinct English chunking
+contract without blocking the calling isolate. The optional
+[`misakid_fonix_en`](packages/misakid_fonix_en/README.md) package implements
+that backend with one isolate-owned CPU Fonix session, one pending request,
+explicit cancellation/drain, strict manifest and ONNX identity checks, and
+bounded copied messages. Unsupported input scalars fail explicitly rather
+than being silently omitted.
+
+The repository-owned UV project at
+[`tool/english_g2p_training`](tool/english_g2p_training/README.md) trains and
+exports the `misakid-conv-ctc-v1` en-US graph solely from the exact pinned
+Apache-2.0 `us_gold.json` and `us_silver.json` inputs. The first accepted
+candidate, `v1-2a7c1108d14e`, is a 692,643-byte opset-17 ONNX graph with SHA-256
+`2a7c1108d14ec0a161ef9012ce518920878268a17d0ec86a7e1eac8e9d93b005`.
+Its independently assigned 2,187-word held-out test split measured 56.24%
+whole-word accuracy and 8.84% phone error rate, passing the frozen 55%/12%
+gates. Torch/ONNX decoded parity and the real Fonix adapter both pass the 32
+bounded exported cases. Weights and reports remain external to Git; a
+consuming application must distribute and verify the exact model separately.
 
 `englishPhonemeInventory` exposes the frozen American/British inventory for
 either rendering version. It covers built-in lexicon/eSpeak output; custom
