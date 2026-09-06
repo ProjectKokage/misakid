@@ -37,8 +37,10 @@ fallback call to settle. close() invalidates ownership first, cancels and
 drains active work, closes the worker session, and is idempotent. The same
 backend remains usable after a settled cancellation until it is closed.
 
-Normal tests use copied fake logits and no native runtime. The provisioned test
-is opt-in and requires paths supplied by the training tool:
+Normal tests use copied fake logits and no native runtime. The workspace-root
+`pubspec.yaml` selects Fonix's external mode for these checks; consuming apps
+select their own native runtime policy. The provisioned test is opt-in and
+requires paths supplied by the training tool:
 
     MISAKID_FONIX_EN_MANIFEST=/absolute/model-manifest.json \
     MISAKID_FONIX_EN_MODEL=/absolute/model.onnx \
@@ -55,5 +57,9 @@ target contract. A successful complete 32-case run can atomically write the
 identity-bound receipt required by the training tool's V1 promotion command.
 
 Training, deterministic data splitting, ONNX export, Torch/ORT parity, metrics,
-and artifact generation live in ../../tool/english_g2p_training. Model bytes
-stay external to Git.
+and artifact generation live in ../../tool/english_g2p_training. The repository
+retains one exact promoted V1 pair at
+[`models/en-us-g2p/v1-5ce8863c502d`](../../models/en-us-g2p/v1-5ce8863c502d/README.md)
+for explicit commit-pinned downloads, outside this adapter and Pub packages.
+All candidate weights and reports stay external. Callers still supply the
+verified bytes explicitly; the adapter adds no downloader.

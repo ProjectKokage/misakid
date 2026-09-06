@@ -13,9 +13,11 @@ backend boundary. The repository includes pure-Dart runtime tables derived
 from the four Apache-licensed English lexicons, the reviewed Vietnamese
 dictionaries and tables, and Unicode 15 normalization and scalar property
 data, plus
-executable-reference tooling and derived parity fixtures. It contains no model,
-compiled native artifact, or bundled external dictionary. The pure root
-package has no production Pub dependency; optional sibling adapters use the
+executable-reference tooling and derived parity fixtures. The repository also
+retains the exact app-owned en-US G2P V1 pair under `models/`, with its
+Apache-2.0 license and training-data notices; that directory is excluded from
+Pub packages. It contains no compiled native artifact or bundled external
+dictionary. The pure root package has no production Pub dependency; optional sibling adapters use the
 reviewed pure-Dart `crypto` package for SHA-256 validation. The root Apache
 License 2.0 text has been carried into `LICENSE`. This file
 must be updated whenever further upstream-derived code or data is introduced.
@@ -762,8 +764,15 @@ The optional `misakid_fonix_en` package is original Apache-2.0 Misakid adapter
 code and redistributes no model or runtime. It depends on the project-owned
 Fonix package, whose selected repository license is GPLv3 and whose notices
 govern the ONNX Runtime selected by a consuming application. Candidate model
-weights remain external to this repository and retain the source-data
-provenance and manifest emitted by the training tool.
+weights remain external to this repository. The one promoted
+`v1-5ce8863c502d` manifest/model pair is intentionally retained under
+`models/en-us-g2p/v1-5ce8863c502d/` for explicit commit-pinned downloads,
+with the original runtime manifest bytes, the root Apache-2.0 license, and
+that directory's `NOTICE.md` preserving the exact source-data provenance.
+The publication contains no source corpus, parity words, training reports,
+Kokoro graph/voice, spaCy model, or native runtime, and `/models/` is excluded
+from the Pub package. The model's publication does not change Fonix or any
+other dependency's separate license or distribution obligations.
 
 #### English eSpeak fixture oracle and adapter
 

@@ -10,8 +10,8 @@ DEFAULT pronunciations override silver entries with the same exact spelling.
 Case variants share a split, and train/dev/test assignment is a stable SHA-256
 function of the case-folded word. No corpus or model is downloaded at runtime.
 
-The output directory must be absolute and outside the Misakid checkout. Model
-weights are never written into Git:
+The output directory must be absolute and outside the Misakid checkout.
+Training and promotion never write their output into Git:
 
     uv sync --frozen --group dev
     uv run misakid-train-english-g2p \
@@ -68,3 +68,14 @@ A shorter plumbing check uses a deterministic subset and one epoch:
 
 The smoke command validates tooling only and must not be promoted into Kokage's
 artifact catalog.
+
+## Exact V1 repository publication
+
+The single promoted `v1-5ce8863c502d` runtime manifest/model pair may be copied
+without regeneration to `models/en-us-g2p/v1-5ce8863c502d/` under the narrow
+repository publication exception. That directory owns its fingerprints and
+notices and is excluded from Pub packages. Candidate weights, training reports,
+parity records, and training inputs remain external. Preserve the 1,812-byte
+manifest exactly; changing its formatting changes the consuming application's
+pinned artifact. Public push requires review of the full unpublished commit
+range, followed by download verification at the resulting immutable commit.

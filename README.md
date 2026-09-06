@@ -126,9 +126,13 @@ whole-word accuracy and 5.31% phone error rate, clearing the fixed 67%/7%
 gates. Warm raw ONNX Runtime p95 was 896 microseconds on the qualifying macOS
 arm64 host, under the fixed 2 ms gate. Torch/ONNX decoded parity and the real
 Fonix adapter both pass the 32 bounded exported cases. The prior 692,643-byte
-graph was an unfrozen prototype and is not V1. Weights and reports remain
-external to Git; a consuming application must distribute and verify the exact
-model separately.
+graph was an unfrozen prototype and is not V1. The exact promoted
+[manifest/model pair](models/en-us-g2p/v1-5ce8863c502d/README.md) is retained
+in this repository for explicit, commit-pinned downloads; `/models/` is
+excluded from the Pub package. Training candidates and generated reports stay
+external. Consumers verify the manifest and model sizes/SHA-256 before loading
+and retain their Apache-2.0 training-data notices. This repository path adds no
+automatic download or runtime dependency to the pure-Dart package.
 
 `englishPhonemeInventory` exposes the frozen American/British inventory for
 either rendering version. It covers built-in lexicon/eSpeak output; custom

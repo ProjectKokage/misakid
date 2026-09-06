@@ -1,0 +1,3 @@
+# Preserve the exact published runtime artifact fingerprints on every checkout.
+/models/en-us-g2p/v1-5ce8863c502d/model.onnx binary
+/models/en-us-g2p/v1-5ce8863c502d/model-manifest.json -text

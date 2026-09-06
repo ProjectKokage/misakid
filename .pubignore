@@ -14,3 +14,6 @@ __pycache__/
 unidic-csj-202302.zip
 unidic-cwj-202302.zip
 unidic-lite-1.0.8.tar.gz
+
+# Explicit repository model publication is not a Dart package resource.
+/models/

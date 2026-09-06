@@ -285,6 +285,15 @@ must be obtained by an explicit user/tooling step, pinned by version and
 checksum, and excluded from normal source control unless their license and size
 make vendoring intentional.
 
+The sole model-publication exception is the exact promoted en-US G2P pair
+`models/en-us-g2p/v1-5ce8863c502d/model.onnx` and `model-manifest.json`, governed
+by that directory's README and notices. Preserve both files byte for byte,
+exclude `/models/` from Pub packages, and keep training candidates, reports,
+caches, and native binaries external. This permits explicit repository
+publication of that pair; it does not permit automatic downloads or changes
+to package/runtime support. Public push still requires the owner's review of
+the complete unpublished commit range.
+
 ## Data and derived tables
 
 The English lexicons and language data are part of behavior, not incidental
@@ -554,7 +563,8 @@ benefit and the API makes ownership, initialization, and data transfer clear.
 Keep diffs reviewable. Never hand-edit generated files, regenerate goldens
 merely because Dart disagrees, hide a failure behind a fallback, replace a
 typed boundary with `dynamic`, disable checks without a documented issue, or
-commit models/caches/build outputs/backend binaries.
+commit model candidates, caches, build outputs, or backend binaries. Only the
+exact model-publication exception above may add model bytes to Git.
 
 ## Required commands
 
