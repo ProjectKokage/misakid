@@ -8,6 +8,23 @@ import '../hook/build.dart' as build_hook;
 
 void main() {
   group('desktop native-assets tuples', () {
+    test('rejects custom targets from the hook protocol', () {
+      expect(
+        build_hook.supportsOpenJtalkNativeAssetTarget(
+          OS.fromString('custom-os'),
+          Architecture.x64,
+        ),
+        isFalse,
+      );
+      expect(
+        build_hook.supportsOpenJtalkNativeAssetTarget(
+          OS.linux,
+          Architecture.fromString('custom-architecture'),
+        ),
+        isFalse,
+      );
+    });
+
     test('accepts Linux x64/arm64 and Windows x64 only', () {
       expect(
         build_hook.supportsOpenJtalkNativeAssetTarget(

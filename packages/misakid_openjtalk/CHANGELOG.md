@@ -1,3 +1,9 @@
+## Unreleased
+
+- Use `code_assets` 2, `hooks` 2.2, and `native_toolchain_c` 0.19.4.
+  Preserve the immutable native target inventory with the new OS equality
+  contract and retain the existing non-code-asset hook guard.
+
 ## 0.1.0-dev.2
 
 - Add `openBundledFromVerifiedInstall` for app-private dictionaries whose exact
