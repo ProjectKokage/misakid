@@ -545,6 +545,10 @@ download resources, discover executables, invoke Python, or require Flutter.
 
 ## Development
 
+The [porting contract](doc/porting_contract.md) records parity, backend, data and
+licensing requirements. Read the sections for the behavior being changed;
+[PORTING_STATUS.md](PORTING_STATUS.md) records current implementation coverage.
+
 Normal verification is offline after Dart dependencies have been resolved:
 
 ```sh
