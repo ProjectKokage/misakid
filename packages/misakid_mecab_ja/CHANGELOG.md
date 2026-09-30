@@ -1,3 +1,8 @@
+## Unreleased
+
+- Align the workspace adapter with `code_assets` 2, `hooks` 2.2, and
+  `native_toolchain_c` 0.19.4.
+
 ## 0.1.0
 
 - Publish with explicit repository and Android/iOS/macOS platform metadata,

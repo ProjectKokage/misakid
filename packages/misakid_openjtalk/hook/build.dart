@@ -165,13 +165,13 @@ Future<void> main(List<String> arguments) async {
 }
 
 /// Operating systems with an implemented native-assets build profile.
-const Set<OS> openJtalkNativeAssetOperatingSystems = <OS>{
+final Set<OS> openJtalkNativeAssetOperatingSystems = Set<OS>.unmodifiable(<OS>{
   OS.android,
   OS.iOS,
   OS.linux,
   OS.macOS,
   OS.windows,
-};
+});
 
 /// Whether [targetOS] and [targetArchitecture] have a build profile.
 ///
