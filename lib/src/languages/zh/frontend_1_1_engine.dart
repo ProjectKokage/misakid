@@ -17,6 +17,7 @@ import '../../core/backend.dart';
 import '../../core/constants.dart';
 import '../../core/engine.dart';
 import '../../core/errors.dart';
+import '../../core/python_whitespace.dart';
 import '../../core/result.dart';
 import '../../core/token.dart';
 import 'legacy_helpers.dart';
@@ -392,29 +393,16 @@ bool _isAllBasicCjk(String word) =>
     word.runes.every((rune) => rune >= 0x4e00 && rune <= 0x9fff);
 
 bool _isPythonWhitespaceOnly(String text) =>
-    text.runes.every(_isPythonWhitespace);
-
-bool _isPythonWhitespace(int scalar) =>
-    (scalar >= 0x09 && scalar <= 0x0d) ||
-    (scalar >= 0x1c && scalar <= 0x20) ||
-    scalar == 0x85 ||
-    scalar == 0xa0 ||
-    scalar == 0x1680 ||
-    (scalar >= 0x2000 && scalar <= 0x200a) ||
-    scalar == 0x2028 ||
-    scalar == 0x2029 ||
-    scalar == 0x202f ||
-    scalar == 0x205f ||
-    scalar == 0x3000;
+    text.runes.every(isPythonWhitespace);
 
 String _pythonTrim(String value) {
   final scalars = value.runes.toList(growable: false);
   var start = 0;
-  while (start < scalars.length && _isPythonWhitespace(scalars[start])) {
+  while (start < scalars.length && isPythonWhitespace(scalars[start])) {
     start++;
   }
   var end = scalars.length;
-  while (end > start && _isPythonWhitespace(scalars[end - 1])) {
+  while (end > start && isPythonWhitespace(scalars[end - 1])) {
     end--;
   }
   return String.fromCharCodes(scalars.sublist(start, end));

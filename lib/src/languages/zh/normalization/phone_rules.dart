@@ -12,6 +12,7 @@
 // whitespace splitting and boundary captures instead of regex lookbehind.
 
 import '../../../core/python312_unicode.dart';
+import '../../../core/python_whitespace.dart';
 import 'number_rules.dart';
 
 /// Pure mobile, landline, and national-number stages for Chinese text.
@@ -93,7 +94,7 @@ final class ChinesePhoneRules {
     final result = <String>[];
     var part = StringBuffer();
     for (final scalar in value.runes) {
-      if (_isPythonWhitespace(scalar)) {
+      if (isPythonWhitespace(scalar)) {
         if (part.isNotEmpty) {
           result.add(part.toString());
           part = StringBuffer();
@@ -107,17 +108,4 @@ final class ChinesePhoneRules {
     }
     return result;
   }
-
-  static bool _isPythonWhitespace(int scalar) =>
-      (scalar >= 0x09 && scalar <= 0x0d) ||
-      (scalar >= 0x1c && scalar <= 0x20) ||
-      scalar == 0x85 ||
-      scalar == 0xa0 ||
-      scalar == 0x1680 ||
-      (scalar >= 0x2000 && scalar <= 0x200a) ||
-      scalar == 0x2028 ||
-      scalar == 0x2029 ||
-      scalar == 0x202f ||
-      scalar == 0x205f ||
-      scalar == 0x3000;
 }

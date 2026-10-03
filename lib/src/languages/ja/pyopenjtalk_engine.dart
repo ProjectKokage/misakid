@@ -8,6 +8,7 @@ import '../../core/constants.dart';
 import '../../core/engine.dart';
 import '../../core/errors.dart';
 import '../../core/metadata.dart';
+import '../../core/python_whitespace.dart';
 import '../../core/result.dart';
 import '../../core/token.dart';
 import 'frontend.dart';
@@ -708,22 +709,7 @@ bool _isPunctuation(String surface) {
 }
 
 bool _isNonEmptyWhitespace(String surface) =>
-    surface.isNotEmpty && surface.runes.every(_isPythonWhitespace);
-
-// CPython str.isspace/strip uses bidirectional WS/B/S characters, Unicode Zs,
-// and the four historic ASCII information separators U+001C..U+001F.
-bool _isPythonWhitespace(int codePoint) =>
-    (codePoint >= 0x09 && codePoint <= 0x0d) ||
-    (codePoint >= 0x1c && codePoint <= 0x20) ||
-    codePoint == 0x85 ||
-    codePoint == 0xa0 ||
-    codePoint == 0x1680 ||
-    (codePoint >= 0x2000 && codePoint <= 0x200a) ||
-    codePoint == 0x2028 ||
-    codePoint == 0x2029 ||
-    codePoint == 0x202f ||
-    codePoint == 0x205f ||
-    codePoint == 0x3000;
+    surface.isNotEmpty && surface.runes.every(isPythonWhitespace);
 
 List<String> _scalarCharacters(String value) =>
     value.runes.map<String>(String.fromCharCode).toList(growable: false);

@@ -6,6 +6,8 @@
 // controls, freezes all returned collections, and implements Python 3.12
 // whitespace behavior explicitly over Unicode scalar values.
 
+import '../../core/python_whitespace.dart';
+
 /// Base type for an inline English pronunciation or normalization control.
 sealed class EnglishInlineControl {
   const EnglishInlineControl();
@@ -160,7 +162,7 @@ bool _isAsciiDigits(String value) {
 String _pythonLstrip(String value) {
   final codePoints = value.runes.toList(growable: false);
   var first = 0;
-  while (first < codePoints.length && _isPythonWhitespace(codePoints[first])) {
+  while (first < codePoints.length && isPythonWhitespace(codePoints[first])) {
     first++;
   }
   return String.fromCharCodes(codePoints.skip(first));
@@ -170,7 +172,7 @@ List<String> _pythonWhitespaceSplit(String value) {
   final words = <String>[];
   final current = <int>[];
   for (final codePoint in value.runes) {
-    if (_isPythonWhitespace(codePoint)) {
+    if (isPythonWhitespace(codePoint)) {
       if (current.isNotEmpty) {
         words.add(String.fromCharCodes(current));
         current.clear();
@@ -184,21 +186,6 @@ List<String> _pythonWhitespaceSplit(String value) {
   }
   return words;
 }
-
-// CPython 3.12 str.isspace/lstrip/split uses bidirectional WS/B/S characters,
-// Unicode Zs, and the historic ASCII information separators U+001C..U+001F.
-bool _isPythonWhitespace(int codePoint) =>
-    (codePoint >= 0x09 && codePoint <= 0x0d) ||
-    (codePoint >= 0x1c && codePoint <= 0x20) ||
-    codePoint == 0x85 ||
-    codePoint == 0xa0 ||
-    codePoint == 0x1680 ||
-    (codePoint >= 0x2000 && codePoint <= 0x200a) ||
-    codePoint == 0x2028 ||
-    codePoint == 0x2029 ||
-    codePoint == 0x202f ||
-    codePoint == 0x205f ||
-    codePoint == 0x3000;
 
 int _scalarLength(String value) => value.runes.length;
 

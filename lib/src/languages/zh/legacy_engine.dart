@@ -9,6 +9,7 @@
 import '../../core/backend.dart';
 import '../../core/engine.dart';
 import '../../core/errors.dart';
+import '../../core/python_whitespace.dart';
 import '../../core/result.dart';
 import 'legacy_helpers.dart';
 import 'transcription.dart';
@@ -177,17 +178,4 @@ final class ChineseLegacyG2pEngine implements G2pEngine {
 bool _isBasicCjk(int scalar) => scalar >= 0x4e00 && scalar <= 0x9fff;
 
 bool _isPythonWhitespaceOnly(String text) =>
-    text.runes.every(_isPythonWhitespace);
-
-bool _isPythonWhitespace(int scalar) =>
-    (scalar >= 0x09 && scalar <= 0x0d) ||
-    (scalar >= 0x1c && scalar <= 0x20) ||
-    scalar == 0x85 ||
-    scalar == 0xa0 ||
-    scalar == 0x1680 ||
-    (scalar >= 0x2000 && scalar <= 0x200a) ||
-    scalar == 0x2028 ||
-    scalar == 0x2029 ||
-    scalar == 0x202f ||
-    scalar == 0x205f ||
-    scalar == 0x3000;
+    text.runes.every(isPythonWhitespace);

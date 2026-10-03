@@ -13,6 +13,7 @@
 // conversion instead of embedding char_convert.py, use scalar-safe width and
 // whitespace handling, and return an immutable sentence list.
 
+import '../../../core/python_whitespace.dart';
 import 'character_converter.dart';
 import 'chronology_rules.dart';
 import 'number_rules.dart';
@@ -108,28 +109,15 @@ final class ChineseTextNormalizer {
   static String _pythonTrim(String value) {
     final scalars = value.runes.toList(growable: false);
     var start = 0;
-    while (start < scalars.length && _isPythonWhitespace(scalars[start])) {
+    while (start < scalars.length && isPythonWhitespace(scalars[start])) {
       start++;
     }
     var end = scalars.length;
-    while (end > start && _isPythonWhitespace(scalars[end - 1])) {
+    while (end > start && isPythonWhitespace(scalars[end - 1])) {
       end--;
     }
     return String.fromCharCodes(scalars.sublist(start, end));
   }
-
-  static bool _isPythonWhitespace(int scalar) =>
-      (scalar >= 0x09 && scalar <= 0x0d) ||
-      (scalar >= 0x1c && scalar <= 0x20) ||
-      scalar == 0x85 ||
-      scalar == 0xa0 ||
-      scalar == 0x1680 ||
-      (scalar >= 0x2000 && scalar <= 0x200a) ||
-      scalar == 0x2028 ||
-      scalar == 0x2029 ||
-      scalar == 0x202f ||
-      scalar == 0x205f ||
-      scalar == 0x3000;
 
   static final RegExp _sentenceSplitter = RegExp(r'([：、，；。？！,;?!][”’]?)');
   static final RegExp _splitSpecialCharacters = RegExp(

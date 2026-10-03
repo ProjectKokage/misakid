@@ -8,6 +8,7 @@
 import '../../core/errors.dart';
 import '../../core/metadata.dart';
 import '../../core/python312_unicode.dart';
+import '../../core/python_whitespace.dart';
 import '../../core/token.dart';
 
 /// Merges one non-empty English token group with pinned metadata semantics.
@@ -40,7 +41,7 @@ MisakiToken mergeEnglishTokens(
       final token = tokens[index];
       if (metadata[index].precededBySpace &&
           lastPhonemeScalar != null &&
-          !_isPythonWhitespace(lastPhonemeScalar) &&
+          !isPythonWhitespace(lastPhonemeScalar) &&
           token.phonemes != null &&
           token.phonemes!.isNotEmpty) {
         buffer.write(' ');
@@ -120,16 +121,3 @@ int _tagWeight(String text) {
 }
 
 int _lastScalar(String value) => value.runes.last;
-
-bool _isPythonWhitespace(int codePoint) =>
-    (codePoint >= 0x09 && codePoint <= 0x0d) ||
-    (codePoint >= 0x1c && codePoint <= 0x20) ||
-    codePoint == 0x85 ||
-    codePoint == 0xa0 ||
-    codePoint == 0x1680 ||
-    (codePoint >= 0x2000 && codePoint <= 0x200a) ||
-    codePoint == 0x2028 ||
-    codePoint == 0x2029 ||
-    codePoint == 0x202f ||
-    codePoint == 0x205f ||
-    codePoint == 0x3000;
