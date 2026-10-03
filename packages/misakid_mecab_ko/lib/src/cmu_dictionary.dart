@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:misakid/misaki_ko.dart';
+import 'package:misakid_adapter_support/file_system.dart';
 
 const _pinnedManifest = _CmuDictionaryManifest(
   sizeBytes: 3820830,
@@ -19,7 +20,6 @@ const int _maximumLineLength = 4096;
 const int _maximumFieldsPerRecord = 256;
 const int _maximumWordLength = 1024;
 const int _maximumPhoneLength = 32;
-const int _maximumPathUtf8Bytes = 32768;
 
 /// Checksum-pinned, pure-Dart CMUdict 0.7a pronunciation provider.
 ///
@@ -102,7 +102,7 @@ Future<CmuDictionaryPronunciationProvider> _openCmuDictionary(
   String path,
   _CmuDictionaryManifest manifest,
 ) async {
-  if (!_isAbsolutePath(path) || !_isValidPathText(path)) {
+  if (!isAbsoluteFilePath(path) || !isValidPathText(path)) {
     throw const InvalidConfigurationException(
       'The CMUdict file path must be absolute, valid Unicode without NUL, and no longer than 32768 UTF-8 bytes.',
     );
@@ -186,40 +186,6 @@ Future<CmuDictionaryPronunciationProvider> _openCmuDictionary(
       cause: error,
     );
   }
-}
-
-bool _isAbsolutePath(String path) {
-  if (path.isEmpty) return false;
-  if (!Platform.isWindows) return path.startsWith('/');
-  return RegExp(r'^(?:[A-Za-z]:[\\/]|\\\\)').hasMatch(path);
-}
-
-bool _isValidPathText(String path) {
-  var utf8Bytes = 0;
-  final units = path.codeUnits;
-  for (var index = 0; index < units.length; index++) {
-    final unit = units[index];
-    if (unit == 0) return false;
-    if (unit <= 0x7F) {
-      utf8Bytes++;
-    } else if (unit <= 0x7FF) {
-      utf8Bytes += 2;
-    } else if (unit >= 0xD800 && unit <= 0xDBFF) {
-      if (index + 1 >= units.length ||
-          units[index + 1] < 0xDC00 ||
-          units[index + 1] > 0xDFFF) {
-        return false;
-      }
-      utf8Bytes += 4;
-      index++;
-    } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
-      return false;
-    } else {
-      utf8Bytes += 3;
-    }
-    if (utf8Bytes > _maximumPathUtf8Bytes) return false;
-  }
-  return true;
 }
 
 Future<Uint8List> _readBounded(File file, int expectedSizeBytes) async {

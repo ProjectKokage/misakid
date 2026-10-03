@@ -6,6 +6,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:misakid/misaki.dart';
+import 'package:misakid_adapter_support/file_system.dart';
 
 import 'bounded_file_reader.dart';
 import 'limits.dart';
@@ -18,8 +19,8 @@ final class BartResourceBundle {
     required this.weightsPath,
     required this.configBytes,
     required this.weightsBytes,
-    required _FileSnapshot configSnapshot,
-    required _FileSnapshot weightsSnapshot,
+    required FileSnapshot configSnapshot,
+    required FileSnapshot weightsSnapshot,
   }) : _configSnapshot = configSnapshot,
        _weightsSnapshot = weightsSnapshot;
 
@@ -27,8 +28,8 @@ final class BartResourceBundle {
   final String weightsPath;
   final Uint8List configBytes;
   final Uint8List weightsBytes;
-  final _FileSnapshot _configSnapshot;
-  final _FileSnapshot _weightsSnapshot;
+  final FileSnapshot _configSnapshot;
+  final FileSnapshot _weightsSnapshot;
 
   static Future<BartResourceBundle> load({
     required String configPath,
@@ -131,7 +132,7 @@ Future<_ReadFile> _readExactFile({
   }
   final bytes = await readExactlyBoundedFile(file, expectedBytes);
   final after = await file.stat();
-  final snapshot = _FileSnapshot.fromStat(before);
+  final snapshot = FileSnapshot.fromStat(before);
   if (!snapshot.matches(after) ||
       bytes.length != expectedBytes ||
       sha256.convert(bytes).toString() != expectedSha256) {
@@ -148,7 +149,7 @@ Future<_ReadFile> _readExactFile({
 
 Future<void> _ensureFileUnchanged(
   String path,
-  _FileSnapshot snapshot,
+  FileSnapshot snapshot,
   String label,
 ) async {
   final type = await FileSystemEntity.type(path, followLinks: false);
@@ -223,29 +224,5 @@ final class _ReadFile {
 
   final String path;
   final Uint8List bytes;
-  final _FileSnapshot snapshot;
-}
-
-final class _FileSnapshot {
-  const _FileSnapshot({
-    required this.size,
-    required this.modifiedMicroseconds,
-    required this.changedMicroseconds,
-  });
-
-  factory _FileSnapshot.fromStat(FileStat stat) => _FileSnapshot(
-    size: stat.size,
-    modifiedMicroseconds: stat.modified.microsecondsSinceEpoch,
-    changedMicroseconds: stat.changed.microsecondsSinceEpoch,
-  );
-
-  final int size;
-  final int modifiedMicroseconds;
-  final int changedMicroseconds;
-
-  bool matches(FileStat stat) =>
-      stat.type == FileSystemEntityType.file &&
-      stat.size == size &&
-      stat.modified.microsecondsSinceEpoch == modifiedMicroseconds &&
-      stat.changed.microsecondsSinceEpoch == changedMicroseconds;
+  final FileSnapshot snapshot;
 }

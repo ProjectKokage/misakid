@@ -193,6 +193,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  misakid_adapter_support:
+    dependency: "direct overridden"
+    description:
+      path: "../../packages/misakid_adapter_support"
+      relative: true
+    source: path
+    version: "0.1.0-dev.1"
   misakid_mecab_ja:
     dependency: "direct main"
     description:

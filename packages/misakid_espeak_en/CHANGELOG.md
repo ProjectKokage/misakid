@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Use `misakid_adapter_support` for the path and file checks this package
+  shared with the other adapters, instead of private copies. No behavior
+  change.
 - Free the first native path buffer when allocating the second one fails
   while creating a context.
 - Report malformed initialization data from the native library as

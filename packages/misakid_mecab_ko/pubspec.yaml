@@ -18,6 +18,7 @@ resolution: workspace
 dependencies:
   crypto: ^3.0.7
   misakid: ^0.1.0-dev.1
+  misakid_adapter_support: ^0.1.0-dev.1
 
 dev_dependencies:
   lints: ^6.0.0

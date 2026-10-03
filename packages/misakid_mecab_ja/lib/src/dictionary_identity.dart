@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:misakid/misaki.dart';
+import 'package:misakid_adapter_support/file_system.dart';
 
 /// Exact dictionary distribution required by the Cutlet parity profile.
 const String pinnedUnidicPyCwjDistribution = 'unidic-py';
@@ -119,7 +120,6 @@ pinnedUnidicPyCwjFileManifest = <String, ({int size, String sha256})>{
   ),
 };
 
-const int _maximumPathUtf8Bytes = 32768;
 const List<String> _requiredRuntimeFiles = <String>[
   'char.bin',
   'matrix.bin',
@@ -147,13 +147,13 @@ abstract interface class UnidicDictionarySnapshot {
 final class CompatibleUnidicSnapshot implements UnidicDictionarySnapshot {
   CompatibleUnidicSnapshot._({
     required this.resolvedPath,
-    required Map<String, _FileSnapshot?> files,
-  }) : _files = Map<String, _FileSnapshot?>.unmodifiable(files);
+    required Map<String, FileSnapshot?> files,
+  }) : _files = Map<String, FileSnapshot?>.unmodifiable(files);
 
   @override
   final String resolvedPath;
 
-  final Map<String, _FileSnapshot?> _files;
+  final Map<String, FileSnapshot?> _files;
 
   /// Validates the real directory and runtime files required by MeCab.
   static Future<CompatibleUnidicSnapshot> validate(String path) async {
@@ -179,7 +179,7 @@ final class CompatibleUnidicSnapshot implements UnidicDictionarySnapshot {
         );
       }
 
-      final files = <String, _FileSnapshot?>{};
+      final files = <String, FileSnapshot?>{};
       for (final name in _requiredRuntimeFiles) {
         final file = File(_joinResourcePath(resolvedPath, name));
         final type = await FileSystemEntity.type(file.path, followLinks: false);
@@ -191,7 +191,7 @@ final class CompatibleUnidicSnapshot implements UnidicDictionarySnapshot {
             'The configured UniDic runtime file `$name` is missing or invalid.',
           );
         }
-        files[name] = _FileSnapshot.fromStat(stat);
+        files[name] = FileSnapshot.fromStat(stat);
       }
       for (final name in _optionalRuntimeFiles) {
         final file = File(_joinResourcePath(resolvedPath, name));
@@ -207,7 +207,7 @@ final class CompatibleUnidicSnapshot implements UnidicDictionarySnapshot {
             'The configured UniDic optional file `$name` must be a real file.',
           );
         }
-        files[name] = _FileSnapshot.fromStat(stat);
+        files[name] = FileSnapshot.fromStat(stat);
       }
 
       return CompatibleUnidicSnapshot._(
@@ -277,15 +277,15 @@ final class CompatibleUnidicSnapshot implements UnidicDictionarySnapshot {
 final class PinnedUnidicPyCwjSnapshot implements UnidicDictionarySnapshot {
   PinnedUnidicPyCwjSnapshot._({
     required this.resolvedPath,
-    required Map<String, _FileSnapshot> files,
+    required Map<String, FileSnapshot> files,
     required _DictionaryManifest manifest,
-  }) : _files = Map<String, _FileSnapshot>.unmodifiable(files),
+  }) : _files = Map<String, FileSnapshot>.unmodifiable(files),
        _manifest = manifest;
 
   @override
   final String resolvedPath;
 
-  final Map<String, _FileSnapshot> _files;
+  final Map<String, FileSnapshot> _files;
   final _DictionaryManifest _manifest;
 
   /// Streams and validates every file in the pinned dictionary.
@@ -339,7 +339,7 @@ final class PinnedUnidicPyCwjSnapshot implements UnidicDictionarySnapshot {
     }
     await _validateEntrySet(Directory(resolvedPath), manifest.files);
 
-    final snapshots = <String, _FileSnapshot>{};
+    final snapshots = <String, FileSnapshot>{};
     final treeDigestSink = _DigestSink();
     final treeHasher = sha256.startChunkedConversion(treeDigestSink);
     var totalBytes = 0;
@@ -377,7 +377,7 @@ final class PinnedUnidicPyCwjSnapshot implements UnidicDictionarySnapshot {
         followLinks: false,
       );
       final statAfterHash = await file.stat();
-      final snapshot = _FileSnapshot.fromStat(statBeforeHash);
+      final snapshot = FileSnapshot.fromStat(statBeforeHash);
       if (typeAfterHash != FileSystemEntityType.file ||
           !snapshot.matches(statAfterHash)) {
         throw MalformedDataException(
@@ -514,50 +514,16 @@ Future<void> _validateEntrySet(
 }
 
 void _validatePath(String path) {
-  if (!_isAbsolutePath(path)) {
+  if (!isAbsoluteFilePath(path)) {
     throw const InvalidConfigurationException(
       'The UniDic path must be a non-empty absolute path.',
     );
   }
-  if (!_isValidPathText(path)) {
+  if (!isValidPathText(path)) {
     throw const InvalidConfigurationException(
       'The UniDic path must be valid Unicode without NUL and no longer than 32768 UTF-8 bytes.',
     );
   }
-}
-
-bool _isAbsolutePath(String path) {
-  if (path.isEmpty) return false;
-  if (!Platform.isWindows) return path.startsWith('/');
-  return RegExp(r'^(?:[A-Za-z]:[\\/]|\\\\)').hasMatch(path);
-}
-
-bool _isValidPathText(String path) {
-  var utf8Bytes = 0;
-  final units = path.codeUnits;
-  for (var index = 0; index < units.length; index++) {
-    final unit = units[index];
-    if (unit == 0) return false;
-    if (unit <= 0x7F) {
-      utf8Bytes++;
-    } else if (unit <= 0x7FF) {
-      utf8Bytes += 2;
-    } else if (unit >= 0xD800 && unit <= 0xDBFF) {
-      if (index + 1 >= units.length ||
-          units[index + 1] < 0xDC00 ||
-          units[index + 1] > 0xDFFF) {
-        return false;
-      }
-      utf8Bytes += 4;
-      index++;
-    } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
-      return false;
-    } else {
-      utf8Bytes += 3;
-    }
-    if (utf8Bytes > _maximumPathUtf8Bytes) return false;
-  }
-  return true;
 }
 
 String _joinResourcePath(String root, String relative) =>
@@ -584,30 +550,6 @@ final class _DictionaryManifest {
   final Map<String, ({int size, String sha256})> files;
   final int totalBytes;
   final String treeSha256;
-}
-
-final class _FileSnapshot {
-  const _FileSnapshot({
-    required this.size,
-    required this.modifiedMicroseconds,
-    required this.changedMicroseconds,
-  });
-
-  factory _FileSnapshot.fromStat(FileStat stat) => _FileSnapshot(
-    size: stat.size,
-    modifiedMicroseconds: stat.modified.microsecondsSinceEpoch,
-    changedMicroseconds: stat.changed.microsecondsSinceEpoch,
-  );
-
-  final int size;
-  final int modifiedMicroseconds;
-  final int changedMicroseconds;
-
-  bool matches(FileStat stat) =>
-      stat.type == FileSystemEntityType.file &&
-      stat.size == size &&
-      stat.modified.microsecondsSinceEpoch == modifiedMicroseconds &&
-      stat.changed.microsecondsSinceEpoch == changedMicroseconds;
 }
 
 final class _DigestSink implements Sink<Digest> {

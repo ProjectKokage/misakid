@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:misakid/misaki.dart';
+import 'package:misakid_adapter_support/file_system.dart';
 
 /// Exact model distribution accepted by this resource boundary.
 const String spacyTransformerModelVersion = '3.8.0';
@@ -49,7 +50,6 @@ const int spacyTransformerByteBpeSizeBytes = 1063863;
 const String spacyTransformerByteBpeSha256 =
     '3a937453afcd04229fc5e32d7304c117781d4c48f1e7c87a603194e2077576f0';
 
-const int _maximumPathUtf8Bytes = 32768;
 const int _readChunkBytes = 64 * 1024;
 
 /// Immutable snapshot of the exact non-native transformer resources.
@@ -378,46 +378,12 @@ Future<Uint8List> _readExactRange(
 }
 
 void _validateAbsolutePath(String path) {
-  if (!_isAbsolutePath(path) || !_isValidPathText(path)) {
+  if (!isAbsoluteFilePath(path) || !isValidPathText(path)) {
     throw const InvalidConfigurationException(
       'The en_core_web_trf model root must be a valid canonical absolute path '
       'without NUL and no longer than 32768 UTF-8 bytes.',
     );
   }
-}
-
-bool _isAbsolutePath(String path) {
-  if (path.isEmpty) return false;
-  if (!Platform.isWindows) return path.startsWith('/');
-  return RegExp(r'^(?:[A-Za-z]:[\\/]|\\\\)').hasMatch(path);
-}
-
-bool _isValidPathText(String path) {
-  var utf8Bytes = 0;
-  final units = path.codeUnits;
-  for (var index = 0; index < units.length; index++) {
-    final unit = units[index];
-    if (unit == 0) return false;
-    if (unit <= 0x7f) {
-      utf8Bytes++;
-    } else if (unit <= 0x7ff) {
-      utf8Bytes += 2;
-    } else if (unit >= 0xd800 && unit <= 0xdbff) {
-      if (index + 1 >= units.length ||
-          units[index + 1] < 0xdc00 ||
-          units[index + 1] > 0xdfff) {
-        return false;
-      }
-      utf8Bytes += 4;
-      index++;
-    } else if (unit >= 0xdc00 && unit <= 0xdfff) {
-      return false;
-    } else {
-      utf8Bytes += 3;
-    }
-    if (utf8Bytes > _maximumPathUtf8Bytes) return false;
-  }
-  return true;
 }
 
 String _resourcePath(String root, String relativePath) {

@@ -5,6 +5,7 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:misakid_adapter_support/file_system.dart';
 import 'package:misakid_spacy_en/misakid_spacy_en.dart';
 
 import 'native_bindings.dart';
@@ -20,8 +21,6 @@ const int defaultSpacyTransformerMaxPieces = 4096;
 
 /// Largest public piece limit accepted by this synchronous adapter.
 const int maximumConfigurableSpacyTransformerPieces = 16384;
-
-const int _maximumLibraryPathUtf8Bytes = 32768;
 
 /// Penn Treebank labels emitted by the exact transformer tagger head.
 const List<String> spacyTransformerTagLabels = <String>[
@@ -275,8 +274,8 @@ void _validateConfiguration({
   required String nativeLibraryPath,
   required int maxPieces,
 }) {
-  if (!_isAbsolutePath(nativeLibraryPath) ||
-      !_isValidPathText(nativeLibraryPath)) {
+  if (!isAbsoluteFilePath(nativeLibraryPath) ||
+      !isValidPathText(nativeLibraryPath)) {
     throw const InvalidConfigurationException(
       'The transformer native library must be a valid non-empty absolute path '
       'without NUL and no longer than 32768 UTF-8 bytes.',
@@ -323,38 +322,4 @@ Future<String> _canonicalNativeLibrary(String path) async {
       cause: error,
     );
   }
-}
-
-bool _isAbsolutePath(String path) {
-  if (path.isEmpty) return false;
-  if (!Platform.isWindows) return path.startsWith('/');
-  return RegExp(r'^(?:[A-Za-z]:[\\/]|\\\\)').hasMatch(path);
-}
-
-bool _isValidPathText(String path) {
-  var utf8Bytes = 0;
-  final units = path.codeUnits;
-  for (var index = 0; index < units.length; index++) {
-    final unit = units[index];
-    if (unit == 0) return false;
-    if (unit <= 0x7f) {
-      utf8Bytes++;
-    } else if (unit <= 0x7ff) {
-      utf8Bytes += 2;
-    } else if (unit >= 0xd800 && unit <= 0xdbff) {
-      if (index + 1 >= units.length ||
-          units[index + 1] < 0xdc00 ||
-          units[index + 1] > 0xdfff) {
-        return false;
-      }
-      utf8Bytes += 4;
-      index++;
-    } else if (unit >= 0xdc00 && unit <= 0xdfff) {
-      return false;
-    } else {
-      utf8Bytes += 3;
-    }
-    if (utf8Bytes > _maximumLibraryPathUtf8Bytes) return false;
-  }
-  return true;
 }

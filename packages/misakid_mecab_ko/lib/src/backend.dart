@@ -5,6 +5,7 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:misakid/misaki_ko.dart';
+import 'package:misakid_adapter_support/file_system.dart';
 
 import 'dictionary_identity.dart';
 import 'native_bindings.dart';
@@ -16,7 +17,6 @@ const String mecabKoSupportedPlatform = 'macos-arm64';
 const int defaultMecabKoMaxInputBytes = 1024 * 1024;
 
 const int _maximumConfigurableInputBytes = 64 * 1024 * 1024;
-const int _maximumPathUtf8Bytes = 32768;
 
 /// Explicit native MeCab-ko morphology backend for [KoreanG2pkcEngine].
 ///
@@ -191,12 +191,12 @@ void _validateConfiguration({
   required String dictionaryPath,
   required int maxInputBytes,
 }) {
-  if (!_isAbsolutePath(libraryPath) || !_isAbsolutePath(dictionaryPath)) {
+  if (!isAbsoluteFilePath(libraryPath) || !isAbsoluteFilePath(dictionaryPath)) {
     throw const InvalidConfigurationException(
       'MeCab-ko library and dictionary paths must be non-empty absolute paths.',
     );
   }
-  if (!_isValidPathText(libraryPath) || !_isValidPathText(dictionaryPath)) {
+  if (!isValidPathText(libraryPath) || !isValidPathText(dictionaryPath)) {
     throw const InvalidConfigurationException(
       'MeCab-ko paths must be valid Unicode without NUL and no longer than 32768 UTF-8 bytes.',
     );
@@ -207,38 +207,4 @@ void _validateConfiguration({
       '$_maximumConfigurableInputBytes.',
     );
   }
-}
-
-bool _isAbsolutePath(String path) {
-  if (path.isEmpty) return false;
-  if (!Platform.isWindows) return path.startsWith('/');
-  return RegExp(r'^(?:[A-Za-z]:[\\/]|\\\\)').hasMatch(path);
-}
-
-bool _isValidPathText(String path) {
-  var utf8Bytes = 0;
-  final units = path.codeUnits;
-  for (var index = 0; index < units.length; index++) {
-    final unit = units[index];
-    if (unit == 0) return false;
-    if (unit <= 0x7F) {
-      utf8Bytes++;
-    } else if (unit <= 0x7FF) {
-      utf8Bytes += 2;
-    } else if (unit >= 0xD800 && unit <= 0xDBFF) {
-      if (index + 1 >= units.length ||
-          units[index + 1] < 0xDC00 ||
-          units[index + 1] > 0xDFFF) {
-        return false;
-      }
-      utf8Bytes += 4;
-      index++;
-    } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
-      return false;
-    } else {
-      utf8Bytes += 3;
-    }
-    if (utf8Bytes > _maximumPathUtf8Bytes) return false;
-  }
-  return true;
 }

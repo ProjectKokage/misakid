@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:misakid/misaki.dart';
+import 'package:misakid_adapter_support/file_system.dart';
 
 /// Open JTalk dictionary release required by this adapter.
 const String openJtalkDictionaryName = 'open_jtalk_dic_utf_8-1.11';
@@ -62,12 +63,12 @@ _expectedFiles = <String, ({int size, String sha256})>{
 final class OpenJtalkDictionarySnapshot {
   OpenJtalkDictionarySnapshot._({
     required this.resolvedPath,
-    required Map<String, _FileSnapshot> files,
-  }) : _files = Map<String, _FileSnapshot>.unmodifiable(files);
+    required Map<String, FileSnapshot> files,
+  }) : _files = Map<String, FileSnapshot>.unmodifiable(files);
 
   /// Canonical path passed to the native frontend after validation.
   final String resolvedPath;
-  final Map<String, _FileSnapshot> _files;
+  final Map<String, FileSnapshot> _files;
 
   /// Streams and validates every file in the pinned dictionary.
   static Future<OpenJtalkDictionarySnapshot> validate(String path) async {
@@ -151,7 +152,7 @@ final class OpenJtalkDictionarySnapshot {
       );
     }
 
-    final snapshots = <String, _FileSnapshot>{};
+    final snapshots = <String, FileSnapshot>{};
     final treeRecords = BytesBuilder(copy: false);
     var totalBytes = 0;
     final sortedNames = _expectedFiles.keys.toList(growable: false)..sort();
@@ -167,7 +168,7 @@ final class OpenJtalkDictionarySnapshot {
           'Open JTalk dictionary file `$name` has the wrong type or size.',
         );
       }
-      final snapshot = _FileSnapshot.fromStat(statBeforeHash);
+      final snapshot = FileSnapshot.fromStat(statBeforeHash);
       if (!verifyContents) {
         snapshots[name] = snapshot;
         continue;
@@ -239,30 +240,6 @@ final class OpenJtalkDictionarySnapshot {
       }
     }
   }
-}
-
-final class _FileSnapshot {
-  const _FileSnapshot({
-    required this.size,
-    required this.modifiedMicroseconds,
-    required this.changedMicroseconds,
-  });
-
-  factory _FileSnapshot.fromStat(FileStat stat) => _FileSnapshot(
-    size: stat.size,
-    modifiedMicroseconds: stat.modified.microsecondsSinceEpoch,
-    changedMicroseconds: stat.changed.microsecondsSinceEpoch,
-  );
-
-  final int size;
-  final int modifiedMicroseconds;
-  final int changedMicroseconds;
-
-  bool matches(FileStat stat) =>
-      stat.type == FileSystemEntityType.file &&
-      stat.size == size &&
-      stat.modified.microsecondsSinceEpoch == modifiedMicroseconds &&
-      stat.changed.microsecondsSinceEpoch == changedMicroseconds;
 }
 
 String _basename(String path) {

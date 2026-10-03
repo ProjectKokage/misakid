@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:misakid/misaki.dart';
+import 'package:misakid_adapter_support/file_system.dart';
 
 /// Exact SHA-256 of pinned Misaki's `misaki/data/ja_words.txt`.
 const String pinnedMisakiCutletWordsSha256 =
@@ -19,7 +20,6 @@ const int pinnedMisakiCutletWordsSizeBytes = 1921140;
 const int pinnedMisakiCutletWordsRecordCount = 147571;
 
 const String _upstreamCommit = 'fba1236595f2d2bf21d414ba6e57d25256afada3';
-const int _maximumPathUtf8Bytes = 32768;
 
 /// Explicit, provenance-bearing membership boundary for Cutlet grouping.
 ///
@@ -198,48 +198,14 @@ int _compareUnicodeScalars(String left, String right) {
 }
 
 void _validatePath(String path) {
-  if (!_isAbsolutePath(path)) {
+  if (!isAbsoluteFilePath(path)) {
     throw const InvalidConfigurationException(
       'The pinned Misaki Japanese word-list path must be a non-empty absolute path.',
     );
   }
-  if (!_isValidPathText(path)) {
+  if (!isValidPathText(path)) {
     throw const InvalidConfigurationException(
       'The pinned Misaki Japanese word-list path must be valid Unicode without NUL and no longer than 32768 UTF-8 bytes.',
     );
   }
-}
-
-bool _isAbsolutePath(String path) {
-  if (path.isEmpty) return false;
-  if (!Platform.isWindows) return path.startsWith('/');
-  return RegExp(r'^(?:[A-Za-z]:[\\/]|\\\\)').hasMatch(path);
-}
-
-bool _isValidPathText(String path) {
-  var utf8Bytes = 0;
-  final units = path.codeUnits;
-  for (var index = 0; index < units.length; index++) {
-    final unit = units[index];
-    if (unit == 0) return false;
-    if (unit <= 0x7F) {
-      utf8Bytes++;
-    } else if (unit <= 0x7FF) {
-      utf8Bytes += 2;
-    } else if (unit >= 0xD800 && unit <= 0xDBFF) {
-      if (index + 1 >= units.length ||
-          units[index + 1] < 0xDC00 ||
-          units[index + 1] > 0xDFFF) {
-        return false;
-      }
-      utf8Bytes += 4;
-      index++;
-    } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
-      return false;
-    } else {
-      utf8Bytes += 3;
-    }
-    if (utf8Bytes > _maximumPathUtf8Bytes) return false;
-  }
-  return true;
 }
