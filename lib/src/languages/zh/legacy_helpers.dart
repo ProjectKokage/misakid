@@ -6,6 +6,7 @@
 // the upstream assertion with a typed malformed-data failure.
 
 import '../../core/errors.dart';
+import '../../core/python_whitespace.dart';
 
 /// Replaces legacy Mandarin tone contours and syllabic-r variants.
 String retoneLegacyChinese(String phonemes) {
@@ -51,25 +52,12 @@ String mapLegacyChinesePunctuation(String text) {
 String _pythonTrim(String value) {
   final runes = value.runes.toList(growable: false);
   var start = 0;
-  while (start < runes.length && _isPythonWhitespace(runes[start])) {
+  while (start < runes.length && isPythonWhitespace(runes[start])) {
     start++;
   }
   var end = runes.length;
-  while (end > start && _isPythonWhitespace(runes[end - 1])) {
+  while (end > start && isPythonWhitespace(runes[end - 1])) {
     end--;
   }
   return String.fromCharCodes(runes.sublist(start, end));
 }
-
-bool _isPythonWhitespace(int codePoint) =>
-    (codePoint >= 0x09 && codePoint <= 0x0d) ||
-    (codePoint >= 0x1c && codePoint <= 0x20) ||
-    codePoint == 0x85 ||
-    codePoint == 0xa0 ||
-    codePoint == 0x1680 ||
-    (codePoint >= 0x2000 && codePoint <= 0x200a) ||
-    codePoint == 0x2028 ||
-    codePoint == 0x2029 ||
-    codePoint == 0x202f ||
-    codePoint == 0x205f ||
-    codePoint == 0x3000;

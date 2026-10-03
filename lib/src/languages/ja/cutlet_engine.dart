@@ -10,6 +10,7 @@ import '../../core/backend.dart';
 import '../../core/engine.dart';
 import '../../core/errors.dart';
 import '../../core/python312_unicode.dart';
+import '../../core/python_whitespace.dart';
 import '../../core/result.dart';
 import 'cutlet_mapping.dart';
 import 'cutlet_normalizer.dart';
@@ -335,7 +336,7 @@ String _collapsePythonWhitespace(String value) {
   var hasOutput = false;
   var pendingSpace = false;
   for (final scalar in value.runes) {
-    if (_isPythonWhitespace(scalar)) {
+    if (isPythonWhitespace(scalar)) {
       pendingSpace = hasOutput;
       continue;
     }
@@ -372,19 +373,6 @@ String _removeSokuonSpaces(String value) {
   }
   return String.fromCharCodes(output);
 }
-
-bool _isPythonWhitespace(int scalar) =>
-    (scalar >= 0x09 && scalar <= 0x0d) ||
-    (scalar >= 0x1c && scalar <= 0x20) ||
-    scalar == 0x85 ||
-    scalar == 0xa0 ||
-    scalar == 0x1680 ||
-    (scalar >= 0x2000 && scalar <= 0x200a) ||
-    scalar == 0x2028 ||
-    scalar == 0x2029 ||
-    scalar == 0x202f ||
-    scalar == 0x205f ||
-    scalar == 0x3000;
 
 const Set<String> _smallKana = <String>{'ゃ', 'ゅ', 'ょ', 'ぁ', 'ぃ', 'ぅ', 'ぇ', 'ぉ'};
 const Set<String> _iterationMarks = <String>{'〃', '々', 'ゝ', 'ゞ', 'ヽ'};
