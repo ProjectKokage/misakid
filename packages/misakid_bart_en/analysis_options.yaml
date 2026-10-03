@@ -5,3 +5,14 @@ analyzer:
     strict-casts: true
     strict-inference: true
     strict-raw-types: true
+
+linter:
+  rules:
+    avoid_dynamic_calls: true
+    cancel_subscriptions: true
+    close_sinks: true
+    discarded_futures: true
+    no_adjacent_strings_in_list: true
+    only_throw_errors: true
+    throw_in_finally: true
+    unawaited_futures: true

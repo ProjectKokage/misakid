@@ -23,6 +23,14 @@ linter:
   rules:
     # Public contracts are part of the port's compatibility surface.
     public_member_api_docs: true
+    avoid_dynamic_calls: true
+    cancel_subscriptions: true
+    close_sinks: true
+    discarded_futures: true
+    no_adjacent_strings_in_list: true
+    only_throw_errors: true
+    throw_in_finally: true
+    unawaited_futures: true
 
 # analyzer:
 #   exclude:

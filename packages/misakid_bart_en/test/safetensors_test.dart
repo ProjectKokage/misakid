@@ -18,10 +18,10 @@ void main() {
   test('rejects duplicate top-level and nested header keys', () {
     final data = ByteData(4)..setFloat32(0, 1, Endian.little);
     for (final header in <String>[
-      '{"a":{"dtype":"F32","shape":[1],"data_offsets":[0,4]},'
-          '"a":{"dtype":"F32","shape":[1],"data_offsets":[0,4]}}',
-      '{"a":{"dtype":"F32","dtype":"F32","shape":[1],'
-          '"data_offsets":[0,4]}}',
+      ('{"a":{"dtype":"F32","shape":[1],"data_offsets":[0,4]},'
+          '"a":{"dtype":"F32","shape":[1],"data_offsets":[0,4]}}'),
+      ('{"a":{"dtype":"F32","dtype":"F32","shape":[1],'
+          '"data_offsets":[0,4]}}'),
     ]) {
       expect(
         () =>
