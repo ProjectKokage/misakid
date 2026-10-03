@@ -127,6 +127,12 @@ final class EspeakEnglishBackend implements EnglishEspeakBackend {
         '(native stage `${error.stage}`, code ${error.code}).',
         cause: error,
       );
+    } on EspeakEnglishNativeLibraryException catch (error) {
+      native?.close();
+      throw BackendUnavailableException(
+        'The eSpeak NG native library returned malformed initialization data.',
+        cause: error,
+      );
     } on Object {
       native?.close();
       rethrow;

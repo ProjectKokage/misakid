@@ -313,10 +313,14 @@ final class EspeakEnglishNativeContext implements Finalizable {
       rejectNul: true,
       maxBytes: _maximumPathBytes,
     );
-    final runtimeBuffer = _copyToNative(library, runtimeBytes);
-    final dataBuffer = _copyToNative(library, dataBytes);
+    Pointer<Uint8>? runtimeBuffer;
+    Pointer<Uint8>? dataBuffer;
     Pointer<_NativeContext> context;
     try {
+      // Both copies sit inside the try, so a failed second allocation still
+      // frees the first buffer.
+      runtimeBuffer = _copyToNative(library, runtimeBytes);
+      dataBuffer = _copyToNative(library, dataBytes);
       context = library._contextCreate(
         runtimeBuffer,
         runtimeBytes.length,
@@ -326,8 +330,12 @@ final class EspeakEnglishNativeContext implements Finalizable {
         maxOutputBytes,
       );
     } finally {
-      library._bufferFree(runtimeBuffer.cast<Void>());
-      library._bufferFree(dataBuffer.cast<Void>());
+      if (runtimeBuffer != null) {
+        library._bufferFree(runtimeBuffer.cast<Void>());
+      }
+      if (dataBuffer != null) {
+        library._bufferFree(dataBuffer.cast<Void>());
+      }
     }
     if (context.address == 0) {
       throw const EspeakEnglishNativeException(

@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Free the first native path buffer when allocating the second one fails
+  while creating a context.
+- Report malformed initialization data from the native library as
+  `BackendUnavailableException`, as the other adapters do, instead of letting
+  the internal exception escape.
+
 ## 0.1.0-dev.1
 
 - Add the explicit macOS-arm64 eSpeak NG 1.52.0 English fallback backend.
