@@ -1,3 +1,9 @@
+## Unreleased
+
+- Use `misakid_adapter_support` for the path and file checks this package
+  shared with the other adapters, instead of private copies. No behavior
+  change.
+
 ## 0.1.0-dev.1
 
 - Add an explicit macOS arm64 MeCab-ko 0.996/ko-0.9.2 morphology adapter.

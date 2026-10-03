@@ -6,6 +6,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:misakid/misaki_ja.dart';
+import 'package:misakid_adapter_support/file_system.dart';
 
 import 'dictionary_identity.dart';
 import 'grouping.dart';
@@ -30,7 +31,6 @@ const Set<String> mecabJapaneseBundledBuildPlatforms = <String>{
 const int defaultMecabJapaneseMaxInputBytes = 1024 * 1024;
 
 const int _maximumConfigurableInputBytes = 64 * 1024 * 1024;
-const int _maximumPathUtf8Bytes = 32768;
 
 /// Dictionary validation and compatibility contract for the native backend.
 enum MecabJapaneseDictionaryProfile {
@@ -471,12 +471,12 @@ void _validateConfiguration({
   required String dictionaryPath,
   required int maxInputBytes,
 }) {
-  if (!_isAbsolutePath(libraryPath) || !_isAbsolutePath(dictionaryPath)) {
+  if (!isAbsoluteFilePath(libraryPath) || !isAbsoluteFilePath(dictionaryPath)) {
     throw const InvalidConfigurationException(
       'Japanese MeCab library and dictionary paths must be non-empty absolute paths.',
     );
   }
-  if (!_isValidPathText(libraryPath) || !_isValidPathText(dictionaryPath)) {
+  if (!isValidPathText(libraryPath) || !isValidPathText(dictionaryPath)) {
     throw const InvalidConfigurationException(
       'Japanese MeCab paths must be valid Unicode without NUL and no longer than 32768 UTF-8 bytes.',
     );
@@ -488,12 +488,12 @@ void _validateBundledConfiguration({
   required String dictionaryPath,
   required int maxInputBytes,
 }) {
-  if (!_isAbsolutePath(dictionaryPath)) {
+  if (!isAbsoluteFilePath(dictionaryPath)) {
     throw const InvalidConfigurationException(
       'The Japanese MeCab dictionary path must be a non-empty absolute path.',
     );
   }
-  if (!_isValidPathText(dictionaryPath)) {
+  if (!isValidPathText(dictionaryPath)) {
     throw const InvalidConfigurationException(
       'The Japanese MeCab dictionary path must be valid Unicode without NUL '
       'and no longer than 32768 UTF-8 bytes.',
@@ -534,38 +534,4 @@ void _validateSupportedPlatform() {
       'The explicit-library Japanese MeCab adapter supports only macOS arm64.',
     );
   }
-}
-
-bool _isAbsolutePath(String path) {
-  if (path.isEmpty) return false;
-  if (!Platform.isWindows) return path.startsWith('/');
-  return RegExp(r'^(?:[A-Za-z]:[\\/]|\\\\)').hasMatch(path);
-}
-
-bool _isValidPathText(String path) {
-  var utf8Bytes = 0;
-  final units = path.codeUnits;
-  for (var index = 0; index < units.length; index++) {
-    final unit = units[index];
-    if (unit == 0) return false;
-    if (unit <= 0x7F) {
-      utf8Bytes++;
-    } else if (unit <= 0x7FF) {
-      utf8Bytes += 2;
-    } else if (unit >= 0xD800 && unit <= 0xDBFF) {
-      if (index + 1 >= units.length ||
-          units[index + 1] < 0xDC00 ||
-          units[index + 1] > 0xDFFF) {
-        return false;
-      }
-      utf8Bytes += 4;
-      index++;
-    } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
-      return false;
-    } else {
-      utf8Bytes += 3;
-    }
-    if (utf8Bytes > _maximumPathUtf8Bytes) return false;
-  }
-  return true;
 }

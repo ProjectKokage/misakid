@@ -6,6 +6,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:misakid/misaki.dart';
+import 'package:misakid_adapter_support/file_system.dart';
 
 import 'resource_identity.dart';
 
@@ -42,7 +43,7 @@ loadSpacyEnglishTokenizerResources(String modelDirectoryPath) async {
         modelName: 'pinned spaCy English model',
       ),
     ]);
-    final snapshots = <String, _FileSnapshot>{
+    final snapshots = <String, FileSnapshot>{
       for (final resource in loaded) resource.relativePath: resource.snapshot,
     };
     return (
@@ -118,7 +119,7 @@ loadSpacyEnglishModelResources(String modelDirectoryPath) async {
         modelName: 'en_core_web_sm',
       ),
     ]);
-    final snapshots = <String, _FileSnapshot>{
+    final snapshots = <String, FileSnapshot>{
       for (final resource in loaded) resource.relativePath: resource.snapshot,
     };
     return (
@@ -169,7 +170,7 @@ Future<String> _resolveModelRoot(
 
 Future<void> _ensureFilesUnchanged({
   required String modelDirectoryPath,
-  required Map<String, _FileSnapshot> files,
+  required Map<String, FileSnapshot> files,
   required String modelName,
 }) async {
   try {
@@ -221,7 +222,7 @@ Future<_LoadedResource> _loadResource(
   }
   final bytes = await file.readAsBytes();
   final after = await file.stat();
-  final snapshot = _FileSnapshot.fromStat(before);
+  final snapshot = FileSnapshot.fromStat(before);
   if (!snapshot.matches(after) ||
       sha256.convert(bytes).toString() != sha256Value) {
     throw MalformedDataException(
@@ -236,46 +237,12 @@ Future<_LoadedResource> _loadResource(
 }
 
 void _validateModelDirectoryPath(String path) {
-  if (!_isAbsolutePath(path) || !_isValidPathText(path)) {
+  if (!isAbsoluteFilePath(path) || !isValidPathText(path)) {
     throw const InvalidConfigurationException(
       'The pinned spaCy English model directory must be a valid non-empty absolute '
       'path without NUL and no longer than 32768 UTF-8 bytes.',
     );
   }
-}
-
-bool _isAbsolutePath(String path) {
-  if (path.isEmpty) return false;
-  if (!Platform.isWindows) return path.startsWith('/');
-  return RegExp(r'^(?:[A-Za-z]:[\\/]|\\\\)').hasMatch(path);
-}
-
-bool _isValidPathText(String path) {
-  var utf8Bytes = 0;
-  final units = path.codeUnits;
-  for (var index = 0; index < units.length; index++) {
-    final unit = units[index];
-    if (unit == 0) return false;
-    if (unit <= 0x7f) {
-      utf8Bytes++;
-    } else if (unit <= 0x7ff) {
-      utf8Bytes += 2;
-    } else if (unit >= 0xd800 && unit <= 0xdbff) {
-      if (index + 1 >= units.length ||
-          units[index + 1] < 0xdc00 ||
-          units[index + 1] > 0xdfff) {
-        return false;
-      }
-      utf8Bytes += 4;
-      index++;
-    } else if (unit >= 0xdc00 && unit <= 0xdfff) {
-      return false;
-    } else {
-      utf8Bytes += 3;
-    }
-    if (utf8Bytes > 32768) return false;
-  }
-  return true;
 }
 
 final class _LoadedResource {
@@ -287,29 +254,5 @@ final class _LoadedResource {
 
   final String relativePath;
   final Uint8List bytes;
-  final _FileSnapshot snapshot;
-}
-
-final class _FileSnapshot {
-  const _FileSnapshot({
-    required this.size,
-    required this.modifiedMicroseconds,
-    required this.changedMicroseconds,
-  });
-
-  factory _FileSnapshot.fromStat(FileStat stat) => _FileSnapshot(
-    size: stat.size,
-    modifiedMicroseconds: stat.modified.microsecondsSinceEpoch,
-    changedMicroseconds: stat.changed.microsecondsSinceEpoch,
-  );
-
-  final int size;
-  final int modifiedMicroseconds;
-  final int changedMicroseconds;
-
-  bool matches(FileStat stat) =>
-      stat.type == FileSystemEntityType.file &&
-      stat.size == size &&
-      stat.modified.microsecondsSinceEpoch == modifiedMicroseconds &&
-      stat.changed.microsecondsSinceEpoch == changedMicroseconds;
+  final FileSnapshot snapshot;
 }

@@ -15,6 +15,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:misakid/misaki_zh.dart';
+import 'package:misakid_adapter_support/path_text.dart';
 
 import 'resource_file_loader.dart';
 
@@ -66,7 +67,6 @@ const _pinnedPartOfSpeechManifest = _JiebaPartOfSpeechManifest(
   emissionEntryCount: 89290,
 );
 
-const int _maximumPathUtf8Bytes = 32768;
 const int _maximumDictionaryBytes = 16 * 1024 * 1024;
 const int _maximumProbabilityBytes = 8 * 1024 * 1024;
 const int _maximumDictionaryRecords = 1000000;
@@ -706,7 +706,7 @@ Future<JiebaSegmenter> _openJieba({
     ],
   ];
   for (final path in configuredPaths) {
-    if (!_isAbsolutePath(path) || !_isValidPathText(path)) {
+    if (!_isAbsolutePath(path) || !isValidPathText(path)) {
       throw const InvalidConfigurationException(
         'Jieba resource paths must be absolute, valid Unicode without NUL, and no longer than 32768 UTF-8 bytes.',
       );
@@ -1552,34 +1552,6 @@ bool _isAbsolutePath(String path) {
   if (path.isEmpty) return false;
   return path.startsWith('/') ||
       RegExp(r'^(?:[A-Za-z]:[\\/]|\\\\)').hasMatch(path);
-}
-
-bool _isValidPathText(String path) {
-  var utf8Bytes = 0;
-  final units = path.codeUnits;
-  for (var index = 0; index < units.length; index++) {
-    final unit = units[index];
-    if (unit == 0) return false;
-    if (unit <= 0x7F) {
-      utf8Bytes++;
-    } else if (unit <= 0x7FF) {
-      utf8Bytes += 2;
-    } else if (unit >= 0xD800 && unit <= 0xDBFF) {
-      if (index + 1 >= units.length ||
-          units[index + 1] < 0xDC00 ||
-          units[index + 1] > 0xDFFF) {
-        return false;
-      }
-      utf8Bytes += 4;
-      index++;
-    } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
-      return false;
-    } else {
-      utf8Bytes += 3;
-    }
-    if (utf8Bytes > _maximumPathUtf8Bytes) return false;
-  }
-  return true;
 }
 
 bool _isValidUnicode(String value) {

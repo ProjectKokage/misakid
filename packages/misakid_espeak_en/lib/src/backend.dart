@@ -5,6 +5,7 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:misakid/misaki_en.dart';
+import 'package:misakid_adapter_support/file_system.dart';
 
 import 'native_bindings.dart';
 import 'phonemizer_contract.dart';
@@ -20,7 +21,6 @@ const int defaultEspeakEnglishMaxInputBytes = 1024 * 1024;
 const int defaultEspeakEnglishMaxOutputBytes = 4 * 1024 * 1024;
 
 const int _maximumConfigurableBytes = 64 * 1024 * 1024;
-const int _maximumPathUtf8Bytes = 32768;
 
 /// Explicit macOS-arm64 eSpeak NG provider for [EnglishEspeakFallback].
 ///
@@ -198,7 +198,7 @@ void _validateConfiguration({
         'All eSpeak adapter and resource paths must be non-empty absolute paths.',
       );
     }
-    if (!_isValidPathText(path)) {
+    if (!isValidPathText(path)) {
       throw const InvalidConfigurationException(
         'eSpeak paths must be valid Unicode without NUL and no longer than 32768 UTF-8 bytes.',
       );
@@ -217,31 +217,3 @@ void _validateConfiguration({
 }
 
 bool _isAbsolutePath(String path) => path.isNotEmpty && path.startsWith('/');
-
-bool _isValidPathText(String path) {
-  var utf8Bytes = 0;
-  final units = path.codeUnits;
-  for (var index = 0; index < units.length; index++) {
-    final unit = units[index];
-    if (unit == 0) return false;
-    if (unit <= 0x7F) {
-      utf8Bytes++;
-    } else if (unit <= 0x7FF) {
-      utf8Bytes += 2;
-    } else if (unit >= 0xD800 && unit <= 0xDBFF) {
-      if (index + 1 >= units.length ||
-          units[index + 1] < 0xDC00 ||
-          units[index + 1] > 0xDFFF) {
-        return false;
-      }
-      utf8Bytes += 4;
-      index++;
-    } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
-      return false;
-    } else {
-      utf8Bytes += 3;
-    }
-    if (utf8Bytes > _maximumPathUtf8Bytes) return false;
-  }
-  return true;
-}

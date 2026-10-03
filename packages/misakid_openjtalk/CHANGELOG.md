@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Use `misakid_adapter_support` for the path and file checks this package
+  shared with the other adapters, instead of private copies. No behavior
+  change.
 - Use `code_assets` 2, `hooks` 2.2, and `native_toolchain_c` 0.19.4.
   Preserve the immutable native target inventory with the new OS equality
   contract and retain the existing non-code-asset hook guard.

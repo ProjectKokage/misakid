@@ -17,9 +17,11 @@ dependencies:
     path: ../../packages/misakid_openjtalk
 
 dependency_overrides:
-  # Keep the adapter's publishable hosted constraint on this repository copy.
+  # Keep the adapters' publishable hosted constraints on this repository copy.
   misakid:
     path: ../..
+  misakid_adapter_support:
+    path: ../../packages/misakid_adapter_support
 
 dev_dependencies:
   crypto: ^3.0.7

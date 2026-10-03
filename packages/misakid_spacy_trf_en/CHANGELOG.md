@@ -1,3 +1,9 @@
+## Unreleased
+
+- Use `misakid_adapter_support` for the path and file checks this package
+  shared with the other adapters, instead of private copies. No behavior
+  change.
+
 ## 0.1.0-dev.1
 
 - Add exact pure-Dart GPT-2/RoBERTa byte-BPE decoding, splitting, merging, and

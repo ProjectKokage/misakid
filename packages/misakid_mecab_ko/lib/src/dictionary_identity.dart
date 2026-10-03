@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:misakid/misaki.dart';
+import 'package:misakid_adapter_support/file_system.dart';
 
 /// Package name of the exact Korean MeCab dictionary resource.
 const String mecabKoDictionaryName = 'python-mecab-ko-dic';
@@ -74,8 +75,6 @@ mecabKoDictionaryFileManifest = <String, ({int size, String sha256})>{
   ),
 };
 
-const int _maximumPathUtf8Bytes = 32768;
-
 final _productionManifest = _DictionaryManifest(
   files: mecabKoDictionaryFileManifest,
   totalBytes: mecabKoDictionarySizeBytes,
@@ -86,15 +85,15 @@ final _productionManifest = _DictionaryManifest(
 final class MecabKoDictionarySnapshot {
   MecabKoDictionarySnapshot._({
     required this.resolvedPath,
-    required Map<String, _FileSnapshot> files,
+    required Map<String, FileSnapshot> files,
     required _DictionaryManifest manifest,
-  }) : _files = Map<String, _FileSnapshot>.unmodifiable(files),
+  }) : _files = Map<String, FileSnapshot>.unmodifiable(files),
        _manifest = manifest;
 
   /// Canonical absolute path passed to the native MeCab-ko frontend.
   final String resolvedPath;
 
-  final Map<String, _FileSnapshot> _files;
+  final Map<String, FileSnapshot> _files;
   final _DictionaryManifest _manifest;
 
   /// Streams and validates every file in the pinned dictionary.
@@ -152,7 +151,7 @@ final class MecabKoDictionarySnapshot {
 
     await _validateEntrySet(Directory(resolvedPath), manifest.files);
 
-    final snapshots = <String, _FileSnapshot>{};
+    final snapshots = <String, FileSnapshot>{};
     final treeRecords = BytesBuilder(copy: false);
     var totalBytes = 0;
     final sortedNames = manifest.files.keys.toList(growable: false)..sort();
@@ -178,7 +177,7 @@ final class MecabKoDictionarySnapshot {
         followLinks: false,
       );
       final statAfterHash = await file.stat();
-      final snapshot = _FileSnapshot.fromStat(statBeforeHash);
+      final snapshot = FileSnapshot.fromStat(statBeforeHash);
       if (typeAfterHash != FileSystemEntityType.file ||
           !snapshot.matches(statAfterHash)) {
         throw MalformedDataException(
@@ -309,50 +308,16 @@ Future<void> _validateEntrySet(
 }
 
 void _validatePath(String path) {
-  if (!_isAbsolutePath(path)) {
+  if (!isAbsoluteFilePath(path)) {
     throw const InvalidConfigurationException(
       'The MeCab-ko dictionary path must be a non-empty absolute path.',
     );
   }
-  if (!_isValidPathText(path)) {
+  if (!isValidPathText(path)) {
     throw const InvalidConfigurationException(
       'The MeCab-ko dictionary path must be valid Unicode without NUL and no longer than 32768 UTF-8 bytes.',
     );
   }
-}
-
-bool _isAbsolutePath(String path) {
-  if (path.isEmpty) return false;
-  if (!Platform.isWindows) return path.startsWith('/');
-  return RegExp(r'^(?:[A-Za-z]:[\\/]|\\\\)').hasMatch(path);
-}
-
-bool _isValidPathText(String path) {
-  var utf8Bytes = 0;
-  final units = path.codeUnits;
-  for (var index = 0; index < units.length; index++) {
-    final unit = units[index];
-    if (unit == 0) return false;
-    if (unit <= 0x7F) {
-      utf8Bytes++;
-    } else if (unit <= 0x7FF) {
-      utf8Bytes += 2;
-    } else if (unit >= 0xD800 && unit <= 0xDBFF) {
-      if (index + 1 >= units.length ||
-          units[index + 1] < 0xDC00 ||
-          units[index + 1] > 0xDFFF) {
-        return false;
-      }
-      utf8Bytes += 4;
-      index++;
-    } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
-      return false;
-    } else {
-      utf8Bytes += 3;
-    }
-    if (utf8Bytes > _maximumPathUtf8Bytes) return false;
-  }
-  return true;
 }
 
 final class _DictionaryManifest {
@@ -365,30 +330,6 @@ final class _DictionaryManifest {
   final Map<String, ({int size, String sha256})> files;
   final int totalBytes;
   final String treeSha256;
-}
-
-final class _FileSnapshot {
-  const _FileSnapshot({
-    required this.size,
-    required this.modifiedMicroseconds,
-    required this.changedMicroseconds,
-  });
-
-  factory _FileSnapshot.fromStat(FileStat stat) => _FileSnapshot(
-    size: stat.size,
-    modifiedMicroseconds: stat.modified.microsecondsSinceEpoch,
-    changedMicroseconds: stat.changed.microsecondsSinceEpoch,
-  );
-
-  final int size;
-  final int modifiedMicroseconds;
-  final int changedMicroseconds;
-
-  bool matches(FileStat stat) =>
-      stat.type == FileSystemEntityType.file &&
-      stat.size == size &&
-      stat.modified.microsecondsSinceEpoch == modifiedMicroseconds &&
-      stat.changed.microsecondsSinceEpoch == changedMicroseconds;
 }
 
 String _basename(String path) {
