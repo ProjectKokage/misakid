@@ -75,6 +75,12 @@ jobs:
       - run: dart test
         working-directory: packages/misakid_spacy_trf_en
       - run: dart analyze --fatal-infos
+        working-directory: packages/misakid_adapter_support
+      - run: dart doc --dry-run
+        working-directory: packages/misakid_adapter_support
+      - run: dart test
+        working-directory: packages/misakid_adapter_support
+      - run: dart analyze --fatal-infos
         working-directory: packages/misakid_bart_en
       - run: dart doc --dry-run
         working-directory: packages/misakid_bart_en
@@ -103,6 +109,9 @@ jobs:
       - if: runner.os == 'Linux'
         run: dart pub publish --dry-run --ignore-warnings
         working-directory: packages/misakid_spacy_trf_en
+      - if: runner.os == 'Linux'
+        run: dart pub publish --dry-run --ignore-warnings
+        working-directory: packages/misakid_adapter_support
       - if: runner.os == 'Linux'
         run: dart pub publish --dry-run --ignore-warnings
         working-directory: packages/misakid_bart_en

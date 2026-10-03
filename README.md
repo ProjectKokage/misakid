@@ -549,6 +549,10 @@ The [porting contract](doc/porting_contract.md) records parity, backend, data an
 licensing requirements. Read the sections for the behavior being changed;
 [PORTING_STATUS.md](PORTING_STATUS.md) records current implementation coverage.
 
+The adapter packages share their path and file checks through
+[`misakid_adapter_support`](packages/misakid_adapter_support/README.md); a new
+adapter uses that package instead of copying them.
+
 Normal verification is offline after Dart dependencies have been resolved:
 
 ```sh
