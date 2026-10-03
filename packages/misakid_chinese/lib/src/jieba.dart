@@ -19,6 +19,8 @@ import 'package:misakid_adapter_support/path_text.dart';
 
 import 'resource_file_loader.dart';
 
+import 'jieba_pickle.dart';
+
 const _pinnedManifest = _JiebaManifest(
   dictionary: _ResourceManifest(
     sizeBytes: 5071852,
@@ -68,15 +70,15 @@ const _pinnedPartOfSpeechManifest = _JiebaPartOfSpeechManifest(
 );
 
 const int _maximumDictionaryBytes = 16 * 1024 * 1024;
+
 const int _maximumProbabilityBytes = 8 * 1024 * 1024;
+
 const int _maximumDictionaryRecords = 1000000;
+
 const int _maximumDictionaryLineScalars = 4096;
+
 const int _maximumDictionaryWordScalars = 256;
-const int _maximumPickleLineBytes = 256;
-const int _maximumPickleStackDepth = 128;
-const int _maximumPickleMemoEntries = 300000;
-const int _maximumPickleMapEntries = 100000;
-const int _maximumPickleTupleLength = 1024;
+
 const double _minimumProbability = -3.14e100;
 
 /// Maximum number of Unicode scalars accepted by one [JiebaSegmenter.segment]
@@ -1064,9 +1066,11 @@ _JiebaHmmModel _parseHmm(
   Uint8List emissionBytes,
   _JiebaManifest manifest,
 ) {
-  final startRoot = _Protocol0ProbabilityParser(startBytes).parse();
-  final transitionRoot = _Protocol0ProbabilityParser(transitionBytes).parse();
-  final emissionRoot = _Protocol0ProbabilityParser(emissionBytes).parse();
+  final startRoot = PickleProtocol0ProbabilityParser(startBytes).parse();
+  final transitionRoot = PickleProtocol0ProbabilityParser(
+    transitionBytes,
+  ).parse();
+  final emissionRoot = PickleProtocol0ProbabilityParser(emissionBytes).parse();
 
   final startMap = _probabilityMap(startRoot, 'start probabilities');
   _expectExactKeys(startMap, _states, 'start probabilities');
@@ -1149,7 +1153,7 @@ _JiebaPartOfSpeechModel _parsePartOfSpeechHmm(
 ) {
   final canonicalStates = <_JiebaPartOfSpeechState, _JiebaPartOfSpeechState>{};
   _JiebaPartOfSpeechState state(Object value, String location) {
-    if (value is! _PickleTuple || value.values.length != 2) {
+    if (value is! PickleTuple || value.values.length != 2) {
       throw FormatException('$location must be a two-string state tuple.');
     }
     final boundary = value.values[0];
@@ -1165,7 +1169,7 @@ _JiebaPartOfSpeechModel _parsePartOfSpeechHmm(
   }
 
   final rawStart = _objectMap(
-    _Protocol0ProbabilityParser(startBytes).parse(),
+    PickleProtocol0ProbabilityParser(startBytes).parse(),
     'POS start probabilities',
   );
   final start = <_JiebaPartOfSpeechState, double>{};
@@ -1178,7 +1182,7 @@ _JiebaPartOfSpeechModel _parsePartOfSpeechHmm(
   }
 
   final rawTransition = _objectMap(
-    _Protocol0ProbabilityParser(transitionBytes).parse(),
+    PickleProtocol0ProbabilityParser(transitionBytes).parse(),
     'POS transition probabilities',
   );
   final transition =
@@ -1207,7 +1211,7 @@ _JiebaPartOfSpeechModel _parsePartOfSpeechHmm(
   }
 
   final rawEmission = _objectMap(
-    _Protocol0ProbabilityParser(emissionBytes).parse(),
+    PickleProtocol0ProbabilityParser(emissionBytes).parse(),
     'POS emission probabilities',
   );
   final emission = <_JiebaPartOfSpeechState, Map<int, double>>{};
@@ -1237,7 +1241,7 @@ _JiebaPartOfSpeechModel _parsePartOfSpeechHmm(
   }
 
   final rawCharacterStates = _objectMap(
-    _Protocol0ProbabilityParser(characterStateBytes).parse(),
+    PickleProtocol0ProbabilityParser(characterStateBytes).parse(),
     'POS character states',
   );
   final characterStates = <int, List<_JiebaPartOfSpeechState>>{};
@@ -1247,7 +1251,7 @@ _JiebaPartOfSpeechModel _parsePartOfSpeechHmm(
     final rawStates = entry.value;
     if (character is! String ||
         character.runes.length != 1 ||
-        rawStates is! _PickleTuple ||
+        rawStates is! PickleTuple ||
         rawStates.values.isEmpty) {
       throw const FormatException('Invalid POS character-state record.');
     }
@@ -1350,202 +1354,6 @@ void _expectExactKeys(
       expectedSet.difference(values.keys.toSet()).isNotEmpty) {
     throw FormatException('$location has missing or unexpected states.');
   }
-}
-
-final class _Protocol0ProbabilityParser {
-  _Protocol0ProbabilityParser(this.bytes);
-
-  final Uint8List bytes;
-  final List<Object> _stack = <Object>[];
-  final Map<int, Object> _memo = <int, Object>{};
-  var _offset = 0;
-  var _mapEntryCount = 0;
-
-  Object parse() {
-    while (_offset < bytes.length) {
-      final opcode = bytes[_offset++];
-      switch (opcode) {
-        case 0x28: // MARK
-          _push(_pickleMark);
-        case 0x64: // DICT
-          if (_stack.isEmpty || !identical(_stack.last, _pickleMark)) {
-            throw const FormatException(
-              'Only empty protocol-0 dictionary construction is allowed.',
-            );
-          }
-          _stack.removeLast();
-          _push(<Object, Object>{});
-        case 0x70: // PUT
-          final index = _memoIndex(_readAsciiLine());
-          if (_stack.isEmpty ||
-              _memo.containsKey(index) ||
-              _memo.length >= _maximumPickleMemoEntries) {
-            throw const FormatException('Invalid protocol-0 memo PUT.');
-          }
-          _memo[index] = _stack.last;
-        case 0x67: // GET
-          final index = _memoIndex(_readAsciiLine());
-          final value = _memo[index];
-          if (value == null) {
-            throw const FormatException('Invalid protocol-0 memo GET.');
-          }
-          _push(value);
-        case 0x53: // STRING
-          _push(_parseAsciiString(_readAsciiLine()));
-        case 0x56: // UNICODE
-          _push(_parseRawUnicode(_readAsciiLine()));
-        case 0x46: // FLOAT
-          final source = _readAsciiLine();
-          if (!_floatPattern.hasMatch(source)) {
-            throw const FormatException('Invalid protocol-0 float literal.');
-          }
-          final value = double.parse(source);
-          if (!value.isFinite) {
-            throw const FormatException('Non-finite pickle float rejected.');
-          }
-          _push(value);
-        case 0x74: // TUPLE
-          final markIndex = _stack.lastIndexWhere(
-            (value) => identical(value, _pickleMark),
-          );
-          if (markIndex < 0 ||
-              markIndex + 1 == _stack.length ||
-              _stack.length - markIndex - 1 > _maximumPickleTupleLength) {
-            throw const FormatException('Invalid protocol-0 TUPLE stack.');
-          }
-          final values = _stack.sublist(markIndex + 1);
-          _stack.removeRange(markIndex, _stack.length);
-          _push(_PickleTuple(List<Object>.unmodifiable(values)));
-        case 0x73: // SETITEM
-          if (_stack.length < 3) {
-            throw const FormatException('Invalid protocol-0 SETITEM stack.');
-          }
-          final value = _stack.removeLast();
-          final key = _stack.removeLast();
-          final target = _stack.last;
-          if ((key is! String && key is! _PickleTuple) ||
-              target is! Map<Object, Object>) {
-            throw const FormatException(
-              'Probability pickle dictionaries require inert scalar or tuple keys.',
-            );
-          }
-          if (target.containsKey(key) ||
-              ++_mapEntryCount > _maximumPickleMapEntries) {
-            throw const FormatException(
-              'Duplicate or excessive probability-map entry.',
-            );
-          }
-          target[key] = value;
-        case 0x2E: // STOP
-          if (_offset != bytes.length ||
-              _stack.length != 1 ||
-              _stack.single is! Map<Object, Object>) {
-            throw const FormatException(
-              'Protocol-0 probability pickle has trailing or stacked data.',
-            );
-          }
-          return _stack.single;
-        default:
-          throw FormatException(
-            'Unsupported protocol-0 probability opcode 0x${opcode.toRadixString(16)}.',
-          );
-      }
-    }
-    throw const FormatException('Protocol-0 probability pickle has no STOP.');
-  }
-
-  void _push(Object value) {
-    if (_stack.length >= _maximumPickleStackDepth) {
-      throw const FormatException('Protocol-0 pickle stack is too deep.');
-    }
-    _stack.add(value);
-  }
-
-  String _readAsciiLine() {
-    final start = _offset;
-    while (_offset < bytes.length && bytes[_offset] != 0x0A) {
-      final value = bytes[_offset++];
-      if (value < 0x20 || value > 0x7E) {
-        throw const FormatException(
-          'Protocol-0 argument must be printable ASCII.',
-        );
-      }
-      if (_offset - start > _maximumPickleLineBytes) {
-        throw const FormatException('Protocol-0 argument line is too long.');
-      }
-    }
-    if (_offset >= bytes.length) {
-      throw const FormatException('Unterminated protocol-0 argument line.');
-    }
-    final result = ascii.decode(bytes.sublist(start, _offset));
-    _offset++;
-    return result;
-  }
-}
-
-int _memoIndex(String source) {
-  if (!_memoPattern.hasMatch(source)) {
-    throw const FormatException('Invalid protocol-0 memo index.');
-  }
-  final value = int.parse(source);
-  if (value >= _maximumPickleMemoEntries) {
-    throw const FormatException('Protocol-0 memo index exceeds the bound.');
-  }
-  return value;
-}
-
-String _parseAsciiString(String source) {
-  if (source.length < 3 ||
-      source.codeUnitAt(0) != 0x27 ||
-      source.codeUnitAt(source.length - 1) != 0x27) {
-    throw const FormatException(
-      'Protocol-0 STRING must be one quoted inert ASCII atom.',
-    );
-  }
-  final value = source.substring(1, source.length - 1);
-  if (!_pickleAsciiAtomPattern.hasMatch(value)) {
-    throw const FormatException(
-      'Protocol-0 STRING contains unsupported or excessive data.',
-    );
-  }
-  return value;
-}
-
-String _parseRawUnicode(String source) {
-  if (source.isEmpty) {
-    throw const FormatException('Protocol-0 UNICODE must not be empty.');
-  }
-  final output = StringBuffer();
-  for (var index = 0; index < source.length;) {
-    final unit = source.codeUnitAt(index++);
-    if (unit != 0x5C) {
-      output.writeCharCode(unit);
-      continue;
-    }
-    if (index >= source.length) {
-      throw const FormatException('Incomplete raw-Unicode escape.');
-    }
-    final kind = source.codeUnitAt(index++);
-    final width = switch (kind) {
-      0x75 => 4, // u
-      0x55 => 8, // U
-      _ => throw const FormatException('Unsupported raw-Unicode escape.'),
-    };
-    if (index + width > source.length) {
-      throw const FormatException('Incomplete raw-Unicode scalar escape.');
-    }
-    final digits = source.substring(index, index + width);
-    if (!RegExp('^[0-9A-Fa-f]{$width}\$').hasMatch(digits)) {
-      throw const FormatException('Invalid raw-Unicode scalar escape.');
-    }
-    final scalar = int.parse(digits, radix: 16);
-    if (scalar > 0x10FFFF || (scalar >= 0xD800 && scalar <= 0xDFFF)) {
-      throw const FormatException('Invalid raw-Unicode scalar value.');
-    }
-    output.writeCharCode(scalar);
-    index += width;
-  }
-  return output.toString();
 }
 
 bool _isAbsolutePath(String path) {
@@ -1865,26 +1673,6 @@ final class _JiebaPartOfSpeechModel {
   }
 }
 
-final class _PickleTuple {
-  const _PickleTuple(this.values);
-
-  final List<Object> values;
-
-  @override
-  bool operator ==(Object other) {
-    if (other is! _PickleTuple || other.values.length != values.length) {
-      return false;
-    }
-    for (var index = 0; index < values.length; index++) {
-      if (values[index] != other.values[index]) return false;
-    }
-    return true;
-  }
-
-  @override
-  int get hashCode => Object.hashAll(values);
-}
-
 final class _ResourceManifest {
   const _ResourceManifest({required this.sizeBytes, required this.sha256});
 
@@ -1931,7 +1719,7 @@ final class _JiebaManifest {
               dictionaryTagEntryCount! <= dictionaryRecordCount)) &&
       totalFrequency > 0 &&
       emissionEntryCount >= 0 &&
-      emissionEntryCount <= _maximumPickleMapEntries;
+      emissionEntryCount <= maximumPickleMapEntries;
 }
 
 final class _JiebaPartOfSpeechManifest {
@@ -1963,15 +1751,15 @@ final class _JiebaPartOfSpeechManifest {
       probabilityTransition.isValid &&
       probabilityEmission.isValid &&
       characterRecordCount > 0 &&
-      characterRecordCount <= _maximumPickleMapEntries &&
+      characterRecordCount <= maximumPickleMapEntries &&
       characterStateCount >= characterRecordCount &&
-      characterStateCount <= _maximumPickleMemoEntries &&
+      characterStateCount <= maximumPickleMemoEntries &&
       stateCount > 0 &&
-      stateCount <= _maximumPickleMapEntries &&
+      stateCount <= maximumPickleMapEntries &&
       transitionEntryCount >= 0 &&
-      transitionEntryCount <= _maximumPickleMapEntries &&
+      transitionEntryCount <= maximumPickleMapEntries &&
       emissionEntryCount >= 0 &&
-      emissionEntryCount <= _maximumPickleMapEntries;
+      emissionEntryCount <= maximumPickleMapEntries;
 }
 
 final class _JiebaPartOfSpeechPaths {
@@ -1988,34 +1776,37 @@ final class _JiebaPartOfSpeechPaths {
   final String probabilityEmission;
 }
 
-const Object _pickleMark = Object();
 const List<String> _states = <String>['B', 'M', 'E', 'S'];
+
 const Map<String, int> _stateIndex = <String, int>{
   'B': 0,
   'M': 1,
   'E': 2,
   'S': 3,
 };
+
 const Map<String, List<String>> _expectedNextStates = <String, List<String>>{
   'B': <String>['E', 'M'],
   'E': <String>['B', 'S'],
   'M': <String>['E', 'M'],
   'S': <String>['B', 'S'],
 };
+
 const int _stateB = 0;
+
 const int _stateM = 1;
+
 const int _stateE = 2;
+
 const int _stateS = 3;
+
 const List<int> _stateCodeUnits = <int>[0x42, 0x4D, 0x45, 0x53];
+
 const List<List<int>> _previousStates = <List<int>>[
   <int>[_stateE, _stateS], // B <- E,S
   <int>[_stateM, _stateB], // M <- M,B
   <int>[_stateB, _stateM], // E <- B,M
   <int>[_stateS, _stateE], // S <- S,E
 ];
-final RegExp _memoPattern = RegExp(r'^(?:0|[1-9][0-9]*)$');
-final RegExp _pickleAsciiAtomPattern = RegExp(r'^[A-Za-z0-9_.+-]{1,32}$');
+
 final RegExp _partOfSpeechTagPattern = RegExp(r'^[a-z]{1,16}$');
-final RegExp _floatPattern = RegExp(
-  r'^-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:e[+-]?[0-9]+)?$',
-);
