@@ -13,6 +13,9 @@ const int openJtalkNativeAbiVersion = 1;
 
 const int _maximumDictionaryPathBytes = 32768;
 
+// The native shim's kMaximumWords; it never returns more.
+const int _maximumReturnedWords = 65536;
+
 /// Exact immutable identities required from a compatible native library.
 const Map<int, String> expectedOpenJtalkNativeIdentities = <int, String>{
   0: '0.1.0-dev.2',
@@ -621,6 +624,11 @@ final class OpenJtalkNativeFrontend implements Finalizable {
       }
       final words = <OpenJtalkRawWord>[];
       final count = _library._resultWordCount(result);
+      if (count < 0 || count > _maximumReturnedWords) {
+        throw const OpenJtalkNativeLibraryException(
+          'The native adapter returned an invalid word count.',
+        );
+      }
       for (var wordIndex = 0; wordIndex < count; wordIndex++) {
         final strings = <String>[
           for (var field = 0; field < 11; field++)

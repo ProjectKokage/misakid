@@ -3,6 +3,8 @@
 - Use `code_assets` 2, `hooks` 2.2, and `native_toolchain_c` 0.19.4.
   Preserve the immutable native target inventory with the new OS equality
   contract and retain the existing non-code-asset hook guard.
+- Reject a native result whose word count is negative or above the shim's
+  65,536-word limit before reading any word.
 
 ## 0.1.0-dev.2
 
