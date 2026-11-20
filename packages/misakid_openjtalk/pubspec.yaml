@@ -1,7 +1,7 @@
 name: misakid_openjtalk
 description: Native-assets Open JTalk frontend adapter for exact Misaki Japanese G2P.
 version: 0.1.0-dev.2
-repository: https://github.com/ProjectKokage/misakid
+repository: https://github.com/ProjectKokage/misakid/tree/main/packages/misakid_openjtalk
 issue_tracker: https://github.com/ProjectKokage/misakid/issues
 topics:
   - g2p
@@ -28,8 +28,8 @@ dependencies:
   code_assets: ^2.0.0
   crypto: ^3.0.7
   hooks: ^2.2.0
-  misakid: ^0.1.0
-  misakid_adapter_support: ^0.1.0-dev.1
+  misakid: ^0.2.0
+  misakid_adapter_support: ^0.1.0
   native_toolchain_c: ^0.19.4
 
 dev_dependencies:

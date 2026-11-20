@@ -1,13 +1,10 @@
-## Unreleased
+## 0.1.0
 
 - Use `misakid_adapter_support` for the path and file checks this package
   shared with the other adapters, instead of private copies. No behavior
   change.
 - Align the workspace adapter with `code_assets` 2, `hooks` 2.2, and
   `native_toolchain_c` 0.19.4.
-
-## 0.1.0
-
 - Publish with explicit repository and Android/iOS/macOS platform metadata,
   depending on the stable `misakid` 0.1.0 core.
 - Make caller-selected compatible UTF-8 UniDic dictionaries the default,

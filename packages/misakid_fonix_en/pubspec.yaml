@@ -1,7 +1,8 @@
 name: misakid_fonix_en
 description: Bounded Fonix ONNX Runtime adapter for Misakid English neural G2P.
 version: 0.1.0-dev.1
-publish_to: none
+repository: https://github.com/ProjectKokage/misakid/tree/main/packages/misakid_fonix_en
+issue_tracker: https://github.com/ProjectKokage/misakid/issues
 
 topics:
   - english
@@ -16,9 +17,8 @@ resolution: workspace
 
 dependencies:
   crypto: ^3.0.7
-  fonix:
-    path: ../../../fonix
-  misakid: ^0.1.0
+  fonix: ^0.1.0-dev.1
+  misakid: ^0.2.0
 
 dev_dependencies:
   lints: ^6.0.0
