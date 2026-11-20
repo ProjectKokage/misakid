@@ -1,7 +1,8 @@
 name: misakid_adapter_support
 description: Path and file checks shared by the misakid adapter packages.
-version: 0.1.0-dev.1
-repository: https://github.com/ProjectKokage/misakid
+version: 0.1.0
+repository: https://github.com/ProjectKokage/misakid/tree/main/packages/misakid_adapter_support
+issue_tracker: https://github.com/ProjectKokage/misakid/issues
 topics:
   - g2p
   - text-to-speech

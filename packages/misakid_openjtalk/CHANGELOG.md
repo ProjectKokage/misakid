@@ -1,4 +1,4 @@
-## Unreleased
+## 0.1.0-dev.2
 
 - Use `misakid_adapter_support` for the path and file checks this package
   shared with the other adapters, instead of private copies. No behavior
@@ -8,9 +8,6 @@
   contract and retain the existing non-code-asset hook guard.
 - Reject a native result whose word count is negative or above the shim's
   65,536-word limit before reading any word.
-
-## 0.1.0-dev.2
-
 - Add `openBundledFromVerifiedInstall` for app-private dictionaries whose exact
   file identities were checked in staging before atomic promotion. The
   existing `open` and `openBundled` entry points retain full runtime

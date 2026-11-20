@@ -1,11 +1,8 @@
-## Unreleased
+## 0.1.0-dev.1
 
 - Use `misakid_adapter_support` for the path and file checks this package
   shared with the other adapters, instead of private copies. No behavior
   change.
-
-## 0.1.0-dev.1
-
 - Add exact pure-Dart GPT-2/RoBERTa byte-BPE decoding, splitting, merging, and
   spaCy token-to-piece alignment for `en_core_web_trf==3.8.0`.
 - Add deterministic `regex==2024.11.6` / Unicode 16 Letter, Number, and

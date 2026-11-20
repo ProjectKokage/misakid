@@ -1,7 +1,8 @@
 name: misakid
 description: Pure-Dart Misaki G2P engines with explicit resource and native adapter boundaries.
-version: 0.1.0
+version: 0.2.0
 repository: https://github.com/ProjectKokage/misakid
+issue_tracker: https://github.com/ProjectKokage/misakid/issues
 
 topics:
   - g2p
@@ -23,6 +24,12 @@ workspace:
   - packages/misakid_openjtalk
   - packages/misakid_spacy_en
   - packages/misakid_spacy_trf_en
+
+# misakid_fonix_en depends on the hosted fonix package; develop the workspace
+# against the sibling checkout.
+dependency_overrides:
+  fonix:
+    path: ../fonix
 
 dev_dependencies:
   crypto: ^3.0.7

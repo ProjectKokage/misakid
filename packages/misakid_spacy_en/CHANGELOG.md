@@ -1,11 +1,8 @@
-## Unreleased
+## 0.1.0-dev.1
 
 - Use `misakid_adapter_support` for the path and file checks this package
   shared with the other adapters, instead of private copies. No behavior
   change.
-
-## 0.1.0-dev.1
-
 - Add the exact pure-Dart `en_core_web_sm==3.8.0` tokenizer and tagger
   resource adapter with explicit four-file checksum validation.
 - Port spaCy 3.8.4 tokenization, lexical norms, StringStore hashing, inline
